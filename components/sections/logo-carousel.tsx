@@ -19,24 +19,23 @@ const logos = [
 export function LogoCarousel() {
   return (
     <section className="py-12 bg-white relative overflow-hidden">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes scroll {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-scroll {
+          animation: scroll 30s linear infinite;
+        }
+      `}} />
       <div className="container mx-auto px-4 md:px-8 mb-8">
         <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/30 text-center">
           Our Trusted Brand Partners
         </p>
       </div>
       
-      <div className="relative flex">
-        <motion.div
-          animate={{
-            x: ["0%", "-50%"],
-          }}
-          transition={{
-            duration: 30,
-            ease: "linear",
-            repeat: Infinity,
-          }}
-          className="flex space-x-12 items-center whitespace-nowrap"
-        >
+      <div className="relative flex overflow-hidden">
+        <div className="flex space-x-12 items-center whitespace-nowrap animate-scroll">
           {/* Double the logos for seamless loop */}
           {[...logos, ...logos].map((logo, index) => (
             <div key={index} className="flex-shrink-0 px-8 py-4 bg-zinc-50 rounded-2xl border border-black/5 hover:bg-white hover:shadow-xl transition-all duration-500 group">
@@ -47,8 +46,9 @@ export function LogoCarousel() {
               />
             </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   )
 }
+

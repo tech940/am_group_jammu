@@ -33,64 +33,12 @@ export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState("")
 
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-
   const [isLoading, setIsLoading] = useState(true)
-
   const [isSearching, setIsSearching] = useState(false)
 
   const { onOpen } = useEnquiryModal()
-  const { filters, setSearchQuery: setStoreSearchQuery, resetFilters, showConfetti, setShowConfetti } = useInventoryStore()
-
+  const { filters, setSearchQuery: setStoreSearchQuery, resetFilters } = useInventoryStore()
   const inventoryRef = useRef<HTMLDivElement>(null)
-
-  // Define proper type for particles
-  interface ConfettiParticle {
-    id: number
-    initialLeft: string
-    initialScale: number
-    animateLeft: string
-    duration: number
-    delay: number
-    color: string
-    emoji: string
-  }
-
-  // Move random generation to a state and update it in useEffect to satisfy purity rules
-  const [confettiParticles, setConfettiParticles] = useState<ConfettiParticle[]>([])
-
-  useEffect(() => {
-    const particles: ConfettiParticle[] = [...Array(40)].map((_, i) => ({
-      id: i,
-      initialLeft: `${Math.random() * 100}%`,
-      initialScale: Math.random() * 0.5 + 0.5,
-      animateLeft: `${(Math.random() - 0.5) * 40 + (i * 2.5)}%`,
-      duration: Math.random() * 2 + 3,
-      delay: Math.random() * 1.5,
-      color: i % 3 === 0 ? "text-[#E31837]" : i % 3 === 1 ? "text-yellow-400" : "text-blue-400",
-      emoji: i % 2 === 0 ? "🎉" : "✨"
-    }))
-    
-    // Defer state update to avoid cascading renders
-    const timer = setTimeout(() => {
-      setConfettiParticles(particles)
-    }, 0)
-    
-    return () => clearTimeout(timer)
-  }, [])
-
-
-
-
-  // Reset confetti after 5 seconds
-  useEffect(() => {
-    if (showConfetti) {
-      const timer = setTimeout(() => {
-        setShowConfetti(false)
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [showConfetti, setShowConfetti])
-
 
   const scrollToInventory = () => {
 
@@ -134,16 +82,12 @@ export default function InventoryPage() {
 
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
 
-    if (isLoading) {
-
-      const timer = setTimeout(() => setIsLoading(false), 1500)
-
-      return () => clearTimeout(timer)
-
-    }
-
-  }, [isLoading])
 
 
 
@@ -167,49 +111,8 @@ export default function InventoryPage() {
 
   return (
     <div className="min-h-screen bg-white relative">
-      {/* Confetti Celebration Overlay */}
-      <AnimatePresence>
-        {showConfetti && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
-          >
-            {confettiParticles.map((particle) => (
-              <motion.div
-                key={particle.id}
-                initial={{ 
-                  top: "110%", 
-                  left: particle.initialLeft,
-                  scale: particle.initialScale,
-                  rotate: 0
-                }}
-                animate={{ 
-                  top: "-10%",
-                  left: particle.animateLeft,
-                  rotate: 360,
-                  opacity: [0, 1, 1, 0]
-                }}
-                transition={{ 
-                  duration: particle.duration, 
-                  delay: particle.delay,
-                  ease: "easeOut"
-                }}
-                className="absolute"
-              >
-                <div className={`
-                  ${particle.color}
-                  filter drop-shadow-lg
-                `}>
-                  {particle.emoji}
-                </div>
-              </motion.div>
-            ))}
 
-          </motion.div>
-        )}
-      </AnimatePresence>
+
 
 
       <section className="relative min-h-[500px] flex items-center overflow-hidden bg-black">
@@ -484,16 +387,13 @@ export default function InventoryPage() {
 
 
          <div className={viewType === "grid" 
-
-           ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12" 
-
+           ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 xl:gap-12" 
            : "flex flex-col gap-6"
-
          }>
 
            {isLoading ? (
 
-             Array.from({ length: 6 }).map((_, index) => (
+             Array.from({ length: 8 }).map((_, index) => (
 
                <SkeletonCard key={`skeleton-${index}`} />
 

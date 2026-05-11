@@ -6,39 +6,34 @@ const photos = [
   {
     id: 1,
     src: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=800",
-    className: "col-span-1 row-span-1 h-64",
-    initial: { x: -200, y: -100, rotate: -15, opacity: 0 }
+    className: "col-span-1 row-span-1 h-64"
   },
   {
     id: 2,
     src: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800",
-    className: "col-span-1 row-span-1 h-64",
-    initial: { x: -300, y: 150, rotate: 10, opacity: 0 }
+    className: "col-span-1 row-span-1 h-64"
   },
   {
     id: 3,
     src: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=800",
-    className: "col-span-1 row-span-2 h-full min-h-[512px]",
-    initial: { y: 300, rotate: 0, opacity: 0 }
+    className: "col-span-1 row-span-2 h-full min-h-[512px]"
   },
   {
     id: 4,
     src: "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&q=80&w=800",
-    className: "col-span-1 row-span-1 h-64",
-    initial: { x: 250, y: -150, rotate: 20, opacity: 0 }
+    className: "col-span-1 row-span-1 h-64"
   },
   {
     id: 5,
     src: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=800",
-    className: "col-span-1 row-span-1 h-64",
-    initial: { x: 400, y: 50, rotate: -10, opacity: 0 }
+    className: "col-span-1 row-span-1 h-64"
   },
   {
     id: 6,
     src: "https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=1200",
-    className: "col-span-2 row-span-1 h-64",
-    initial: { x: 100, y: 200, rotate: 5, opacity: 0 }
+    className: "col-span-2 row-span-1 h-64"
   }
+
 ]
 
 export function TeamMosaic() {
@@ -69,17 +64,15 @@ export function TeamMosaic() {
             <motion.div
               key={photo.id}
               className={`relative overflow-hidden rounded-3xl shadow-xl ${photo.className}`}
-              initial={photo.initial}
-              whileInView={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ 
-                type: "spring", 
-                stiffness: 50, 
-                damping: 20,
-                duration: 1.5,
+                duration: 0.8,
                 delay: photo.id * 0.1 
               }}
               viewport={{ once: true, margin: "-100px" }}
             >
+
               <img 
                 src={photo.src} 
                 alt="Team moment" 
