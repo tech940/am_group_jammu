@@ -3,6 +3,8 @@
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import Image from "next/image"
+
 
 export function CompanyOverview() {
   return (
@@ -51,30 +53,37 @@ export function CompanyOverview() {
               className="grid grid-cols-2 gap-4"
             >
               <div className="relative rounded-2xl overflow-hidden h-[600px]">
-                <img 
+                <Image 
                   src="https://amgroupind.com/wp-content/uploads/2024/10/abt-2.webp" 
                   alt="AM Tata Motors" 
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
                   className="h-full w-full object-cover" 
                 />
               </div>
               <div className="flex flex-col gap-4">
                 <div className="relative rounded-2xl overflow-hidden h-[292px]">
-                  <img 
+                  <Image 
                     src="https://amgroupind.com/wp-content/uploads/2024/10/IMG_4571.webp" 
                     alt="Diamond Honda" 
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 25vw"
                     className="h-full w-full object-cover" 
                   />
                 </div>
                 <div className="relative rounded-2xl overflow-hidden h-[292px]">
-                  <img 
+                  <Image 
                     src="https://amgroupind.com/wp-content/uploads/2024/10/abt-4-1024x576.webp" 
                     alt="AM Group Showroom" 
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 25vw"
                     className="h-full w-full object-cover" 
                   />
                 </div>
               </div>
             </motion.div>
           </div>
+
         </div>
       </div>
     </section>

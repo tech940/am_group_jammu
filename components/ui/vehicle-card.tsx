@@ -71,8 +71,10 @@ export function VehicleCard({ vehicle, index, onUnlock, viewType = "grid" }: { v
             src={images[currentImg]}
             alt={vehicle.name}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover transition-transform duration-1000 group-hover:scale-105"
           />
+
         </Link>
         
         {/* Top Badges */}

@@ -3,6 +3,8 @@
 import { motion, useInView } from "framer-motion"
 import { useRef, useEffect, useState } from "react"
 import { Handshake, Car, MapPin, Users } from "lucide-react"
+import Image from "next/image"
+
 
 const stats = [
   {
@@ -68,13 +70,16 @@ export function WhyUs() {
     <section className="relative py-32 overflow-hidden">
       {/* Background Image with Dark Overlay */}
       <div className="absolute inset-0 z-0">
-        <img 
+        <Image 
           src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000" 
           alt="Why Choose AM Group" 
+          fill
+          sizes="100vw"
           className="h-full w-full object-cover brightness-[0.2]" 
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#023468]/60 via-transparent to-[#023468]/60" />
       </div>
+
 
       <div className="container mx-auto px-4 md:px-8 relative z-10">
         <div className="text-center mb-20">

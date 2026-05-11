@@ -1,64 +1,59 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Image from "next/image"
+
 
 const brandImages = [
   { 
     name: "Hyundai", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/hyundai.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/am-hyundai.webp", 
-    link: "/brands/hyundai",
-    initial: { x: -300, y: -200, rotate: -10, opacity: 0 }
+    link: "/brands/hyundai"
   },
   { 
     name: "Tata", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/tata-2.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/am-tata.jpg", 
-    link: "/brands/tata",
-    initial: { x: -100, y: -400, rotate: 5, opacity: 0 }
+    link: "/brands/tata"
   },
   { 
     name: "Diamond Honda", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/diamond.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/am-honda.jpg", 
-    link: "/brands/honda",
-    initial: { x: 100, y: -400, rotate: -5, opacity: 0 }
+    link: "/brands/honda"
   },
   { 
     name: "KTM", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/ktm1.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/ktm.jpg", 
-    link: "/brands/ktm",
-    initial: { x: 300, y: -200, rotate: 10, opacity: 0 }
+    link: "/brands/ktm"
   },
   { 
     name: "MG Motors", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/mg-am-1.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/mg-motor-jammu-jammu-motor-dealers-1024x768.jpg", 
-    link: "/brands/mg",
-    initial: { x: -300, y: 200, rotate: 15, opacity: 0 }
+    link: "/brands/mg"
   },
   { 
     name: "Bajaj", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/bajaj-1-1.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/bajaj-1-1024x977.jpg", 
-    link: "/brands/bajaj",
-    initial: { x: -100, y: 400, rotate: -5, opacity: 0 }
+    link: "/brands/bajaj"
   },
   { 
     name: "Kia", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/KIA-Logo-1.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/kia-1024x597.jpg", 
-    link: "/brands/kia",
-    initial: { x: 100, y: 400, rotate: 5, opacity: 0 }
+    link: "/brands/kia"
   },
   { 
     name: "Triumph", 
     logo: "https://amgroupind.com/wp-content/uploads/2024/10/Logo_Triumph-2.png", 
     image: "https://amgroupind.com/wp-content/uploads/2024/10/triumph-1-1024x768.jpg", 
-    link: "/brands/triumph",
-    initial: { x: 300, y: 200, rotate: -15, opacity: 0 }
+    link: "/brands/triumph"
   },
+
 ]
 
 export function GroupBrands() {
@@ -69,23 +64,23 @@ export function GroupBrands() {
           {brandImages.map((brand, index) => (
             <motion.div
               key={brand.name}
-              initial={brand.initial}
-              whileInView={{ x: 0, y: 0, rotate: 0, opacity: 1 }}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ 
-                type: "spring", 
-                stiffness: 40, 
-                damping: 15,
-                duration: 1.2, 
-                delay: index * 0.08 
+                duration: 0.8, 
+                delay: index * 0.08,
+                ease: "easeOut"
               }}
               viewport={{ once: true, margin: "-50px" }}
               className="relative h-[400px] overflow-hidden group cursor-pointer rounded-[32px] shadow-lg border border-black/[0.03]"
             >
             {/* Background Image with Parallax-like scale */}
             <div className="absolute inset-0 transition-transform duration-1000 ease-out group-hover:scale-110">
-              <img 
+              <Image 
                 src={brand.image} 
                 alt={brand.name} 
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 className="h-full w-full object-cover" 
               />
             </div>
@@ -101,9 +96,11 @@ export function GroupBrands() {
                  whileHover={{ scale: 1.05 }}
                  transition={{ type: "spring", stiffness: 300 }}
                >
-                 <img 
+                 <Image 
                    src={brand.logo} 
                    alt={`${brand.name} logo`} 
+                   fill
+                   sizes="180px"
                    className="h-full w-full object-contain brightness-0 invert transition-all duration-700 group-hover:drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]" 
                  />
                </motion.div>
@@ -131,6 +128,7 @@ export function GroupBrands() {
           </motion.div>
         ))}
         </div>
+
       </div>
     </section>
   )

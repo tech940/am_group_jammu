@@ -9,6 +9,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { useRef } from "react"
 
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
+
 
 import { VehicleCard } from "@/components/ui/vehicle-card"
 
@@ -118,15 +120,18 @@ export default function InventoryPage() {
       <section className="relative min-h-[500px] flex items-center overflow-hidden bg-black">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img 
+          <Image 
             src="/inventory_hero_bg.png" 
             alt="Hero Background" 
-            className="w-full h-full object-cover opacity-50 scale-110"
+            fill
+            priority
+            className="object-cover opacity-50 scale-110"
           />
 
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </div>
+
 
         <div className="container relative z-10 mx-auto px-6 md:px-12 py-20 lg:py-32">
           <div className="max-w-4xl">

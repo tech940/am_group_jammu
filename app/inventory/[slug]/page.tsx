@@ -79,8 +79,11 @@ export default function VehicleProductPage() {
                 src={images[currentImage]}
                 alt={vehicle.name}
                 fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 60vw"
                 className="object-cover"
               />
+
               
               {/* Carousel Controls */}
               <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 flex justify-between opacity-0 hover:opacity-100 transition-opacity duration-500 z-20">

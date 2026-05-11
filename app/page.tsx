@@ -16,6 +16,8 @@ import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import Link from "next/link"
+import Image from "next/image"
+
 
 
 export default function Home() {
@@ -65,11 +67,14 @@ export default function Home() {
                   viewport={{ once: true }}
                 >
                   <div className="aspect-[4/3] rounded-[32px] overflow-hidden mb-6 border border-black/5 relative shadow-xl">
-                    <img
+                    <Image
                       src={`https://images.unsplash.com/photo-1493238507126-134b13efd958?auto=format&fit=crop&q=80&w=800&sig=${i}`}
                       alt="Blog Post"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="h-full w-full object-cover group-hover:scale-110 transition-all duration-700"
                     />
+
                     <div className="absolute top-6 left-6">
                       <span className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-black shadow-sm">
                         Insights

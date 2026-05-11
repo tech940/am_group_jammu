@@ -3,6 +3,8 @@
 import { motion } from "framer-motion"
 import { Wrench, CheckCircle2, ShieldCheck } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
+
 
 export function ServiceWorkshop() {
   return (
@@ -97,11 +99,14 @@ export function ServiceWorkshop() {
                viewport={{ once: true, margin: "-100px" }}
                className="h-full w-full rounded-[40px] overflow-hidden shadow-2xl border border-black/5"
              >
-                <img 
+                <Image 
                   src="https://images.unsplash.com/photo-1635334651336-0562e84d4368?auto=format&fit=crop&q=80&w=1000" 
                   alt="Service Bay" 
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="h-full w-full object-cover" 
                 />
+
                 
                 <div className="absolute top-12 right-12 bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-white/40 shadow-xl max-w-xs">
                    <div className="flex items-center space-x-4 mb-4">

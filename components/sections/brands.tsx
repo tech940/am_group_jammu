@@ -141,9 +141,11 @@ export function BrandsShowcase() {
               <Link href={`/brands/${brand.slug}`} className="block h-full">
                 {/* Image Container */}
                 <div className="absolute inset-0 z-0">
-                  <img 
+                  <Image 
                     src={brand.image} 
                     alt={brand.name} 
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     className="h-full w-full object-cover transition-all duration-700 group-hover:scale-110" 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -151,8 +153,15 @@ export function BrandsShowcase() {
                 
                 <div className="relative z-10 h-full flex flex-col justify-end p-10">
                   <div className="h-14 w-14 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-6 group-hover:scale-110 transition-transform duration-500 border border-black/5">
-                    <img src={brand.logo} alt={`${brand.name} logo`} className="h-8 w-8 object-contain" />
+                    <Image 
+                      src={brand.logo} 
+                      alt={`${brand.name} logo`} 
+                      width={32}
+                      height={32}
+                      className="h-8 w-8 object-contain" 
+                    />
                   </div>
+
                   
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-2">{brand.name}</h3>

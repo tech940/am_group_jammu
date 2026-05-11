@@ -7,6 +7,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Menu, X, User, ShoppingBag, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
+
 
 const navItems = [
   { name: "Used Cars", href: "/inventory" },
@@ -39,13 +41,16 @@ export function Navbar() {
       <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between bg-black/40 rounded-full px-8 border border-white/5 shadow-2xl backdrop-blur-2xl">
           {/* Logo */}
-          <Link href="/" target="_blank" className="flex items-center h-full py-2">
-             <img 
+          <Link href="/" target="_blank" className="flex items-center h-full py-2 relative w-32">
+             <Image 
                src="https://amgroupind.com/wp-content/uploads/2023/06/logo-1.png" 
                alt="AM Group" 
-               className="h-full w-auto object-contain brightness-0 invert" 
+               fill
+               priority
+               className="object-contain brightness-0 invert" 
              />
           </Link>
+
 
           {/* Desktop Nav - Centered like screenshot */}
           <div className="hidden md:flex items-center bg-white/5 rounded-full px-2 py-1 border border-white/5">
