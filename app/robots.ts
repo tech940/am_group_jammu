@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/"],
     },
-    sitemap: "https://amgroup.in/sitemap.xml",
+    sitemap: "https://amgroupind.com/sitemap.xml",
   }
 }

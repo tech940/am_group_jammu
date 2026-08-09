@@ -4,17 +4,19 @@ export function generateLocalBusinessSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "AutoDealer",
-    "name": "AM Group",
-    "image": "https://amgroup.in/logo.png",
-    "@id": "https://amgroup.in",
-    "url": "https://amgroup.in",
-    "telephone": "+91-191-2480000",
+    "name": "AM Group Jammu",
+    "image": "https://amgroupind.com/wp-content/uploads/2023/06/logo-1.png",
+    "logo": "https://amgroupind.com/wp-content/uploads/2023/06/logo-1.png",
+    "@id": "https://amgroupind.com",
+    "url": "https://amgroupind.com",
+    "telephone": "+91-94191-00000",
+    "email": "info@amgroupind.com",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "NH-44, Bye Pass Road",
+      "streetAddress": "AM Business Park, N-H 1 Bye-Pass Road, Opp. Railway Station",
       "addressLocality": "Jammu",
-      "addressRegion": "JK",
-      "postalCode": "180015",
+      "addressRegion": "Jammu and Kashmir",
+      "postalCode": "180012",
       "addressCountry": "IN"
     },
     "geo": {
@@ -34,12 +36,8 @@ export function generateLocalBusinessSchema() {
       ],
       "opens": "09:30",
       "closes": "18:30"
-    },
-    "sameAs": [
-      "https://www.facebook.com/amgroupjammu",
-      "https://www.instagram.com/amgroupjammu",
-      "https://twitter.com/amgroupjammu"
-    ]
+    }
+    // TODO: add "sameAs" with the group's real social profile URLs once confirmed
   }
 }
 

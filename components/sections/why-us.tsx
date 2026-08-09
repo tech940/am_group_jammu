@@ -1,123 +1,69 @@
 "use client"
 
-import { motion, useInView } from "framer-motion"
-import { useRef, useEffect, useState } from "react"
-import { Handshake, Car, MapPin, Users } from "lucide-react"
-import Image from "next/image"
+import { motion } from "framer-motion"
+import { ShieldCheck, CircleDollarSign, FileText, Headphones } from "lucide-react"
 
-
-const stats = [
+const whyChooseFeatures = [
   {
-    label: "Years of Trust",
-    value: 50,
-    suffix: "+",
-    icon: Handshake,
+    icon: ShieldCheck,
+    title: "Quality You Can Trust",
+    description: "Every vehicle is thoroughly inspected and reconditioned to ensure top quality."
   },
   {
-    label: "Vehicles Sold Per Year",
-    value: 10,
-    suffix: "K+",
-    icon: Car,
+    icon: CircleDollarSign,
+    title: "Best Value Guarantee",
+    description: "Competitive pricing and best trade-in value in the market."
   },
   {
-    label: "Dealership Locations",
-    value: 26,
-    suffix: "",
-    icon: MapPin,
+    icon: FileText,
+    title: "Easy Financing",
+    description: "Multiple financing options to fit your budget with instant approvals."
   },
   {
-    label: "Happy Customers",
-    value: 5,
-    suffix: "L+",
-    icon: Users,
-  },
+    icon: Headphones,
+    title: "Here for You",
+    description: "Our dedicated relationship team is here to help before, during, and after the sale."
+  }
 ]
-
-function Counter({ value, suffix }: { value: number; suffix: string }) {
-  const [count, setCount] = useState(0)
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true })
-
-  useEffect(() => {
-    if (isInView) {
-      let start = 0
-      const end = value
-      const duration = 2000
-      const increment = end / (duration / 16)
-      
-      const timer = setInterval(() => {
-        start += increment
-        if (start >= end) {
-          setCount(end)
-          clearInterval(timer)
-        } else {
-          setCount(Math.floor(start))
-        }
-      }, 16)
-      return () => clearInterval(timer)
-    }
-  }, [isInView, value])
-
-  return (
-    <span ref={ref} className="text-5xl md:text-6xl font-black text-[#E31837]">
-      {count}{suffix}
-    </span>
-  )
-}
 
 export function WhyUs() {
   return (
-    <section className="relative py-32 overflow-hidden">
-      {/* Background Image with Dark Overlay */}
-      <div className="absolute inset-0 z-0">
-        <Image 
-          src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80&w=2000" 
-          alt="Why Choose AM Group" 
-          fill
-          sizes="100vw"
-          className="h-full w-full object-cover brightness-[0.2]" 
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#023468]/60 via-transparent to-[#023468]/60" />
-      </div>
-
-
+    <section className="relative py-24 bg-white overflow-hidden border-t border-black/5">
       <div className="container mx-auto px-4 md:px-8 relative z-10">
-        <div className="text-center mb-20">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-light text-white"
-          >
-            Why <span className="font-bold">us</span>
-          </motion.h2>
+        
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#023468] tracking-tight mb-4">
+            Why Choose AM Group Jammu?
+          </h2>
+          <p className="text-black/60 text-base md:text-lg font-normal">
+            We make car buying simple, transparent, and satisfying.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: index * 0.1, ease: [0.21, 1.02, 0.47, 0.98] }}
-              viewport={{ once: true }}
-              className="flex flex-col items-center text-center group"
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          {whyChooseFeatures.map((feature, index) => (
+            <div
+              key={feature.title}
+              className="bg-white rounded-[32px] p-8 border border-black/10 shadow-sm hover:shadow-xl hover:border-[#023468]/20 transition-all duration-500 text-center flex flex-col items-center justify-between"
             >
-              <div className="mb-8 relative">
-                 <div className="absolute inset-0 bg-[#E31837]/20 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700" />
-                 <stat.icon className="h-12 w-12 text-white relative z-10 stroke-[1.5] group-hover:scale-110 transition-transform duration-500" />
+              <div className="mb-6">
+                <div className="h-16 w-16 rounded-2xl bg-[#023468]/10 flex items-center justify-center text-[#023468]">
+                  <feature.icon className="h-8 w-8 stroke-[1.8]" />
+                </div>
               </div>
-              
-              <div className="mb-4">
-                <Counter value={stat.value} suffix={stat.suffix} />
+
+              <div>
+                <h3 className="text-xl font-bold text-[#023468] mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-black/60 text-xs md:text-sm leading-relaxed font-normal">
+                  {feature.description}
+                </p>
               </div>
-              
-              <p className="text-white/60 font-bold uppercase tracking-[0.2em] text-[10px] md:text-xs">
-                {stat.label}
-              </p>
-            </motion.div>
+            </div>
           ))}
         </div>
+
       </div>
     </section>
   )

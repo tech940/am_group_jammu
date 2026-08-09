@@ -4,11 +4,10 @@ import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Menu, X, User, ShoppingBag, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import Image from "next/image"
-
+import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 
 const navItems = [
   { name: "Used Cars", href: "/inventory" },
@@ -24,8 +23,6 @@ const businesses = [
   { name: "S Mega Mart", href: "/s-mega-mart" },
 ]
 
-import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
-
 export function Navbar() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [isBusinessesOpen, setIsBusinessesOpen] = React.useState(false)
@@ -39,21 +36,22 @@ export function Navbar() {
       className="fixed top-4 z-50 w-full px-4 md:px-8"
     >
       <div className="container mx-auto">
-        <div className="flex h-16 items-center justify-between bg-black/40 rounded-full px-8 border border-white/5 shadow-2xl backdrop-blur-2xl">
+        <div className="flex h-16 items-center justify-between bg-white/90 rounded-full px-6 md:px-8 border border-black/5 shadow-xl backdrop-blur-xl transition-all">
+          
           {/* Logo */}
-          <Link href="/" target="_blank" className="flex items-center h-full py-2 relative w-32">
+          <Link href="/" className="flex items-center justify-center py-1">
              <Image 
                src="https://amgroupind.com/wp-content/uploads/2023/06/logo-1.png" 
                alt="AM Group" 
-               fill
+               width={160}
+               height={40}
                priority
-               className="object-contain brightness-0 invert" 
+               className="h-9 md:h-10 w-auto object-contain brightness-0 transition-all hover:opacity-85" 
              />
           </Link>
 
-
-          {/* Desktop Nav - Centered like screenshot */}
-          <div className="hidden md:flex items-center bg-white/5 rounded-full px-2 py-1 border border-white/5">
+          {/* Desktop Nav Items */}
+          <div className="hidden md:flex items-center bg-zinc-100/80 rounded-full px-2 py-1 border border-black/5">
             {/* Our Businesses Dropdown */}
             <div 
               className="relative group"
@@ -61,11 +59,11 @@ export function Navbar() {
               onMouseLeave={() => setIsBusinessesOpen(false)}
             >
               <button className={cn(
-                "px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all rounded-full flex items-center gap-2",
-                isBusinessesOpen ? "text-white" : "text-white/60 hover:text-white"
+                "px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-full flex items-center gap-1.5 cursor-pointer",
+                isBusinessesOpen ? "bg-[#023468] text-white shadow-sm" : "text-black/70 hover:text-[#023468]"
               )}>
                 Our Businesses
-                <ChevronDown className={cn("h-3 w-3 transition-transform duration-500", isBusinessesOpen && "rotate-180")} />
+                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform duration-300", isBusinessesOpen && "rotate-180")} />
               </button>
 
               <AnimatePresence>
@@ -74,15 +72,14 @@ export function Navbar() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-black/5 overflow-hidden z-[60]"
+                    className="absolute top-full left-0 mt-2 w-60 bg-white rounded-2xl shadow-2xl border border-black/5 overflow-hidden z-[60] p-1.5"
                   >
-                    <div className="py-2">
+                    <div>
                       {businesses.map((business) => (
                         <Link
                           key={business.name}
                           href={business.href}
-                          target="_blank"
-                          className="block px-6 py-4 text-[10px] font-black uppercase tracking-widest text-black/60 hover:text-[#023468] hover:bg-zinc-50 transition-all border-b border-black/[0.03] last:border-0"
+                          className="block px-4 py-3 text-xs font-bold uppercase tracking-wider text-black/70 hover:text-[#023468] hover:bg-zinc-100 rounded-xl transition-all"
                         >
                           {business.name}
                         </Link>
@@ -97,12 +94,11 @@ export function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                target="_blank"
                 className={cn(
-                  "px-6 py-2 text-xs font-bold uppercase tracking-widest transition-all rounded-full",
+                  "px-5 py-2 text-xs font-bold uppercase tracking-wider transition-all rounded-full",
                   pathname === item.href 
-                    ? "bg-white text-[#023468]" 
-                    : "text-white/60 hover:text-white"
+                    ? "bg-[#023468] text-white shadow-sm" 
+                    : "text-black/70 hover:text-[#023468]"
                 )}
               >
                 {item.name}
@@ -110,50 +106,48 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Actions */}
-          <div className="flex items-center gap-6">
-            <Button asChild className="hidden md:flex bg-white text-[#023468] rounded-full px-8 py-5 font-bold uppercase tracking-widest text-[10px] hover:bg-white/90 transition-all active:scale-95 shadow-lg border-none cursor-pointer">
-              <Link href="/inventory" target="_blank">
-                Book Test Drive
-              </Link>
-            </Button>
+          {/* Action CTA */}
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => onOpen()}
+              className="hidden md:flex bg-[#E31837] text-white hover:bg-[#023468] rounded-full px-6 py-2.5 font-extrabold uppercase tracking-widest text-[11px] shadow-md transition-all active:scale-95 cursor-pointer items-center justify-center"
+            >
+              Book Test Drive
+            </button>
             
             {/* Mobile Toggle */}
             <div className="md:hidden">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white h-8 w-8"
+              <button
+                className="text-black/80 hover:text-black p-2 rounded-full hover:bg-zinc-100 transition-colors"
                 onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle Navigation"
               >
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </Button>
+                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Drawer */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="md:hidden mt-4 bg-black/90 backdrop-blur-2xl rounded-[32px] border border-white/10 p-8 shadow-2xl"
+            className="md:hidden mt-3 bg-white/95 backdrop-blur-2xl rounded-[32px] border border-black/5 p-6 shadow-2xl text-black"
           >
-
-            <div className="flex flex-col space-y-6">
-              <div className="space-y-4">
-                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mb-4">Our Businesses</div>
-                <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col space-y-5">
+              <div>
+                <div className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-3">Our Businesses</div>
+                <div className="grid grid-cols-2 gap-2">
                   {businesses.map((business) => (
                     <Link
                       key={business.name}
                       href={business.href}
-                      target="_blank"
                       onClick={() => setIsOpen(false)}
-                      className="bg-white/5 rounded-xl p-4 text-[10px] font-black uppercase tracking-widest text-white/80"
+                      className="bg-zinc-100 rounded-xl p-3 text-[11px] font-bold uppercase tracking-wider text-black/80 hover:bg-[#023468] hover:text-white transition-colors"
                     >
                       {business.name}
                     </Link>
@@ -161,26 +155,29 @@ export function Navbar() {
                 </div>
               </div>
               
-              <hr className="border-white/10" />
+              <hr className="border-black/5" />
 
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  target="_blank"
-                  onClick={() => setIsOpen(false)}
-                  className="text-lg font-bold text-white/80 hover:text-white uppercase tracking-widest"
-                >
-                  {item.name}
-                </Link>
-              ))}
-              <hr className="border-white/10" />
-              <Button 
+              <div className="flex flex-col space-y-3">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className="text-sm font-extrabold text-black/80 hover:text-[#E31837] uppercase tracking-wider py-1"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+
+              <hr className="border-black/5" />
+
+              <button 
                 onClick={() => { onOpen(); setIsOpen(false); }}
-                className="w-full bg-white text-[#023468] rounded-full py-6 font-bold uppercase tracking-widest text-xs border-none hover:bg-white/90 transition-colors"
+                className="w-full bg-[#E31837] text-white hover:bg-[#023468] rounded-full py-4 font-extrabold uppercase tracking-widest text-xs shadow-md transition-colors cursor-pointer"
               >
-                Book Test Drive
-              </Button>
+                Book Test Drive / Inquiry
+              </button>
 
             </div>
           </motion.div>

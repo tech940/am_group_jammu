@@ -1,11 +1,12 @@
 "use client"
 
-import { motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { VehicleCard } from "@/components/ui/vehicle-card"
-
+import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 
 const vehicles = [
   {
@@ -13,79 +14,112 @@ const vehicles = [
     name: "Hyundai IONIQ 5",
     brand: "Hyundai",
     type: "Electric SUV",
+    category: "ev",
     specs: { range: "631 km", acceleration: "7.6s", topSpeed: "185 km/h" },
     price: "₹ 46.05 Lakh*",
     image: "https://images.unsplash.com/photo-1669062092147-380d603e913a?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "k-ev6",
-    name: "Kia EV6",
+    name: "Kia EV6 GT-Line",
     brand: "Kia",
     type: "Electric Crossover",
+    category: "ev",
     specs: { range: "708 km", acceleration: "5.2s", topSpeed: "192 km/h" },
     price: "₹ 60.95 Lakh*",
     image: "https://images.unsplash.com/photo-1647462400329-8472506b12a8?auto=format&fit=crop&q=80&w=800",
   },
   {
     id: "m-gloster",
-    name: "MG Gloster",
+    name: "MG Gloster Savvy 4x4",
     brand: "MG",
     type: "Full-Size SUV",
-    specs: { engine: "2.0L Diesel", power: "215 PS", acceleration: "12.5s", topSpeed: "180 km/h" },
+    category: "suv",
+    specs: { engine: "2.0L Twin Turbo", power: "215 PS", acceleration: "11.2s", topSpeed: "185 km/h" },
     price: "₹ 38.80 Lakh*",
     image: "https://images.unsplash.com/photo-1621360241104-799497148512?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "t-harrier",
+    name: "Tata Harrier Fearless+",
+    brand: "Tata",
+    type: "Premium SUV",
+    category: "suv",
+    specs: { engine: "2.0L Kryotec", power: "170 PS", acceleration: "9.8s", topSpeed: "180 km/h" },
+    price: "₹ 24.50 Lakh*",
+    image: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "h-[#city]",
+    name: "Honda City e:HEV",
+    brand: "Honda",
+    type: "Strong Hybrid Sedan",
+    category: "sedan",
+    specs: { engine: "1.5L i-VTEC Hybrid", power: "126 PS", acceleration: "8.9s", topSpeed: "176 km/h" },
+    price: "₹ 19.80 Lakh*",
+    image: "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&q=80&w=800",
+  },
+  {
+    id: "t-safari",
+    name: "Tata Safari Accomplished",
+    brand: "Tata",
+    type: "7-Seater Luxury SUV",
+    category: "suv",
+    specs: { engine: "2.0L Diesel", power: "170 PS", acceleration: "10.1s", topSpeed: "178 km/h" },
+    price: "₹ 26.90 Lakh*",
+    image: "https://images.unsplash.com/photo-1620217405794-67f0a84976ca?auto=format&fit=crop&q=80&w=800",
   }
 ]
 
 export function FeaturedInventory() {
+  const [filter, setFilter] = useState("all")
+  const { onOpen } = useEnquiryModal()
+
+  const filteredVehicles = filter === "all" 
+    ? vehicles 
+    : vehicles.filter(v => v.category === filter)
+
   return (
-    <section className="py-32 bg-[#FAFAFA]">
-      <div className="container mx-auto px-6 md:px-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: [0.21, 1.02, 0.47, 0.98] }}
-            viewport={{ once: true }}
-            className="max-w-2xl"
-          >
-            <div className="mb-6">
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#E31837] bg-[#E31837]/5 px-4 py-2 rounded-lg">
-                Our Fleet
-              </span>
-            </div>
-            <h2 className="text-[40px] md:text-[64px] font-bold text-[#023468] leading-[1.05] tracking-tight">
-              Featured <span className="text-[#023468]/30">Used Cars</span>
+    <section className="py-28 bg-[#FAFAFA] relative overflow-hidden">
+      <div className="container mx-auto px-4 md:px-8">
+        
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+          <div>
+            <h2 className="text-3xl md:text-5xl font-black text-[#023468]">
+              Featured Vehicles
             </h2>
-            <p className="mt-8 text-black/40 text-lg font-light leading-relaxed">
-              Discover our handpicked collection of certified used cars, meticulously 
-              maintained and ready to redefine your driving experience.
+            <p className="text-black/60 text-sm md:text-base font-normal mt-1">
+              Explore our handpicked collection of certified new &amp; pre-owned vehicles.
             </p>
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, ease: [0.21, 1.02, 0.47, 0.98] }}
-            viewport={{ once: true }}
+          </div>
+
+          <Link
+            href="/inventory"
+            className="text-xs font-extrabold uppercase tracking-widest text-[#023468] hover:text-[#E31837] transition-colors flex items-center gap-1.5"
           >
-            <Button asChild variant="outline" className="rounded-2xl border-[#023468]/10 hover:bg-[#023468] hover:text-white px-10 h-16 font-black transition-all duration-500 flex items-center gap-3 cursor-pointer">
-              <Link href="/inventory" target="_blank" className="flex items-center gap-3">
-                View All Collection
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-
-
-          </motion.div>
+            <span>View All Inventory</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12">
-          {vehicles.map((car, index) => (
-            <VehicleCard key={car.name} vehicle={car} index={index} />
-          ))}
-        </div>
+        {/* Vehicles Grid */}
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <AnimatePresence mode="popLayout">
+            {filteredVehicles.map((car, index) => (
+              <VehicleCard 
+                key={car.id} 
+                vehicle={car} 
+                index={index} 
+                onUnlock={(v) => onOpen(v)}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
       </div>
     </section>
   )
 }
+
+

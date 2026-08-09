@@ -32,38 +32,38 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://amgroup.in"),
+  metadataBase: new URL("https://amgroupind.com"),
   title: {
-    default: "AM Group | Premium Automotive Experience",
-    template: "%s | AM Group",
+    default: "AM Group Jammu | Car Dealerships, Service & Finance in J&K",
+    template: "%s | AM Group Jammu",
   },
-  description: "Experience the future of automotive luxury. Discover our premium vehicle collection, world-class service, and innovative finance solutions.",
-  keywords: ["luxury cars", "premium automotive", "car dealership", "AM Group", "car service", "finance"],
-  authors: [{ name: "AM Group Digital" }],
-  creator: "AM Group Digital",
+  description: "AM Group is J&K's trusted automotive conglomerate since 1968 — new & certified used cars in Jammu and Srinagar, authorised showrooms, service workshops, and easy car finance.",
+  keywords: ["car dealership Jammu", "new cars Jammu", "used cars Jammu", "AM Group Jammu", "car service Jammu", "car finance J&K"],
+  authors: [{ name: "AM Group" }],
+  creator: "AM Group",
   publisher: "AM Group",
   robots: "index, follow",
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://amgroup.in",
-    title: "AM Group | Premium Automotive Experience",
-    description: "Experience the future of automotive luxury. Discover our premium vehicle collection.",
-    siteName: "AM Group",
+    url: "https://amgroupind.com",
+    title: "AM Group Jammu | Car Dealerships, Service & Finance in J&K",
+    description: "New & certified used cars in Jammu and Srinagar, authorised showrooms, service workshops, and easy car finance.",
+    siteName: "AM Group Jammu",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/inventory_hero_bg.png",
         width: 1200,
         height: 630,
-        alt: "AM Group Luxury Automotive",
+        alt: "AM Group Jammu - Automotive Dealerships in J&K",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AM Group | Premium Automotive Experience",
-    description: "Experience the future of automotive luxury.",
-    images: ["/og-image.jpg"],
+    title: "AM Group Jammu | Car Dealerships, Service & Finance in J&K",
+    description: "New & certified used cars in Jammu and Srinagar, authorised showrooms, service workshops, and easy car finance.",
+    images: ["/inventory_hero_bg.png"],
   },
 };
 

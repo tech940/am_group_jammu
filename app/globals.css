@@ -2,6 +2,15 @@
 
 @plugin "tailwindcss-animate";
 
+/* Hide scrollbar for Chrome, Safari, Edge, Firefox */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {

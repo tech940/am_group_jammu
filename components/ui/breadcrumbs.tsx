@@ -24,7 +24,7 @@ export function Breadcrumbs() {
   }
 
   return (
-    <nav className="container mx-auto px-6 mt-20 md:px-12 py-6 flex items-center gap-2 text-sm text-black/40 overflow-x-auto whitespace-nowrap scrollbar-hide">
+    <nav className="container mx-auto px-4 md:px-8 pt-24 pb-1 md:pb-2 flex items-center gap-2 text-sm text-black/50 overflow-x-auto whitespace-nowrap scrollbar-hide">
       <Link
         href="/"
         className="flex items-center gap-1.5 hover:text-black transition-colors"

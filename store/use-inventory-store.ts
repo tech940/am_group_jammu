@@ -5,6 +5,9 @@ interface InventoryState {
     brand: string
     type: string
     fuel: string
+    transmission: string
+    year: string
+    mileage: string
     priceRange: [number, number]
   }
   searchQuery: string
@@ -15,6 +18,9 @@ interface InventoryState {
   setBrand: (brand: string) => void
   setType: (type: string) => void
   setFuel: (fuel: string) => void
+  setTransmission: (transmission: string) => void
+  setYear: (year: string) => void
+  setMileage: (mileage: string) => void
   setPriceRange: (range: [number, number]) => void
   setSearchQuery: (query: string) => void
   setHasInquired: (val: boolean) => void
@@ -28,6 +34,9 @@ export const useInventoryStore = create<InventoryState>((set) => ({
     brand: '',
     type: '',
     fuel: '',
+    transmission: '',
+    year: '',
+    mileage: '',
     priceRange: [0, 10000000],
   },
   searchQuery: '',
@@ -47,6 +56,18 @@ export const useInventoryStore = create<InventoryState>((set) => ({
     filters: { ...state.filters, fuel } 
   })),
 
+  setTransmission: (transmission) => set((state) => ({ 
+    filters: { ...state.filters, transmission } 
+  })),
+
+  setYear: (year) => set((state) => ({ 
+    filters: { ...state.filters, year } 
+  })),
+
+  setMileage: (mileage) => set((state) => ({ 
+    filters: { ...state.filters, mileage } 
+  })),
+
   setPriceRange: (range) => set((state) => ({ 
     filters: { ...state.filters, priceRange: range } 
   })),
@@ -60,12 +81,14 @@ export const useInventoryStore = create<InventoryState>((set) => ({
     viewType: state.viewType === 'grid' ? 'list' : 'grid' 
   })),
 
-
   resetFilters: () => set({
     filters: {
       brand: '',
       type: '',
       fuel: '',
+      transmission: '',
+      year: '',
+      mileage: '',
       priceRange: [0, 10000000],
     }
   })

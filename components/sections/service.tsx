@@ -1,135 +1,165 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Wrench, CheckCircle2, ShieldCheck } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Wrench, CheckCircle2, ShieldCheck, PhoneCall } from "lucide-react"
 import Image from "next/image"
-
+import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 
 export function ServiceWorkshop() {
+  const { onOpen } = useEnquiryModal()
+
   return (
-    <section className="py-24 bg-white overflow-hidden relative">
+    <section className="py-12 md:py-20 bg-white overflow-hidden relative border-t border-black/5">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="flex flex-col lg:flex-row gap-20 items-center">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-center">
+          
           {/* Left: Content */}
-          <div className="lg:w-1/2">
+          <div className="lg:w-1/2 space-y-5 text-left">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1, ease: [0.21, 1.02, 0.47, 0.98] }}
-              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
             >
-              <span className="text-sm font-bold uppercase tracking-[0.3em] text-[#023468] mb-4 inline-block">
-                Master Service
-              </span>
-              <h2 className="text-4xl md:text-5xl font-bold text-black mb-8 tracking-tight">
+              <div className="inline-flex items-center space-x-2 text-[10px] font-bold uppercase tracking-[0.2em] bg-[#023468] text-white px-4 py-1.5 rounded-full mb-4">
+                <Wrench className="h-3.5 w-3.5" />
+                <span>Master Service &amp; Workshop</span>
+              </div>
+              
+              <h2 className="text-[29px] sm:text-[37px] md:text-[45px] font-extrabold text-[#023468] mb-4 tracking-tight leading-[1.12]">
                 Expert Care for Your <br />
-                <span className="text-black/20">Masterpiece</span>
+                <span className="text-[#E31837]">Vehicle Masterpiece</span>
               </h2>
-              <p className="text-black/60 text-lg mb-12 max-w-lg leading-relaxed font-light">
-                Our state-of-the-art workshops are equipped with the latest diagnostic tools and staffed by factory-trained technicians who treat every vehicle like a work of art.
+              
+              <p className="text-black/70 text-xs sm:text-sm md:text-base mb-8 max-w-lg leading-relaxed font-normal">
+                Our state-of-the-art workshops are equipped with the latest OEM diagnostic tools and staffed by certified master technicians.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
-                 <div className="p-8 rounded-[32px] bg-zinc-50 border border-black/5 hover:border-[#023468]/20 transition-all duration-500 group">
-                    <div className="flex items-center space-x-4 mb-6">
-                       <div className="h-10 w-10 bg-[#023468]/10 flex items-center justify-center rounded-full">
-                          <Wrench className="h-5 w-5 text-[#023468]" />
-                       </div>
-                       <h4 className="text-xl font-bold text-black tracking-tight">Express Service</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                 {/* Express Service Card */}
+                 <div className="p-6 rounded-[28px] bg-zinc-50 border border-black/5 hover:bg-white hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center space-x-3 mb-4">
+                         <div className="h-10 w-10 bg-[#023468]/10 flex items-center justify-center rounded-2xl">
+                            <Wrench className="h-5 w-5 text-[#023468]" />
+                         </div>
+                         <h3 className="text-base font-extrabold text-[#023468]">Express Service</h3>
+                      </div>
+
+                      <div className="space-y-3 mb-6">
+                         <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#023468] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-black/70">60-Min Quick Turnaround</span>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#023468] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-black/70">Genuine OEM Spare Parts</span>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#023468] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-black/70">Certified Technicians</span>
+                         </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-6 mb-10">
-                       <div className="flex items-center space-x-3">
-                          <CheckCircle2 className="h-4 w-4 text-[#023468]" />
-                          <span className="text-sm text-black/60">60-Min Quick Turnaround</span>
-                       </div>
-                       <div className="flex items-center space-x-3">
-                          <CheckCircle2 className="h-4 w-4 text-[#023468]" />
-                          <span className="text-sm text-black/60">Genuine OEM Spare Parts</span>
-                       </div>
-                       <div className="flex items-center space-x-3">
-                          <CheckCircle2 className="h-4 w-4 text-[#023468]" />
-                          <span className="text-sm text-black/60">Certified Technicians</span>
-                       </div>
-                    </div>
-
-                    <Button variant="outline" className="w-full rounded-full border-black/10 text-black hover:bg-black hover:text-white transition-all group-hover:scale-[1.02]">
-                       Book Now
-                    </Button>
+                    <button 
+                      onClick={() => onOpen()}
+                      className="w-full rounded-full bg-[#023468] hover:bg-[#E31837] text-white font-extrabold text-xs uppercase tracking-widest py-3.5 shadow-md transition-all cursor-pointer"
+                    >
+                       Book Express Service
+                    </button>
                  </div>
 
-                 <div className="p-8 rounded-[32px] bg-zinc-50 border border-black/5 hover:border-[#023468]/20 transition-all duration-500 group">
-                    <div className="flex items-center space-x-4 mb-6">
-                       <div className="h-10 w-10 bg-[#023468]/10 flex items-center justify-center rounded-full">
-                          <ShieldCheck className="h-5 w-5 text-[#023468]" />
-                       </div>
-                       <h4 className="text-xl font-bold text-black tracking-tight">Body & Paint</h4>
+                 {/* Body & Paint Card */}
+                 <div className="p-6 rounded-[28px] bg-zinc-50 border border-black/5 hover:bg-white hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center space-x-3 mb-4">
+                         <div className="h-10 w-10 bg-[#023468]/10 flex items-center justify-center rounded-2xl">
+                            <ShieldCheck className="h-5 w-5 text-[#023468]" />
+                         </div>
+                         <h3 className="text-base font-extrabold text-[#023468]">Body &amp; Paint</h3>
+                      </div>
+
+                      <div className="space-y-3 mb-6">
+                         <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#023468] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-black/70">Computerized Paint Mix</span>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#023468] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-black/70">Cashless Insurance Claims</span>
+                         </div>
+                         <div className="flex items-center space-x-2">
+                            <CheckCircle2 className="h-4 w-4 text-[#023468] flex-shrink-0" />
+                            <span className="text-xs font-semibold text-black/70">Precision Tinkering</span>
+                         </div>
+                      </div>
                     </div>
 
-                    <div className="space-y-6 mb-10">
-                       <div className="flex items-center space-x-3">
-                          <CheckCircle2 className="h-4 w-4 text-[#023468]" />
-                          <span className="text-sm text-black/60">Computerized Paint Mix</span>
-                       </div>
-                       <div className="flex items-center space-x-3">
-                          <CheckCircle2 className="h-4 w-4 text-[#023468]" />
-                          <span className="text-sm text-black/60">Cashless Insurance Claim</span>
-                       </div>
-                       <div className="flex items-center space-x-3">
-                          <CheckCircle2 className="h-4 w-4 text-[#023468]" />
-                          <span className="text-sm text-black/60">Precision Tinkering</span>
-                       </div>
-                    </div>
-
-                    <Button variant="outline" className="w-full rounded-full border-black/10 text-black hover:bg-black hover:text-white transition-all group-hover:scale-[1.02]">
+                    <button 
+                      onClick={() => onOpen()}
+                      className="w-full rounded-full bg-[#023468] hover:bg-[#E31837] text-white font-extrabold text-xs uppercase tracking-widest py-3.5 shadow-md transition-all cursor-pointer"
+                    >
                        Request Quote
-                    </Button>
+                    </button>
                  </div>
               </div>
             </motion.div>
           </div>
 
-          {/* Right: Floating Elements & Image */}
-          <div className="lg:w-1/2 relative h-[600px] w-full">
+          {/* Right: Working High-Res Showcase Image & Floating Badges */}
+          <div className="lg:w-1/2 relative h-[340px] sm:h-[440px] md:h-[500px] w-full">
              <motion.div
-               initial={{ opacity: 0, scale: 0.95, y: 30 }}
-               whileInView={{ opacity: 1, scale: 1, y: 0 }}
-               transition={{ duration: 1.2, ease: [0.21, 1.02, 0.47, 0.98] }}
-               viewport={{ once: true, margin: "-100px" }}
-               className="h-full w-full rounded-[40px] overflow-hidden shadow-2xl border border-black/5"
+               initial={{ opacity: 0, scale: 0.96 }}
+               whileInView={{ opacity: 1, scale: 1 }}
+               transition={{ duration: 0.8 }}
+               viewport={{ once: true }}
+               className="h-full w-full rounded-[36px] overflow-hidden shadow-xl border border-black/10 relative bg-zinc-900 group"
              >
                 <Image 
-                  src="https://images.unsplash.com/photo-1635334651336-0562e84d4368?auto=format&fit=crop&q=80&w=1000" 
-                  alt="Service Bay" 
+                  src="https://amgroupind.com/wp-content/uploads/2024/11/3.jpg" 
+                  alt="AM Group Service Bay Workshop" 
                   fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="h-full w-full object-cover" 
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  className="h-full w-full object-cover brightness-[0.9] transition-transform duration-1000 group-hover:scale-105" 
                 />
 
-                
-                <div className="absolute top-12 right-12 bg-white/90 backdrop-blur-md p-8 rounded-3xl border border-white/40 shadow-xl max-w-xs">
-                   <div className="flex items-center space-x-4 mb-4">
-                      <div className="h-10 w-10 bg-[#023468] flex items-center justify-center rounded-full text-white shadow-lg">
-                         <div className="text-xl font-bold">A+</div>
+                {/* 5-Star Service Rating Badge - Hidden on small mobile screens */}
+                <div className="hidden sm:block absolute top-6 right-6 bg-white/95 backdrop-blur-md p-5 rounded-2xl border border-black/5 shadow-xl max-w-xs z-10">
+                   <div className="flex items-center space-x-3 mb-2">
+                      <div className="h-8 w-8 bg-[#023468] flex items-center justify-center rounded-full text-white shadow-md flex-shrink-0">
+                         <div className="text-xs font-black">A+</div>
                       </div>
-                      <h4 className="text-black font-bold">5-Star Rated Service</h4>
+                      <h4 className="text-[#023468] font-bold text-xs">5-Star Rated Service</h4>
                    </div>
-                   <p className="text-black/60 text-sm leading-relaxed">Recognized for consistently delivering exceptional service quality across all our locations.</p>
+                   <p className="text-black/60 text-[11px] leading-relaxed">Recognized for consistently delivering exceptional service quality across J&amp;K.</p>
                 </div>
                 
-                <div className="absolute bottom-12 left-12 bg-black/90 p-8 rounded-3xl shadow-2xl max-w-xs">
-                   <h4 className="text-white font-bold mb-2">24/7 Roadside</h4>
-                   <p className="text-white/60 text-sm mb-4 leading-relaxed">We&apos;re always there when you need us most. Instant assistance anywhere, anytime.</p>
-                   <div className="flex items-center space-x-3 text-[#023468] font-bold">
-                      <div className="h-2 w-2 rounded-full bg-[#023468] animate-pulse" />
-                      <span>Call Now: 1800-AM-GROUP</span>
+                {/* High Contrast 24/7 Roadside Card */}
+                <div className="absolute bottom-6 left-6 right-6 sm:right-auto bg-[#023468] p-5 rounded-2xl shadow-2xl max-w-xs z-10 text-white border border-white/15">
+                   <div className="flex items-center space-x-2.5 mb-2">
+                      <PhoneCall className="h-4 w-4 text-[#E31837]" />
+                      <h4 className="font-extrabold text-xs tracking-wider uppercase text-white">24/7 Roadside Care</h4>
                    </div>
+                   
+                   <p className="text-white/80 text-[11px] leading-relaxed mb-3">
+                      Instant roadside breakdown assistance anywhere across Jammu &amp; Srinagar.
+                   </p>
+
+                   <a
+                     href="tel:18002647687"
+                     className="bg-white/15 border border-white/20 hover:bg-[#E31837] text-white rounded-full py-2 px-4 text-[10px] font-extrabold uppercase tracking-wider block text-center transition-all"
+                   >
+                     Call Now: 1800-AM-GROUP
+                   </a>
                 </div>
              </motion.div>
           </div>
+
         </div>
       </div>
     </section>
   )
 }
+

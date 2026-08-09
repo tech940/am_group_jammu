@@ -48,11 +48,11 @@ export const vehicles: Vehicle[] = [
       seats: "5"
     },
     price: "₹ 46.05 Lakh*",
-    image: "https://images.unsplash.com/photo-1614239521970-8cd8b8941017?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=800",
     images: [
-      "https://images.unsplash.com/photo-1614239521970-8cd8b8941017?auto=format&fit=crop&q=80&w=800",
+      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=800",
       "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&q=80&w=800"
+      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&q=80&w=800"
     ],
     description: "The Hyundai IONIQ 5 represents the future of electric mobility with striking design, advanced technology, and impressive performance. This all-electric SUV combines retro-futuristic aesthetics with cutting-edge features.",
     features: [

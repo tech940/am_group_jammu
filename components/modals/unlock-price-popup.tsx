@@ -8,7 +8,7 @@ import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import { useState, useEffect } from "react"
 import { createLead, NewLead } from "@/lib/actions/leads"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, CheckCircle2, Sparkles, PartyPopper } from "lucide-react"
+import { Loader2, CheckCircle2, PartyPopper } from "lucide-react"
 
 import { usePathname } from "next/navigation"
 import { useInventoryStore } from "@/store/use-inventory-store"
@@ -352,7 +352,7 @@ export function UnlockPricePopup() {
                         <div className="text-[10px] text-zinc-400 line-through">Original Price: {vehicle?.price}</div>
                         
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                          <Sparkles className="h-12 w-12 text-[#E31837]" />
+                          <CheckCircle2 className="h-12 w-12 text-[#023468]" />
                         </div>
                       </div>
 
