@@ -1,73 +1,27 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import type { InventoryVehicle } from "@/lib/inventory/types"
 
-const showcaseItems = [
-  {
-    id: 1,
-    brand: "Hyundai",
-    model: "IONIQ 6",
-    tag: "Electric Sedan",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=1200",
-    href: "/inventory",
-  },
-  {
-    id: 2,
-    brand: "Kia",
-    model: "EV6",
-    tag: "Electric Crossover",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1580274455191-1c62238fa333?auto=format&fit=crop&q=80&w=1200",
-    href: "/inventory",
-  },
-  {
-    id: 3,
-    brand: "Mahindra",
-    model: "XEV 9e",
-    tag: "Electric SUV",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=1200",
-    href: "/inventory",
-  },
-  {
-    id: 4,
-    brand: "Tata",
-    model: "Harrier EV",
-    tag: "Electric SUV",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&q=80&w=1200",
-    href: "/inventory",
-  },
-  {
-    id: 5,
-    brand: "MG",
-    model: "Gloster",
-    tag: "Flagship SUV",
-    year: "2025",
-    image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&q=80&w=1200",
-    href: "/inventory",
-  },
-]
-
-export function ShowcaseCarousel() {
-  const [active, setActive] = useState(2)
-  const [paused, setPaused] = useState(false)
+export function ShowcaseCarousel({ vehicles }: { vehicles: InventoryVehicle[] }) {
+  const showcaseItems = vehicles.filter((v) => v.primaryImage).slice(0, 7)
   const total = showcaseItems.length
+  const [active, setActive] = useState(total > 2 ? 2 : 0)
+  const [paused, setPaused] = useState(false)
 
   const prev = () => setActive((a) => (a - 1 + total) % total)
   const next = () => setActive((a) => (a + 1) % total)
 
   // Auto-play every 3.5 s, pause on hover
   useEffect(() => {
-    if (paused) return
+    if (paused || total <= 1) return
     const id = setInterval(() => {
       setActive((a) => (a + 1) % total)
-    }, 1500)
+    }, 3500)
     return () => clearInterval(id)
   }, [paused, total])
 
@@ -78,6 +32,8 @@ export function ShowcaseCarousel() {
     if (d < -total / 2) d += total
     return d
   }
+
+  if (total === 0) return null
 
   const cardStyles = (rel: number) => {
     const abs = Math.abs(rel)
@@ -151,12 +107,11 @@ export function ShowcaseCarousel() {
                   }`}
                 >
                   <Image
-                    src={item.image}
-                    alt={`${item.brand} ${item.model}`}
+                    src={item.primaryImage as string}
+                    alt={item.title}
                     fill
                     sizes="320px"
                     className="object-cover"
-                    unoptimized
                   />
 
                   {/* Gradient */}
@@ -165,7 +120,7 @@ export function ShowcaseCarousel() {
                   {/* Top Tag */}
                   <div className="absolute top-4 left-4">
                     <span className="bg-white/90 backdrop-blur-md text-[#023468] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
-                      {item.tag}
+                      {item.condition ?? item.bodyType ?? "In stock"}
                     </span>
                   </div>
 
@@ -180,11 +135,12 @@ export function ShowcaseCarousel() {
                         className="absolute bottom-0 left-0 right-0 p-5"
                       >
                         <p className="text-white/60 text-[10px] font-black uppercase tracking-widest mb-1">
-                          {item.year} • {item.brand}
+                          {[item.year, item.make].filter(Boolean).join(" • ")}
                         </p>
-                        <h3 className="text-white text-2xl font-black leading-none mb-3">{item.model}</h3>
+                        <h3 className="text-white text-2xl font-black leading-none mb-1">{item.title}</h3>
+                        <p className="text-white text-sm font-black mb-3">{item.priceLabel}</p>
                         <Link
-                          href={item.href}
+                          href={`/inventory/${item.slug}`}
                           onClick={(e) => e.stopPropagation()}
                           className="inline-flex items-center gap-2 bg-white text-[#023468] text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full hover:bg-[#023468] hover:text-white transition-all group"
                         >
@@ -205,28 +161,35 @@ export function ShowcaseCarousel() {
           <button
             onClick={prev}
             className="h-12 w-12 rounded-full border-2 border-[#023468]/20 bg-white hover:bg-[#023468] hover:border-[#023468] text-[#023468] hover:text-white flex items-center justify-center transition-all shadow-md cursor-pointer group"
+            aria-label="Previous showcase vehicle"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
 
           {/* Dots */}
-          <div className="flex gap-2">
+          <div className="flex gap-1 items-center">
             {showcaseItems.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setActive(i)}
-                className={`rounded-full transition-all duration-300 cursor-pointer ${
-                  i === active
-                    ? "w-7 h-2.5 bg-[#023468]"
-                    : "w-2.5 h-2.5 bg-[#023468]/20 hover:bg-[#023468]/40"
-                }`}
-              />
+                className="p-2 flex items-center justify-center cursor-pointer rounded-full"
+                aria-label={`Go to showcase slide ${i + 1}`}
+              >
+                <span
+                  className={`rounded-full transition-all duration-300 ${
+                    i === active
+                      ? "w-7 h-2.5 bg-[#023468]"
+                      : "w-2.5 h-2.5 bg-[#023468]/35 hover:bg-[#023468]/60"
+                  }`}
+                />
+              </button>
             ))}
           </div>
 
           <button
             onClick={next}
             className="h-12 w-12 rounded-full border-2 border-[#023468]/20 bg-[#023468] hover:bg-[#01254a] border-[#023468] text-white flex items-center justify-center transition-all shadow-md cursor-pointer"
+            aria-label="Next showcase vehicle"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

@@ -63,7 +63,7 @@ export function ServiceWorkshop() {
                     </div>
 
                     <button 
-                      onClick={() => onOpen()}
+                      onClick={() => onOpen(null, { intent: "Service", sourceLabel: "service-cta" })}
                       className="w-full rounded-full bg-[#023468] hover:bg-[#E31837] text-white font-extrabold text-xs uppercase tracking-widest py-3.5 shadow-md transition-all cursor-pointer"
                     >
                        Book Express Service
@@ -97,7 +97,7 @@ export function ServiceWorkshop() {
                     </div>
 
                     <button 
-                      onClick={() => onOpen()}
+                      onClick={() => onOpen(null, { intent: "Service", sourceLabel: "service-cta" })}
                       className="w-full rounded-full bg-[#023468] hover:bg-[#E31837] text-white font-extrabold text-xs uppercase tracking-widest py-3.5 shadow-md transition-all cursor-pointer"
                     >
                        Request Quote

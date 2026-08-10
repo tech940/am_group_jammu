@@ -3,7 +3,7 @@
 import React from "react"
 import { motion } from "framer-motion"
 import { MapPin, Phone, Mail, Send, Building2, MessageSquare, CheckCircle2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ContactForm } from "./contact-form"
 
 export default function ContactPage() {
   return (
@@ -149,66 +149,7 @@ export default function ContactPage() {
               </div>
 
               <div className="lg:col-span-8">
-                <motion.form
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  className="space-y-8 bg-zinc-50 p-12 md:p-16 rounded-[60px] border border-black/5"
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-4">Full Name</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. Rahul Sharma"
-                        className="w-full h-16 bg-white rounded-2xl px-8 border border-black/5 focus:outline-none focus:border-[#E31837] transition-all text-sm font-medium"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-4">Email Address</label>
-                      <input 
-                        type="email" 
-                        placeholder="rahul@example.com"
-                        className="w-full h-16 bg-white rounded-2xl px-8 border border-black/5 focus:outline-none focus:border-[#E31837] transition-all text-sm font-medium"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-4">Phone Number</label>
-                    <input 
-                      type="tel" 
-                      placeholder="+91 XXXXX XXXXX"
-                      className="w-full h-16 bg-white rounded-2xl px-8 border border-black/5 focus:outline-none focus:border-[#E31837] transition-all text-sm font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-black/30 ml-4">Message</label>
-                    <textarea 
-                      rows={4}
-                      placeholder="Tell us what you're thinking..."
-                      className="w-full bg-white rounded-2xl p-8 border border-black/5 focus:outline-none focus:border-[#E31837] transition-all text-sm font-medium resize-none"
-                    />
-                  </div>
-
-                  <div className="flex gap-6 items-start">
-                     <div className="relative mt-1">
-                        <input type="checkbox" id="consent" className="peer sr-only" />
-                        <div className="h-6 w-6 rounded-lg border-2 border-black/10 peer-checked:bg-[#023468] peer-checked:border-[#023468] transition-all flex items-center justify-center">
-                           <CheckCircle2 className="h-4 w-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity" />
-                        </div>
-                     </div>
-                     <label htmlFor="consent" className="text-xs text-black/40 leading-relaxed cursor-pointer select-none">
-                        I agree to be contacted by AM Group via Call, SMS, WhatsApp, RCS, and Email regarding my inquiry, offers, and service updates. I understand that I can opt out at any time.
-                     </label>
-                  </div>
-
-                  <Button className="w-full h-20 bg-[#023468] hover:bg-[#E31837] text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs transition-all duration-500 shadow-2xl shadow-[#023468]/20 flex items-center justify-center gap-4">
-                    Send Message
-                    <Send className="h-5 w-5" />
-                  </Button>
-                </motion.form>
+                <ContactForm />
               </div>
 
             </div>

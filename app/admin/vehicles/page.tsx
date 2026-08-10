@@ -2,7 +2,6 @@
 
 import { Car, Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { vehicles } from "@/lib/vehicle-data"
 
 import { getVehicles, addVehicle, getBrands, deleteVehicle } from "@/lib/actions/inventory"
 import { useEffect, useState } from "react"

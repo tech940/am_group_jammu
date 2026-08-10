@@ -17,7 +17,7 @@ import {
   FileText
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { logout } from "@/lib/admin/actions"
 
 const navItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -32,6 +32,10 @@ const navItems = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const pathname = usePathname()
+
+  // The sign-in page lives under /admin but must not render the admin chrome —
+  // a sidebar full of links you cannot use is worse than no sidebar.
+  if (pathname === "/admin/login") return <>{children}</>
 
   return (
     <div className="min-h-screen bg-zinc-50">
@@ -87,10 +91,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Logout */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <button className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all">
-            <LogOut className="h-5 w-5 flex-shrink-0" />
-            {isSidebarOpen && <span className="font-medium text-sm">Logout</span>}
-          </button>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-all cursor-pointer"
+            >
+              <LogOut className="h-5 w-5 flex-shrink-0" />
+              {isSidebarOpen && <span className="font-medium text-sm">Sign out</span>}
+            </button>
+          </form>
         </div>
       </aside>
 
@@ -106,17 +115,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex items-center justify-between h-16 px-6">
             <div>
               <h1 className="text-xl font-bold text-[#023468]">
-                {navItems.find(item => item.href === pathname)?.name || "Dashboard"}
+                {navItems.find((item) => item.href !== "/admin" && pathname.startsWith(item.href))?.name ?? "Dashboard"}
               </h1>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-[#023468] flex items-center justify-center text-white font-bold">
-                  A
+                  AM
                 </div>
                 <div className="hidden md:block">
-                  <p className="text-sm font-medium text-black">Admin User</p>
-                  <p className="text-xs text-black/60">Administrator</p>
+                  <p className="text-sm font-medium text-black">Signed in</p>
+                  <p className="text-xs text-black/60">AM Group staff</p>
                 </div>
               </div>
             </div>

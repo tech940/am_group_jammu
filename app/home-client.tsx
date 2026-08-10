@@ -1,10 +1,10 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { Hero } from "@/components/sections/hero"
 import { CompanyOverview } from "@/components/sections/overview"
 import { ServiceWorkshop } from "@/components/sections/service"
 import { FinanceSection } from "@/components/sections/finance"
-import { ParallaxBanner } from "@/components/sections/parallax-banner"
 import { FeaturedServices } from "@/components/sections/services-new"
 import { GroupBrands } from "@/components/sections/group-brands"
 import { WhyUs } from "@/components/sections/why-us"
@@ -17,7 +17,14 @@ import Image from "next/image"
 import { CustomerDealershipSection } from "@/components/sections/customer-dealership"
 import { SearchedAndElectricCars } from "@/components/sections/searched-electric-cars"
 import { FeaturedSpotlight } from "@/components/sections/featured-spotlight"
-import { ShowcaseCarousel } from "@/components/sections/showcase-carousel"
+import type { HomeInventory } from "@/lib/inventory/server"
+
+const ShowcaseCarousel = dynamic(
+  () => import("@/components/sections/showcase-carousel").then((m) => m.ShowcaseCarousel)
+)
+const ParallaxBanner = dynamic(
+  () => import("@/components/sections/parallax-banner").then((m) => m.ParallaxBanner)
+)
 
 const journalArticles = [
   {
@@ -43,59 +50,55 @@ const journalArticles = [
   }
 ]
 
-export default function Home() {
+export default function Home({ inventory }: { inventory: HomeInventory }) {
   const { onOpen } = useEnquiryModal()
 
   return (
     <main className="flex flex-col min-h-screen bg-[#f8f9fa]">
-      {/* 1. Hero Section */}
-      <Hero />
+      {/* 1. Hero Section (Primary Search & High Intent) */}
+      <Hero latest={inventory.latest} facets={inventory.facets} total={inventory.total} />
 
-      {/* 2. Quick Discovery & Search */}
-      <SearchedAndElectricCars />
+      {/* 2. Quick Inventory Discovery & Affordable Cars */}
+      <SearchedAndElectricCars byBodyType={inventory.byBodyType} bestValue={inventory.bestValue} />
 
       {/* 3. Featured Vehicle Spotlight */}
-      <FeaturedSpotlight />
+      <FeaturedSpotlight vehicles={inventory.spotlight} />
 
-      {/* 4. Auto-playing Coverflow Showcase Carousel */}
-      <ShowcaseCarousel />
+      {/* 4. Real Customer Reviews & Dealership Map (Immediate Trust & Location) */}
+      <CustomerDealershipSection />
 
       {/* 5. Trust & Statistical Milestones */}
       <WhyUs />
 
-      {/* 6. Group Division Hub (Automotive, Retail, Energy, Real Estate) */}
-      <GroupBrands />
-
-      {/* 7. Heritage & Company Overview */}
-      <CompanyOverview />
-
-      {/* 8. Ecosystem Services */}
-      <FeaturedServices />
-
-      {/* 9. Workshop & Care Services */}
-      <ServiceWorkshop />
-
-      {/* 10. Finance & Loan Assistance */}
+      {/* 6. Finance & Loan Assistance (Buying Enablers) */}
       <FinanceSection />
 
-      {/* 11. Parallax Highlighting Banner */}
+      {/* 7. Workshop & Ecosystem Care Services */}
+      <ServiceWorkshop />
+      <FeaturedServices />
+
+      {/* 8. Coverflow Vehicle Showcase Carousel */}
+      <ShowcaseCarousel vehicles={inventory.latest} />
+
+      {/* 9. Group Divisions & Corporate Heritage */}
+      <GroupBrands byBodyType={inventory.byBodyType} />
+      <CompanyOverview />
+
+      {/* 10. Parallax Banner */}
       <ParallaxBanner 
         image="https://di-uploads-development.dealerinspire.com/amford/uploads/2025/08/am-ford-banner.webp"
         title="Unmatched Excellence"
         subtitle="Experience the pinnacle of automotive engineering and customer care with AM Group."
       />
 
-      {/* 12. Customer Testimonials & Dealership Map Section */}
-      <CustomerDealershipSection />
-
-      {/* 13. Blog & Journal Section */}
+      {/* 11. Blog & Journal Section */}
       <section className="py-28 bg-white border-t border-black/5">
         <div className="container mx-auto px-4 md:px-8">
           
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-16 gap-6">
             <div>
               <div className="inline-flex items-center space-x-2 text-[10px] font-bold uppercase tracking-[0.25em] bg-[#023468] text-white px-4 py-1.5 rounded-full mb-4">
-                <span>Editorial & Updates</span>
+                <span>Editorial &amp; Updates</span>
               </div>
               <h2 className="text-3xl md:text-5xl font-extrabold text-[#023468] tracking-tight">
                 Latest From <span className="text-[#023468]/30">AM Journal</span>
@@ -157,7 +160,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 14. Primary Call To Action Banner */}
+      {/* 12. Primary Call To Action Banner */}
       <section className="py-20 md:py-28 bg-[#f8f9fa] relative overflow-hidden">
         <div className="container mx-auto px-4 md:px-8">
            <div className="relative rounded-[36px] md:rounded-[48px] bg-gradient-to-br from-white via-zinc-50 to-zinc-100 p-8 md:p-16 lg:p-20 overflow-hidden shadow-2xl text-[#023468] border border-black/5">
@@ -181,7 +184,7 @@ export default function Home() {
                   
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                      <button 
-                        onClick={() => onOpen()}
+                        onClick={() => onOpen(null, { intent: "Test Drive", sourceLabel: "home-cta" })}
                         className="w-full sm:w-auto bg-[#E31837] text-white hover:bg-[#023468] rounded-full px-8 py-4 h-14 font-extrabold text-xs uppercase tracking-widest shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2 group"
                       >
                         <span>Book Test Drive / Inquiry</span>

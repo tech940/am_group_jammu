@@ -1,16 +1,21 @@
 "use server"
 
-import { supabase } from "../supabase";
+import { getSupabase } from "../supabase";
 import { Database } from "../../types/database";
 import { revalidatePath } from "next/cache";
 
 type Vehicle = Database['public']['Tables']['vehicles']['Row'];
 type NewVehicle = Database['public']['Tables']['vehicles']['Insert'];
 
+// Supabase may not be configured (no env vars). Callers degrade gracefully
+// rather than the whole module throwing at import time, which is what the
+// previous eagerly-created client did.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = supabase as any;
+const client = () => getSupabase() as any;
 
 export async function getVehicles() {
+  const supabase = getSupabase();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('vehicles')
     .select('*, brands(*)')
@@ -25,6 +30,8 @@ export async function getVehicles() {
 }
 
 export async function getFeaturedVehicles() {
+  const supabase = getSupabase();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('vehicles')
     .select('*, brands(*)')
@@ -40,6 +47,8 @@ export async function getFeaturedVehicles() {
 }
 
 export async function getBrands() {
+  const supabase = getSupabase();
+  if (!supabase) return [];
   const { data, error } = await supabase
     .from('brands')
     .select('*')
@@ -55,6 +64,8 @@ export async function getBrands() {
 
 export async function addVehicle(vehicle: NewVehicle) {
 
+  const db = client();
+  if (!db) throw new Error("Supabase is not configured");
   const { data, error } = await db
     .from('vehicles')
     .insert([vehicle])
@@ -71,6 +82,8 @@ export async function addVehicle(vehicle: NewVehicle) {
 }
 
 export async function updateVehicle(id: string, updates: Partial<NewVehicle>) {
+  const db = client();
+  if (!db) throw new Error("Supabase is not configured");
   const { data, error } = await db
     .from('vehicles')
     .update(updates)
@@ -94,6 +107,8 @@ export async function updateVehicle(id: string, updates: Partial<NewVehicle>) {
 }
 
 export async function deleteVehicle(id: string) {
+  const supabase = getSupabase();
+  if (!supabase) throw new Error("Supabase is not configured");
   const { error } = await supabase
     .from('vehicles')
     .delete()

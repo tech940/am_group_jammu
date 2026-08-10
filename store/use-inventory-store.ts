@@ -1,95 +1,74 @@
 import { create } from 'zustand'
 
-interface InventoryState {
-  filters: {
-    brand: string
-    type: string
-    fuel: string
-    transmission: string
-    year: string
-    mileage: string
-    priceRange: [number, number]
-  }
-  searchQuery: string
-  viewType: 'grid' | 'list'
-  hasInquired: boolean
-  showConfetti: boolean
-  
-  setBrand: (brand: string) => void
-  setType: (type: string) => void
-  setFuel: (fuel: string) => void
-  setTransmission: (transmission: string) => void
-  setYear: (year: string) => void
-  setMileage: (mileage: string) => void
-  setPriceRange: (range: [number, number]) => void
-  setSearchQuery: (query: string) => void
-  setHasInquired: (val: boolean) => void
-  setShowConfetti: (val: boolean) => void
-  toggleViewType: () => void
-  resetFilters: () => void
+/**
+ * Filter shape for the live inventory.
+ *
+ * Ranges are `null` when untouched. That distinction matters: a listing with a
+ * null price or year must stay visible in the default view and only drop out
+ * once the user actively filters on that field, otherwise listings with
+ * incomplete upstream data silently disappear.
+ *
+ * NOTE: filter/sort/search state deliberately lives in the listing page's own
+ * React state rather than in this store. It is seeded from the URL on the
+ * server, and a module-level store would be shared across requests during SSR.
+ * This store only holds genuinely cross-component UI state.
+ */
+export type SortKey =
+  | 'recent'
+  | 'price-asc'
+  | 'price-desc'
+  | 'year-desc'
+  | 'year-asc'
+  | 'mileage-asc'
+
+export type Range = [number, number]
+
+export interface InventoryFilterState {
+  make: string
+  model: string
+  bodyType: string
+  fuel: string
+  transmission: string
+  condition: string
+  colour: string
+  priceRange: Range | null
+  yearRange: Range | null
+  mileageRange: Range | null
 }
 
-export const useInventoryStore = create<InventoryState>((set) => ({
-  filters: {
-    brand: '',
-    type: '',
-    fuel: '',
-    transmission: '',
-    year: '',
-    mileage: '',
-    priceRange: [0, 10000000],
-  },
-  searchQuery: '',
-  viewType: 'grid',
+export const EMPTY_FILTERS: InventoryFilterState = {
+  make: '',
+  model: '',
+  bodyType: '',
+  fuel: '',
+  transmission: '',
+  condition: '',
+  colour: '',
+  priceRange: null,
+  yearRange: null,
+  mileageRange: null,
+}
+
+/** How many filters are currently narrowing the list. */
+export function countActiveFilters(f: InventoryFilterState): number {
+  return (
+    [f.make, f.model, f.bodyType, f.fuel, f.transmission, f.condition, f.colour].filter(Boolean)
+      .length +
+    [f.priceRange, f.yearRange, f.mileageRange].filter((r) => r !== null).length
+  )
+}
+
+interface InventoryUiState {
+  /** Set once a visitor submits an enquiry; used by the enquiry modal. */
+  hasInquired: boolean
+  showConfetti: boolean
+  setHasInquired: (val: boolean) => void
+  setShowConfetti: (val: boolean) => void
+}
+
+export const useInventoryStore = create<InventoryUiState>((set) => ({
   hasInquired: false,
   showConfetti: false,
-
-  setBrand: (brand) => set((state) => ({ 
-    filters: { ...state.filters, brand } 
-  })),
-
-  setType: (type) => set((state) => ({ 
-    filters: { ...state.filters, type } 
-  })),
-
-  setFuel: (fuel) => set((state) => ({ 
-    filters: { ...state.filters, fuel } 
-  })),
-
-  setTransmission: (transmission) => set((state) => ({ 
-    filters: { ...state.filters, transmission } 
-  })),
-
-  setYear: (year) => set((state) => ({ 
-    filters: { ...state.filters, year } 
-  })),
-
-  setMileage: (mileage) => set((state) => ({ 
-    filters: { ...state.filters, mileage } 
-  })),
-
-  setPriceRange: (range) => set((state) => ({ 
-    filters: { ...state.filters, priceRange: range } 
-  })),
-
-  setSearchQuery: (query) => set({ searchQuery: query }),
-  
-  setHasInquired: (val) => set({ hasInquired: val }),
-  setShowConfetti: (val) => set({ showConfetti: val }),
-
-  toggleViewType: () => set((state) => ({ 
-    viewType: state.viewType === 'grid' ? 'list' : 'grid' 
-  })),
-
-  resetFilters: () => set({
-    filters: {
-      brand: '',
-      type: '',
-      fuel: '',
-      transmission: '',
-      year: '',
-      mileage: '',
-      priceRange: [0, 10000000],
-    }
-  })
+  setHasInquired: (hasInquired) => set({ hasInquired }),
+  setShowConfetti: (showConfetti) => set({ showConfetti }),
 }))

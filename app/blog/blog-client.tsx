@@ -163,16 +163,12 @@ export default function BlogPage() {
               </div>
               
               <div className="lg:w-1/2 w-full">
-                <form className="relative group">
-                  <input 
-                    type="email" 
-                    placeholder="Enter your email address"
-                    className="w-full h-20 bg-zinc-50 rounded-[30px] px-10 border border-black/5 focus:outline-none focus:border-[#E31837] transition-all text-sm font-medium pr-40"
-                  />
-                  <button className="absolute right-3 top-3 bottom-3 px-8 bg-[#023468] text-white rounded-[22px] font-black uppercase tracking-widest text-[10px] hover:bg-[#E31837] transition-all duration-500">
-                    Subscribe
-                  </button>
-                </form>
+                <a
+                href="/contact"
+                className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full bg-[#023468] hover:bg-[#E31837] text-white text-xs font-black uppercase tracking-widest transition-all"
+              >
+                Contact our team
+              </a>
               </div>
             </div>
           </div>

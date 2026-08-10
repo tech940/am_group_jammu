@@ -9,6 +9,9 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    // Lets scripts/*.ts use explicit .ts import specifiers so they can be run
+    // directly with `node scripts/foo.ts` (Node strips the types natively).
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",

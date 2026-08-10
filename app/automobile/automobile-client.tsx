@@ -5,8 +5,9 @@ import { motion } from "framer-motion"
 import { Car, Shield, Settings, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GroupBrands } from "@/components/sections/group-brands"
+import type { HomeInventory } from "@/lib/inventory/server"
 
-export default function AutomobilePage() {
+export default function AutomobilePage({ byBodyType }: { byBodyType: HomeInventory["byBodyType"] }) {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
@@ -87,7 +88,7 @@ export default function AutomobilePage() {
               <h2 className="text-4xl font-bold text-[#023468]">Strategic Brand <span className="text-black/20">Partnerships</span></h2>
            </div>
         </div>
-        <GroupBrands />
+        <GroupBrands byBodyType={byBodyType} />
       </div>
     </div>
   )

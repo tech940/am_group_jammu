@@ -9,14 +9,16 @@
     "lint": "eslint .",
     "type-check": "tsc --noEmit",
     "validate": "npm run type-check && npm run lint",
-    "pre-flight": "node scripts/pre-flight.js"
-
+    "pre-flight": "node scripts/pre-flight.js",
+    "test:inventory": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-motors-inventory.ts",
+    "test:redirects": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-redirects.ts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-toast": "^1.2.15",
     "@supabase/supabase-js": "^2.105.4",
     "@tanstack/react-query": "^5.100.9",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
@@ -40,5 +42,8 @@
     "tailwindcss": "^4",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   }
 }

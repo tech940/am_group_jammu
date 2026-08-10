@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import AutomobileClient from "./automobile-client"
+import { getHomeInventory } from "@/lib/inventory/server"
 
 export const metadata: Metadata = {
   title: "Automobile Division | Authorised Car Dealerships in J&K",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Page() {
-  return <AutomobileClient />
+export default async function Page() {
+  const { byBodyType } = await getHomeInventory()
+  return <AutomobileClient byBodyType={byBodyType} />
 }

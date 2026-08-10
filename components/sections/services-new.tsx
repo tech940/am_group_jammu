@@ -160,7 +160,7 @@ export function FeaturedServices() {
 
               {/* Action Button */}
               <button 
-                onClick={() => onOpen()}
+                onClick={() => onOpen(null, { intent: "Service", sourceLabel: "services-grid" })}
                 className="flex items-center justify-between text-xs font-bold uppercase tracking-widest text-[#023468] hover:text-[#E31837] transition-colors duration-300 cursor-pointer pt-4 border-t border-black/5"
               >
                 <span>Request Inquiry</span>

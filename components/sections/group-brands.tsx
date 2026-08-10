@@ -1,42 +1,28 @@
 "use client"
 
+import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, ImageOff } from "lucide-react"
+import type { InventoryVehicle } from "@/lib/inventory/types"
 
-const bodyStyles = [
-  {
-    name: "SUVs",
-    count: "45 Vehicles",
-    image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&q=80&w=800",
-    href: "/inventory?type=suv"
-  },
-  {
-    name: "Commercial & Fleet",
-    count: "32 Vehicles",
-    image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&q=80&w=800",
-    href: "/inventory?type=truck"
-  },
-  {
-    name: "Sedans & Hatchbacks",
-    count: "28 Vehicles",
-    image: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&q=80&w=800",
-    href: "/inventory?type=sedan"
-  },
-  {
-    name: "Vans & Luxury MUVs",
-    count: "12 Vehicles",
-    image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&q=80&w=800",
-    href: "/inventory?type=van"
-  }
-]
+/**
+ * "Explore by Body Style", built from live stock.
+ *
+ * Counts and cover images are real: the counts previously shown here ("45
+ * Vehicles", "32 Vehicles"…) were hardcoded and unrelated to actual inventory.
+ */
+export function GroupBrands({
+  byBodyType,
+}: {
+  byBodyType: { label: string; slug: string; count: number; vehicles: InventoryVehicle[] }[]
+}) {
+  if (byBodyType.length === 0) return null
 
-export function GroupBrands() {
   return (
     <section className="py-20 bg-white border-t border-black/5">
       <div className="container mx-auto px-4 md:px-8">
-        
-        {/* Header */}
+
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
           <div>
             <h2 className="text-3xl md:text-4xl font-black text-[#023468]">
@@ -55,39 +41,51 @@ export function GroupBrands() {
           </Link>
         </div>
 
-        {/* 4 Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {bodyStyles.map((style) => (
-            <div key={style.name}>
-              <Link href={style.href} className="group block">
-                <div className="bg-white rounded-[28px] overflow-hidden border border-black/10 shadow-sm hover:shadow-xl transition-all duration-500">
-                  
-                  {/* Image Area */}
-                  <div className="relative h-48 w-full bg-zinc-200 overflow-hidden">
-                    <Image
-                      src={style.image}
-                      alt={style.name}
-                      fill
-                      unoptimized
-                      sizes="(max-width: 768px) 100vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                  </div>
+          {byBodyType.slice(0, 4).map((style, idx) => {
+            const cover = style.vehicles.find((v) => v.primaryImage)?.primaryImage ?? null
+            return (
+              <motion.div
+                key={style.slug}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: idx * 0.1 }}
+                viewport={{ once: true }}
+              >
+                <Link
+                  href={`/inventory?bodyType=${encodeURIComponent(style.label)}`}
+                  className="group block"
+                >
+                  <div className="bg-white rounded-[28px] overflow-hidden border border-black/10 shadow-sm hover:shadow-xl transition-all duration-500">
+                    <div className="relative h-48 w-full bg-zinc-100 overflow-hidden">
+                      {cover ? (
+                        <Image
+                          src={cover}
+                          alt={`${style.label} cars available at AM Group Jammu`}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-black/20">
+                          <ImageOff className="h-8 w-8" />
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Text Content */}
-                  <div className="p-6 text-left">
-                    <h3 className="text-lg font-extrabold text-[#023468] group-hover:text-[#E31837] transition-colors">
-                      {style.name}
-                    </h3>
-                    <p className="text-xs font-bold text-black/50 mt-1">
-                      {style.count}
-                    </p>
+                    <div className="p-6 text-left">
+                      <h3 className="text-lg font-extrabold text-[#023468] group-hover:text-[#E31837] transition-colors">
+                        {style.label}
+                      </h3>
+                      <p className="text-xs font-bold text-black/50 mt-1">
+                        {style.count} {style.count === 1 ? "vehicle" : "vehicles"} in stock
+                      </p>
+                    </div>
                   </div>
-
-                </div>
-              </Link>
-            </div>
-          ))}
+                </Link>
+              </motion.div>
+            )
+          })}
         </div>
 
       </div>

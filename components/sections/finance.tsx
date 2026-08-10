@@ -38,7 +38,7 @@ export function FinanceSection() {
 
             <div className="pt-4">
               <button
-                onClick={() => onOpen()}
+                onClick={() => onOpen(null, { intent: "Finance", sourceLabel: "finance-cta" })}
                 className="bg-white text-[#023468] hover:bg-[#E31837] hover:text-white rounded-full px-8 py-4 font-extrabold text-xs uppercase tracking-widest shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Get Pre-Approved</span>
