@@ -1,0 +1,118 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-11T00:00:00Z",
+  "title": "Design System: AM Group Homepage",
+  "extensions": {
+    "colorMeta": {
+      "paper": { "role": "neutral", "displayName": "Drafting Paper", "canonical": "#f4f3ee", "tonalRamp": ["oklch(15% 0.007 106)", "oklch(26% 0.007 106)", "oklch(38% 0.007 106)", "oklch(49% 0.007 106)", "oklch(61% 0.007 106)", "oklch(72% 0.007 106)", "oklch(84% 0.007 106)", "oklch(96% 0.007 106)"] },
+      "paper-2": { "role": "neutral", "displayName": "Drafting Paper, Second Sheet", "canonical": "#eae8e0", "tonalRamp": ["oklch(15% 0.008 100)", "oklch(26% 0.008 100)", "oklch(38% 0.008 100)", "oklch(49% 0.008 100)", "oklch(61% 0.008 100)", "oklch(72% 0.008 100)", "oklch(84% 0.008 100)", "oklch(93% 0.008 100)"] },
+      "ink": { "role": "neutral", "displayName": "Drawing Ink", "canonical": "#14161a", "tonalRamp": ["oklch(19% 0.012 260)", "oklch(28% 0.012 260)", "oklch(39% 0.012 260)", "oklch(50% 0.012 260)", "oklch(61% 0.012 260)", "oklch(72% 0.012 260)", "oklch(84% 0.012 260)", "oklch(95% 0.012 260)"] },
+      "print": { "role": "neutral", "displayName": "Cyanotype Print Blue", "canonical": "#133a63", "tonalRamp": ["oklch(15% 0.09 255)", "oklch(24% 0.09 255)", "oklch(33% 0.09 255)", "oklch(45% 0.09 255)", "oklch(57% 0.08 255)", "oklch(70% 0.06 255)", "oklch(82% 0.045 255)", "oklch(94% 0.02 255)"] },
+      "print-deep": { "role": "neutral", "displayName": "Deep Print Blue", "canonical": "#0d2a4a", "tonalRamp": ["oklch(15% 0.09 255)", "oklch(24% 0.09 255)", "oklch(33% 0.09 255)", "oklch(45% 0.09 255)", "oklch(57% 0.08 255)", "oklch(70% 0.06 255)", "oklch(82% 0.045 255)", "oklch(94% 0.02 255)"] },
+      "print-line": { "role": "neutral", "displayName": "Print Grid Line", "canonical": "#9fb6d6", "tonalRamp": ["oklch(15% 0.045 255)", "oklch(26% 0.045 255)", "oklch(38% 0.045 255)", "oklch(49% 0.045 255)", "oklch(61% 0.045 255)", "oklch(76% 0.045 255)", "oklch(84% 0.04 255)", "oklch(95% 0.02 255)"] },
+      "print-dim": { "role": "neutral", "displayName": "Print Annotation Dim", "canonical": "#a9bfdd", "tonalRamp": ["oklch(15% 0.045 255)", "oklch(26% 0.045 255)", "oklch(38% 0.045 255)", "oklch(49% 0.045 255)", "oklch(61% 0.045 255)", "oklch(79% 0.045 255)", "oklch(86% 0.04 255)", "oklch(95% 0.02 255)"] },
+      "steel": { "role": "neutral", "displayName": "Steel Annotation Grey", "canonical": "#565e6a", "tonalRamp": ["oklch(15% 0.02 250)", "oklch(26% 0.02 250)", "oklch(38% 0.02 250)", "oklch(47% 0.02 250)", "oklch(61% 0.02 250)", "oklch(72% 0.02 250)", "oklch(84% 0.02 250)", "oklch(95% 0.01 250)"] },
+      "redline": { "role": "primary", "displayName": "Redline Marker", "canonical": "#c13a2a", "tonalRamp": ["oklch(15% 0.1 30)", "oklch(26% 0.13 30)", "oklch(38% 0.15 30)", "oklch(52% 0.16 30)", "oklch(61% 0.15 30)", "oklch(72% 0.12 30)", "oklch(84% 0.08 30)", "oklch(95% 0.03 30)"] },
+      "redline-hi": { "role": "primary", "displayName": "Redline, Dark-Sheet Text", "canonical": "#f08a70", "tonalRamp": ["oklch(15% 0.1 30)", "oklch(26% 0.13 30)", "oklch(38% 0.15 30)", "oklch(52% 0.16 30)", "oklch(61% 0.15 30)", "oklch(74% 0.12 30)", "oklch(84% 0.08 30)", "oklch(95% 0.03 30)"] },
+      "redline-deep": { "role": "primary", "displayName": "Redline, Paper-Sheet Text", "canonical": "#a32e20", "tonalRamp": ["oklch(15% 0.1 30)", "oklch(26% 0.13 30)", "oklch(38% 0.15 30)", "oklch(46% 0.15 30)", "oklch(61% 0.15 30)", "oklch(72% 0.12 30)", "oklch(84% 0.08 30)", "oklch(95% 0.03 30)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display (Barlow Condensed)", "purpose": "Masthead, sheet headlines, register entries. Always uppercase, leading 0.9-0.95." },
+      "body": { "displayName": "Body (Archivo)", "purpose": "Working prose at 13-15px; chosen for legibility on midrange Android screens." },
+      "anno": { "displayName": "Annotation (Fragment Mono)", "purpose": "Title blocks, dimension labels, FIG./REG./SHT numbers, table headers, button labels. Real measurement and reference data only - never prose, never a costume." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-draft", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The single easing for every draw and settle on the page." },
+      { "name": "duration-settle", "value": "0.55s", "purpose": "Content settling up 8px after the lines around it have drawn (Settle primitive)." },
+      { "name": "duration-draw", "value": "0.9s-1.6s", "purpose": "Line drawing: scaleX for dimension lines and rules, pathLength for the elevation profile, clip-path inset wipes for plates." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Redline-filled action; hover inverts to paper/ink. Sharp edges, mono uppercase label.",
+      "html": "<button class=\"ds-btn-primary\">Read the drawings</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 12px; background: var(--color-redline, #c13a2a); color: var(--color-paper, #f4f3ee); padding: 16px 28px; border: none; border-radius: 0; font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: background-color 0.2s, color 0.2s; } .ds-btn-primary:hover { background: var(--color-paper, #f4f3ee); color: var(--color-ink, #14161a); } .ds-btn-primary:focus-visible { outline: 2px solid var(--color-redline, #c13a2a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "1px outline in the ground's text color; hover fills solid. Shown here in its paper-ground (ink) form.",
+      "html": "<button class=\"ds-btn-outline\">Certified pre-owned</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; gap: 12px; background: transparent; color: var(--color-ink, #14161a); padding: 16px 28px; border: 1px solid var(--color-ink, #14161a); border-radius: 0; font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.14em; cursor: pointer; transition: background-color 0.2s, color 0.2s; } .ds-btn-outline:hover { background: var(--color-ink, #14161a); color: var(--color-paper, #f4f3ee); } .ds-btn-outline:focus-visible { outline: 2px solid var(--color-redline, #c13a2a); outline-offset: 2px; }"
+    },
+    {
+      "name": "Title Block",
+      "kind": "custom",
+      "description": "The bordered sheet/title/scale stamp that opens every section (marks.tsx TitleBlock, ink tone).",
+      "html": "<div class=\"ds-titleblock\"><div class=\"ds-titleblock-cell\"><span class=\"ds-titleblock-label\">Sheet</span><span class=\"ds-titleblock-value\">01</span></div><div class=\"ds-titleblock-cell\"><span class=\"ds-titleblock-label\">Title</span><span class=\"ds-titleblock-value\">As-built record</span></div><div class=\"ds-titleblock-cell ds-titleblock-cell-last\"><span class=\"ds-titleblock-label\">Scale</span><span class=\"ds-titleblock-value\">1:58</span></div></div>",
+      "css": ".ds-titleblock { display: inline-grid; grid-template-columns: auto 1fr auto; border: 1px solid rgba(20, 22, 26, 0.7); font-family: 'Fragment Mono', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.08em; } .ds-titleblock-cell { padding: 8px 12px; border-right: 1px solid rgba(20, 22, 26, 0.7); } .ds-titleblock-cell-last { border-right: none; } .ds-titleblock-label { display: block; font-size: 9px; color: var(--color-steel, #565e6a); } .ds-titleblock-value { display: block; font-size: 13px; color: var(--color-ink, #14161a); }"
+    },
+    {
+      "name": "Dimension Line",
+      "kind": "custom",
+      "description": "The measured-claim device: end ticks, drawn rule, centered label (marks.tsx DimensionLine; the rules scale in from each end on view).",
+      "html": "<div class=\"ds-dimline\"><span class=\"ds-dimline-tick\"></span><span>1968</span><span class=\"ds-dimline-rule\"></span><span>58 years</span><span class=\"ds-dimline-rule\"></span><span>2026</span><span class=\"ds-dimline-tick\"></span></div>",
+      "css": ".ds-dimline { display: flex; align-items: center; gap: 12px; font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-steel, #565e6a); min-width: 320px; } .ds-dimline-tick { width: 1px; height: 14px; background: rgba(20, 22, 26, 0.5); } .ds-dimline-rule { height: 1px; flex: 1; background: rgba(20, 22, 26, 0.5); }"
+    },
+    {
+      "name": "Plate Caption",
+      "kind": "custom",
+      "description": "FIG./REG. numbered caption under every photograph plate (marks.tsx PlateCaption, ink tone).",
+      "html": "<figcaption class=\"ds-platecaption\"><span class=\"ds-platecaption-fig\">FIG. 02</span><span>HP &amp; Indian Oil forecourts - the 1968 business, still trading</span></figcaption>",
+      "css": ".ds-platecaption { display: flex; align-items: baseline; gap: 12px; font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--color-steel, #565e6a); } .ds-platecaption-fig { color: var(--color-ink, #14161a); }"
+    },
+    {
+      "name": "Approval Stamp",
+      "kind": "custom",
+      "description": "Circular rotated year stamp for the awards register (marks.tsx Stamp) - the world's only rounded element.",
+      "html": "<span class=\"ds-stamp\">2011</span>",
+      "css": ".ds-stamp { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 9999px; border: 1.5px solid rgba(193, 58, 42, 0.7); color: rgba(193, 58, 42, 0.9); font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 11px; transform: rotate(-8deg); }"
+    },
+    {
+      "name": "Register Row",
+      "kind": "custom",
+      "description": "A franchise-register table row; selection inverts to solid ink-on-paper instead of lifting (brands.tsx).",
+      "html": "<div class=\"ds-register\"><div class=\"ds-register-row\"><span class=\"ds-register-no\">01</span><span class=\"ds-register-name\">Hyundai</span><span class=\"ds-register-year\">2008</span></div><div class=\"ds-register-row ds-register-row-selected\"><span class=\"ds-register-no\">02</span><span class=\"ds-register-name\">Tata Motors</span><span class=\"ds-register-year\">2017</span></div></div>",
+      "css": ".ds-register { min-width: 320px; } .ds-register-row { display: flex; align-items: baseline; gap: 16px; padding: 16px 8px; border-bottom: 1px solid rgba(20, 22, 26, 0.15); color: var(--color-ink, #14161a); transition: background-color 0.2s; } .ds-register-row:hover { background: var(--color-paper-2, #eae8e0); } .ds-register-row-selected, .ds-register-row-selected:hover { background: var(--color-ink, #14161a); color: var(--color-paper, #f4f3ee); } .ds-register-no { font-family: 'Fragment Mono', ui-monospace, monospace; font-size: 11px; color: var(--color-steel, #565e6a); } .ds-register-row-selected .ds-register-no { color: var(--color-print-dim, #a9bfdd); } .ds-register-name { flex: 1; font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 28px; line-height: 1; text-transform: uppercase; } .ds-register-year { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-weight: 600; font-size: 28px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Master Drawing Set",
+    "overview": "The homepage presents AM Group as its own engineering drawing office: a set of numbered sheets (Sheet 00 cover through Sheet 07 plus final plate) on drafting paper, cyanotype print blue and ink, annotated with title blocks, dimension lines, registration marks and figure-numbered photography. Every claim is measured and sourced; the aesthetic IS the argument that the company is verifiable. This world governs the homepage route only - every inner page keeps the incumbent Lato / navy #023468 / red #E31837 system, and neither system may be harmonized into the other.",
+    "keyCharacteristics": [
+      "Sheet-based grounds that alternate",
+      "Drawn (not decorative) ornament",
+      "Mono only for real measurements",
+      "Sharp edges",
+      "Every fact sourced"
+    ],
+    "rules": [
+      { "name": "The Redline Contrast Rule", "body": "Base redline never carries small text: redline-hi on dark sheets, redline-deep on paper sheets, base for fills, lines and display-scale type. The variants exist for WCAG, not taste.", "section": "colors" },
+      { "name": "The Sheet Alternation Rule", "body": "Sections are sheets and alternate grounds: paper, print, paper, paper-2, ink, paper, print-deep, ink. No two adjacent sections share a ground.", "section": "colors" },
+      { "name": "The @theme-inline Trap", "body": "The Tailwind hookup in app/globals.css MUST stay @theme inline, not @theme: next/font's variables live on the homepage wrapper div, not :root. Plain @theme resolves var() at :root, where they are undefined, and every font utility silently falls back to the body font.", "section": "typography" }
+    ],
+    "dos": [
+      "Do render every fact from components/home/content.ts (which carries sources and the replacement table) or live sources (getHomeInventory(), lib/locations.ts). Never hardcode a claim in a component.",
+      "Do mark placeholders visibly: unverified years render as \"c. 2000\" (sinceApprox), missing photography as reserved plates / \"Photo pending\", missing counts as \"-\". The degraded inventory state renders an honest \"sync down\" panel, never fake cars.",
+      "Do keep tel:/wa.me links tracked only via data-track-location - the delegated LinkTracker handles GTM; no onClick."
+    ],
+    "donts": [
+      "Don't apply this world to inner pages, or the incumbent Lato/navy/red to this route.",
+      "Don't use border-radius (Stamp excepted), box-shadows, icon libraries, or generic fonts (Arial/Inter/Roboto/Poppins/Open Sans/system-ui as primary faces).",
+      "Don't use Fragment Mono for prose or headlines - annotation data only.",
+      "Don't put small base-redline text on any ground - pick the contrast variant for the ground.",
+      "Don't change @theme inline to @theme for the homepage fonts (silent body-font fallback)."
+    ]
+  }
+}

@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Lato } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import { siteFontVariables } from "@/components/system/fonts";
 import { ConditionalNavbar } from "@/components/layout/conditional-navbar";
 import { ConditionalFooter } from "@/components/layout/conditional-footer";
 import { ConditionalBreadcrumbs } from "@/components/layout/conditional-breadcrumbs";
 
-import { PageLoader } from "@/components/ui/page-loader";
 import { UnlockPricePopup } from "@/components/modals/unlock-price-popup";
 import { Toaster } from "@/components/ui/toaster";
 import { generateLocalBusinessSchema } from "@/lib/seo-schemas";
@@ -15,19 +13,8 @@ import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analyti
 import { LinkTracker } from "@/components/analytics/link-tracker";
 import { MobileActionBar } from "@/components/layout/mobile-action-bar";
 
-const lato = Lato({
-  variable: "--font-lato",
-  subsets: ["latin"],
-  // Lato only publishes 100/300/400/700/900. Weight 100 is used nowhere in the
-  // app, and Inter was previously loaded alongside this but referenced by
-  // nothing — globals.css maps --font-sans to --font-lato, so every byte of it
-  // was wasted on the critical path.
-  weight: ["300", "400", "700", "900"],
-  display: "swap",
-});
-
 export const viewport: Viewport = {
-  themeColor: "#023468",
+  themeColor: "#133a63",
   width: "device-width",
   initialScale: 1,
 };
@@ -73,9 +60,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { Suspense } from "react";
-
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -88,7 +72,11 @@ export default async function RootLayout({
   const seoLinks = await getSeoLinks();
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    // Font variables live here, at :root, so app/globals.css can resolve them
+    // with a plain `@theme`. They were previously attached to a wrapper div on
+    // the homepage only, which forced `@theme inline` and left every inner page
+    // on a different typeface.
+    <html lang="en" className={siteFontVariables}>
       <head>
         <link rel="icon" href="/icon.png" type="image/png" />
         <link rel="shortcut icon" href="/icon.png" type="image/png" />
@@ -100,9 +88,10 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
       </head>
-      <body
-        className={`${lato.variable} font-lato antialiased bg-background text-foreground selection:bg-primary selection:text-primary-foreground`}
-      >
+      {/* Ground, ink and font come from the base layer in globals.css, not from
+          utility classes here — so a page that forgets them still inherits the
+          system rather than Tailwind's defaults. */}
+      <body>
         <GoogleTagManagerNoScript />
 
         {/* Plain <script>, not next/script: next/script defaults to
@@ -112,33 +101,39 @@ export default async function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Suspense fallback={null}>
-            <PageLoader />
-          </Suspense>
 
+        {/* next-themes was removed with the broken `.dark` token block: nothing
+            in the app called useTheme, and the provider's only effect was to
+            stamp class="dark" on <html> for a theme whose background was light
+            but whose cards and popovers were dark. This app is light-ground by
+            design. A real dark theme, if it is ever wanted, is built on the
+            `deep` family — not resurrected from that block. */}
 
-          <div className="relative flex min-h-screen flex-col pb-16 md:pb-0">
-            <ConditionalNavbar seoLinks={seoLinks} />
-            <main className="flex-1">
-              <ConditionalBreadcrumbs />
-              {children}
-            </main>
-            <ConditionalFooter seoLinks={seoLinks} />
+        {/* The fake `PageLoader` was deleted here, not restyled. It was a
+            setTimeout chain reporting 30/70/100% over 600ms on every pathname
+            *and* searchParams change — so it claimed a completed navigation
+            while a slow route was still fetching, and re-ran on every filter
+            click on /inventory. Next 16's only real navigation signal,
+            `useLinkStatus`, reads context published by an enclosing <Link>, so
+            it cannot be observed from the root layout; React's `useTransition`
+            only sees transitions the same component started. With no honest
+            signal reachable from here, route-level `loading.tsx` is the correct
+            home for navigation feedback. */}
 
-          </div>
-          <UnlockPricePopup />
-          <Toaster />
-          {/* Delegated tel:/mailto:/directions tracking — most of those anchors
-              live in server components and cannot carry an onClick. */}
-          <LinkTracker />
-          <MobileActionBar />
-        </ThemeProvider>
+        <div className="relative flex min-h-screen flex-col pb-16 md:pb-0">
+          <ConditionalNavbar seoLinks={seoLinks} />
+          <main className="flex-1">
+            <ConditionalBreadcrumbs />
+            {children}
+          </main>
+          <ConditionalFooter seoLinks={seoLinks} />
+        </div>
+        <UnlockPricePopup />
+        <Toaster />
+        {/* Delegated tel:/mailto:/directions tracking — most of those anchors
+            live in server components and cannot carry an onClick. */}
+        <LinkTracker />
+        <MobileActionBar />
 
         <GoogleTagManager />
       </body>

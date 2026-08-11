@@ -1,7 +1,7 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { Footer } from "./footer"
+import { SiteFooter } from "@/components/system/site-footer"
 import type { SeoLinks } from "@/lib/seo/links"
 
 export function ConditionalFooter({ seoLinks }: { seoLinks: SeoLinks }) {
@@ -10,5 +10,5 @@ export function ConditionalFooter({ seoLinks }: { seoLinks: SeoLinks }) {
   // Hide footer on admin pages
   if (pathname?.startsWith("/admin")) return null
 
-  return <Footer seoLinks={seoLinks} />
+  return <SiteFooter seoLinks={seoLinks} />
 }

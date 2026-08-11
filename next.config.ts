@@ -209,6 +209,16 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "nhceknbaslqdqofefyla.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "amgroupind.com",
         pathname: "/**",
       },
@@ -236,6 +246,21 @@ const nextConfig: NextConfig = {
     ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Next 16 rejects any `quality` prop not listed here and silently serves the
+    // default 75 instead — which is what was happening to the hero's
+    // `quality={90}`. 90 is reserved for the few large photographic plates whose
+    // source resolution is already marginal; everything else stays at 75.
+    qualities: [75, 90],
+    // AVIF first, WebP second. The default is WebP only, which left roughly a
+    // third of the achievable saving on the table — and the source photography
+    // in am_group_files runs to 4229x2506 / 5.8MB per file, so the originals
+    // must never reach a browser. next/image fetches each original ONCE on the
+    // server, then serves a resized, re-encoded variant per breakpoint.
+    formats: ["image/avif", "image/webp"],
+    // Optimised variants are immutable per (src, width, quality); the default
+    // 60s TTL makes the server re-fetch and re-encode multi-megabyte originals
+    // far too often. 30 days.
+    minimumCacheTTL: 2592000,
   },
 
   async redirects() {

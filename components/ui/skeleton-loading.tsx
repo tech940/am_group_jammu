@@ -1,54 +1,35 @@
-import { motion } from 'framer-motion'
+import { Skeleton } from "@/components/ui/feedback"
 
+/**
+ * Generic loading placeholder.
+ *
+ * Every variant is the one `Skeleton` primitive at a different size, so the
+ * shimmer (one opacity loop, reduced-motion aware) is defined in a single
+ * place instead of being re-declared per shape.
+ */
 export function SkeletonLoading({ type = "card" }: { type?: "card" | "text" | "button" | "input" }) {
   if (type === "text") {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="h-4 w-32 bg-zinc-200 rounded animate-pulse"
-      />
-    )
+    return <Skeleton className="h-4 w-32" />
   }
 
   if (type === "button") {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="h-10 w-24 bg-zinc-200 rounded-xl animate-pulse"
-      />
-    )
+    return <Skeleton className="h-11 w-24 rounded-sm" />
   }
 
   if (type === "input") {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-        className="h-10 w-full bg-zinc-100 rounded-xl animate-pulse"
-      />
-    )
+    return <Skeleton className="h-11 w-full rounded-sm" />
   }
 
   // Default card skeleton
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-[40px] overflow-hidden border border-black/5"
-    >
-      <div className="relative h-[320px] bg-zinc-100 animate-pulse" />
+    <div aria-hidden className="bg-surface overflow-hidden border border-line">
+      <Skeleton className="h-[320px] w-full" />
       <div className="p-6 flex flex-col flex-1 min-h-0 space-y-3">
-        <div className="h-4 w-3/4 bg-zinc-200 rounded animate-pulse" />
-        <div className="h-4 w-1/2 bg-zinc-200 rounded animate-pulse" />
-        <div className="h-8 w-2/3 bg-zinc-200 rounded-xl animate-pulse" />
-        <div className="h-12 w-full bg-zinc-200 rounded-xl animate-pulse" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-8 w-2/3 rounded-sm" />
+        <Skeleton className="h-12 w-full rounded-sm" />
       </div>
-    </motion.div>
+    </div>
   )
 }

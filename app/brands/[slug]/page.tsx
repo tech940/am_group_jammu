@@ -6,7 +6,7 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
 import { getFrequentSearches, getSeoLinks } from "@/lib/seo/links"
-import { ShieldCheck, Wrench, Award, CreditCard } from "lucide-react"
+import { Badge } from "@/components/ui/feedback"
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -95,10 +95,10 @@ export default async function BrandPage({ params }: Props) {
   ]
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f9fa] pt-16 md:pt-20">
-      
+    <div className="flex flex-col min-h-screen bg-ground pt-16 md:pt-20">
+
       {/* Clean Light Header */}
-      <div className="bg-[#f8f9fa] pt-2 pb-6 border-b border-black/5">
+      <div className="bg-ground pt-2 pb-6 border-b border-line">
         <div className="container mx-auto px-4 md:px-8">
           <Breadcrumbs
             items={[
@@ -108,17 +108,14 @@ export default async function BrandPage({ params }: Props) {
           />
 
           <div className="text-center max-w-3xl mx-auto mt-2">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#023468]/10 text-[#023468] text-[11px] font-black uppercase tracking-wider mb-2.5">
-              <Award className="h-3.5 w-3.5" />
-              <span>Certified Pre-Owned Brand Stock</span>
-            </div>
-            
-            <h1 className="text-3xl md:text-5xl font-black text-[#023468] tracking-tight">
-              Used <span className="text-[#E31837]">{brandName}</span> Cars in Jammu
+            <Badge className="mb-2.5">Certified Pre-Owned Brand Stock</Badge>
+
+            <h1 className="font-display text-h1 text-ink">
+              Used <span className="text-accent">{brandName}</span> Cars in Jammu
             </h1>
 
-            <p className="text-xs md:text-sm text-black/60 font-medium leading-relaxed mt-2">
-              Explore {brand.count} certified pre-owned {brandName} {brand.count === 1 ? "car" : "cars"} available in stock at AM Group Jammu.
+            <p className="text-body text-ink-2 mt-2">
+              Explore <span data-num>{brand.count}</span> certified pre-owned {brandName} {brand.count === 1 ? "car" : "cars"} available in stock at AM Group Jammu.
               Every vehicle features real photographs, multi-point inspection, and verified odometer readings.
             </p>
           </div>
@@ -131,21 +128,21 @@ export default async function BrandPage({ params }: Props) {
         title={`Available ${brandName} Stock (${brand.count})`}
         subtitle={`Handpicked certified ${brandName} cars available for immediate delivery in Jammu.`}
         emptyMessage={`We have no ${brandName} listings in stock at the moment.`}
-        className="py-8 md:py-12 bg-[#FAFAFA] relative overflow-hidden"
+        className="py-8 md:py-12 bg-ground-2"
       />
 
       {/* Redesigned Centered Brand Info Section */}
-      <section className="py-20 bg-white border-t border-black/5">
+      <section className="py-20 bg-ground border-t border-line">
         <div className="container mx-auto px-4 md:px-8 max-w-5xl text-center">
-          
+
           <div className="max-w-2xl mx-auto mb-14">
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#023468] bg-[#023468]/5 px-4 py-1.5 rounded-full">
+            <span className="text-meta uppercase text-ink-2">
               Why AM Group
             </span>
-            <h2 className="text-2xl md:text-4xl font-black text-[#023468] tracking-tight mt-4">
+            <h2 className="font-display text-h2 text-ink mt-4">
               Buying a Used {brandName} in Jammu
             </h2>
-            <p className="text-sm text-black/55 font-medium mt-2">
+            <p className="text-body text-ink-2 mt-2">
               AM Group has been Jammu &amp; Kashmir&apos;s trusted automotive group since 1968.
             </p>
           </div>
@@ -153,14 +150,11 @@ export default async function BrandPage({ params }: Props) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
             
             {/* Card 1 */}
-            <div className="bg-[#f8f9fa] rounded-3xl p-8 border border-black/5 flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-2xl bg-[#023468] text-white flex items-center justify-center mb-5 shadow-sm">
-                <Award className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-black text-[#023468] mb-3">
+            <div className="bg-surface p-6 border border-line flex flex-col items-center text-center">
+              <h3 className="font-display text-h3 text-ink mb-3">
                 Authorized {brandName} Dealer Experience
               </h3>
-              <p className="text-xs md:text-sm text-black/60 leading-relaxed font-normal">
+              <p className="text-body text-ink-2">
                 AM Group is proud to be a premier authorized dealership network in Jammu &amp; Kashmir.
                 We offer a comprehensive range of pre-owned {brandName} vehicles, from popular compacts to premium SUVs.
                 Our state-of-the-art Jammu facility provides a world-class car buying experience.
@@ -168,28 +162,22 @@ export default async function BrandPage({ params }: Props) {
             </div>
 
             {/* Card 2 */}
-            <div className="bg-[#f8f9fa] rounded-3xl p-8 border border-black/5 flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-2xl bg-[#023468] text-white flex items-center justify-center mb-5 shadow-sm">
-                <CreditCard className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-black text-[#023468] mb-3">
+            <div className="bg-surface p-6 border border-line flex flex-col items-center text-center">
+              <h3 className="font-display text-h3 text-ink mb-3">
                 Latest {brandName} Models &amp; Transparent Prices
               </h3>
-              <p className="text-xs md:text-sm text-black/60 leading-relaxed font-normal">
+              <p className="text-body text-ink-2">
                 Looking for transparent pricing in Jammu? Contact our sales team for exact on-road price breakdowns,
                 low-EMI finance options, instant loan approvals, and seamless RC transfer for all {brandName} models.
               </p>
             </div>
 
             {/* Card 3 */}
-            <div className="bg-[#f8f9fa] rounded-3xl p-8 border border-black/5 flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-2xl bg-[#023468] text-white flex items-center justify-center mb-5 shadow-sm">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-black text-[#023468] mb-3">
+            <div className="bg-surface p-6 border border-line flex flex-col items-center text-center">
+              <h3 className="font-display text-h3 text-ink mb-3">
                 Certified Quality &amp; Verified Documentation
               </h3>
-              <p className="text-xs md:text-sm text-black/60 leading-relaxed font-normal">
+              <p className="text-body text-ink-2">
                 {brandName} vehicles hold their value exceptionally well in J&amp;K.
                 Every {brandName} listed here undergoes a rigorous 140+ point structural and mechanical evaluation.
                 All odometers are intake-verified, and every vehicle comes with verified documentation.
@@ -197,14 +185,11 @@ export default async function BrandPage({ params }: Props) {
             </div>
 
             {/* Card 4 */}
-            <div className="bg-[#f8f9fa] rounded-3xl p-8 border border-black/5 flex flex-col items-center text-center">
-              <div className="h-12 w-12 rounded-2xl bg-[#023468] text-white flex items-center justify-center mb-5 shadow-sm">
-                <Wrench className="h-6 w-6" />
-              </div>
-              <h3 className="text-lg font-black text-[#023468] mb-3">
+            <div className="bg-surface p-6 border border-line flex flex-col items-center text-center">
+              <h3 className="font-display text-h3 text-ink mb-3">
                 Workshop Servicing &amp; Genuine OEM Parts
               </h3>
-              <p className="text-xs md:text-sm text-black/60 leading-relaxed font-normal">
+              <p className="text-body text-ink-2">
                 AM Group operates master workshops across Jammu and Srinagar.
                 Your pre-owned {brandName} can be serviced directly at our official service centers with 100% genuine OEM parts,
                 factory-trained technicians, and transparent maintenance packages.

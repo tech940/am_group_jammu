@@ -1,5 +1,3 @@
-import { HelpCircle } from "lucide-react"
-
 export interface FaqItem {
   question: string
   answer: string
@@ -35,28 +33,28 @@ export function FaqSection({
   }
 
   return (
-    <section className="py-16 bg-white border-t border-black/5">
+    <section className="py-16 bg-ground border-t border-line">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="container mx-auto px-4 md:px-8 max-w-4xl">
-        <div className="flex items-center gap-3 mb-3">
-          <HelpCircle className="h-5 w-5 text-[#E31837]" />
-          <h2 className="text-2xl md:text-3xl font-black text-[#023468]">{title}</h2>
-        </div>
-        {intro && <p className="text-sm text-black/55 leading-relaxed mb-8 max-w-2xl">{intro}</p>}
+        <h2 className="font-display text-h2 text-ink mb-3">{title}</h2>
+        {intro && <p className="text-body text-ink-2 mb-8 max-w-2xl">{intro}</p>}
 
-        <div className="divide-y divide-black/8 border-y border-black/8">
+        <div className="divide-y divide-line border-y border-line">
           {items.map((faq) => (
             <details key={faq.question} className="group py-4">
-              <summary className="flex items-start justify-between gap-4 cursor-pointer list-none">
-                <h3 className="text-base font-bold text-[#023468] leading-snug">{faq.question}</h3>
-                <span className="text-2xl leading-none text-black/30 group-open:rotate-45 transition-transform shrink-0">
+              <summary className="flex min-h-11 items-center justify-between gap-4 cursor-pointer list-none">
+                <h3 className="font-display text-h3 text-ink">{faq.question}</h3>
+                <span
+                  aria-hidden
+                  className="text-h3 leading-none text-ink-3 group-open:rotate-45 transition-transform duration-(--duration-2) shrink-0"
+                >
                   +
                 </span>
               </summary>
-              <p className="mt-3 text-sm text-black/65 leading-relaxed pr-8">{faq.answer}</p>
+              <p className="mt-3 text-body text-ink-2 pr-8">{faq.answer}</p>
             </details>
           ))}
         </div>

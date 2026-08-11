@@ -1,9 +1,9 @@
 "use client"
 
 import { usePathname } from "next/navigation"
-import { Phone, MessageCircle, Car } from "lucide-react"
 import Link from "next/link"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
+import { PhoneGlyph, ChatGlyph, CompassGlyph } from "@/components/system/marks"
 
 /**
  * Sticky call/WhatsApp bar, mobile only.
@@ -29,15 +29,15 @@ export function MobileActionBar() {
     "Hi AM Group, I'm looking for a used car in Jammu. Can you help me with what's available?"
 
   return (
-    <div className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-black/10 bg-white/95 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.08)] pb-[env(safe-area-inset-bottom)]">
-      <div className="grid grid-cols-3">
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
+      <div className="grid grid-cols-3 divide-x divide-line">
         <a
           href={`tel:${PRIMARY_LOCATION.phoneE164}`}
           data-track-location="mobile-bar"
-          className="flex flex-col items-center justify-center gap-1 py-2.5 text-[#023468] active:bg-zinc-100 transition-colors"
+          className="flex flex-col items-center justify-center gap-1 py-3 text-ink transition-colors duration-(--duration-1) active:bg-ground-2"
         >
-          <Phone className="h-5 w-5" />
-          <span className="text-[10px] font-black uppercase tracking-wider">Call</span>
+          <PhoneGlyph />
+          <span className="text-meta uppercase">Call</span>
         </a>
 
         <a
@@ -45,18 +45,18 @@ export function MobileActionBar() {
           target="_blank"
           rel="noopener noreferrer"
           data-track-location="mobile-bar"
-          className="flex flex-col items-center justify-center gap-1 py-2.5 text-white bg-[#25D366] active:bg-[#1da851] transition-colors"
+          className="flex flex-col items-center justify-center gap-1 py-3 text-ink transition-colors duration-(--duration-1) active:bg-ground-2"
         >
-          <MessageCircle className="h-5 w-5" />
-          <span className="text-[10px] font-black uppercase tracking-wider">WhatsApp</span>
+          <ChatGlyph />
+          <span className="text-meta uppercase">WhatsApp</span>
         </a>
 
         <Link
           href="/inventory"
-          className="flex flex-col items-center justify-center gap-1 py-2.5 text-[#023468] active:bg-zinc-100 transition-colors"
+          className="flex flex-col items-center justify-center gap-1 py-3 text-ink transition-colors duration-(--duration-1) active:bg-ground-2"
         >
-          <Car className="h-5 w-5" />
-          <span className="text-[10px] font-black uppercase tracking-wider">Browse</span>
+          <CompassGlyph />
+          <span className="text-meta uppercase">Browse</span>
         </Link>
       </div>
     </div>

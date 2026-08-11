@@ -1,59 +1,51 @@
-import { motion } from "framer-motion"
+import { Skeleton } from "@/components/ui/feedback"
 
+/**
+ * Loading placeholder for one vehicle card.
+ *
+ * The shimmer lives in the `Skeleton` primitive — one opacity loop at 1.4s,
+ * exempted from the reduced-motion kill in globals.css because a frozen
+ * placeholder reads as broken rather than calm. No second `animate-pulse` on
+ * the wrapper, and no card elevation: the card separates by `surface` on
+ * `ground` plus a hairline.
+ */
 export function SkeletonCard() {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-[40px] overflow-hidden border border-black/5 animate-pulse"
-    >
-      {/* Image skeleton */}
-      <div className="relative h-[320px] bg-zinc-100">
-        <div className="absolute top-4 left-4 z-10">
-          <div className="h-6 w-20 bg-zinc-200 rounded-full" />
-        </div>
-        <div className="absolute top-4 right-4 z-10">
-          <div className="h-6 w-16 bg-zinc-200 rounded-full" />
-        </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          <div className="h-1.5 w-1.5 rounded-full bg-zinc-200" />
-          <div className="h-1.5 w-1.5 rounded-full bg-zinc-200" />
-          <div className="h-1.5 w-1.5 rounded-full bg-zinc-200" />
-        </div>
-      </div>
+    <div aria-hidden className="bg-surface overflow-hidden border border-line">
+      {/* Image plate */}
+      <Skeleton className="h-[320px] w-full" />
 
-      {/* Content skeleton */}
+      {/* Content */}
       <div className="p-6 flex flex-col flex-1 min-h-0 space-y-4">
-        {/* Title and price skeleton */}
+        {/* Title and price */}
         <div className="flex justify-between items-start">
           <div className="flex-1 pr-4 space-y-2">
-            <div className="h-3 w-32 bg-zinc-200 rounded" />
-            <div className="h-6 w-48 bg-zinc-200 rounded" />
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-6 w-48" />
           </div>
           <div className="text-right flex-shrink-0 space-y-2">
-            <div className="h-2 w-16 bg-zinc-200 rounded ml-auto" />
-            <div className="h-6 w-24 bg-zinc-200 rounded ml-auto" />
+            <Skeleton className="h-3 w-16 ml-auto" />
+            <Skeleton className="h-6 w-24 ml-auto" />
           </div>
         </div>
 
-        {/* Features skeleton */}
+        {/* Specs */}
         <div className="flex gap-2">
-          <div className="h-8 w-20 bg-zinc-200 rounded-xl" />
-          <div className="h-8 w-20 bg-zinc-200 rounded-xl" />
-          <div className="h-8 w-20 bg-zinc-200 rounded-xl" />
+          <Skeleton className="h-8 w-20 rounded-sm" />
+          <Skeleton className="h-8 w-20 rounded-sm" />
+          <Skeleton className="h-8 w-20 rounded-sm" />
         </div>
 
-        {/* Live offer skeleton */}
+        {/* Live offer */}
         <div className="flex justify-center">
-          <div className="h-7 w-32 bg-zinc-200 rounded-full" />
+          <Skeleton className="h-7 w-32 rounded-sm" />
         </div>
 
-        {/* Button skeleton */}
+        {/* Button */}
         <div className="mt-auto">
-          <div className="h-12 w-full bg-zinc-200 rounded-xl" />
+          <Skeleton className="h-12 w-full rounded-sm" />
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }

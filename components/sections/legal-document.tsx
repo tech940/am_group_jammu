@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { buttonVariants } from "@/components/ui/button"
 import { PRIMARY_LOCATION, formatAddress } from "@/lib/locations"
 
 /**
@@ -35,18 +36,16 @@ export function LegalDocument({
   sections: LegalSection[]
 }) {
   return (
-    <div className="bg-white">
-      <section className="border-b border-black/5 bg-gradient-to-b from-zinc-50 to-white">
+    <div className="bg-ground">
+      <section className="border-b border-line bg-ground-2">
         <div className="container mx-auto px-4 md:px-8 py-10 md:py-14">
-          <h1 className="text-3xl md:text-5xl font-black text-[#023468] tracking-tight mb-4">
-            {title}
-          </h1>
-          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#E31837]">
-            Effective {effectiveDate}
+          <h1 className="font-display text-h1 text-ink mb-4">{title}</h1>
+          <p className="text-meta uppercase text-accent-text-light">
+            Effective <span data-num>{effectiveDate}</span>
           </p>
           <div className="max-w-3xl mt-6 space-y-3">
             {intro.map((p, i) => (
-              <p key={i} className="text-sm md:text-[15px] text-black/65 leading-relaxed">
+              <p key={i} className="text-body text-ink-2">
                 {p}
               </p>
             ))}
@@ -60,25 +59,21 @@ export function LegalDocument({
             {sections.map((s, i) => (
               <div key={i}>
                 {s.heading && (
-                  <h2 className="text-lg md:text-xl font-black text-[#023468] tracking-tight mb-3">
-                    {s.heading}
-                  </h2>
+                  <h2 className="font-display text-h3 text-ink mb-3">{s.heading}</h2>
                 )}
                 {s.subheading && (
-                  <h3 className="text-[13px] font-black uppercase tracking-wider text-black/45 mt-5 mb-2">
-                    {s.subheading}
-                  </h3>
+                  <h3 className="text-meta uppercase text-ink-2 mt-5 mb-2">{s.subheading}</h3>
                 )}
                 {s.paragraphs?.map((p, j) => (
-                  <p key={j} className="text-sm text-black/65 leading-relaxed mb-3">
+                  <p key={j} className="text-body text-ink-2 mb-3">
                     {p}
                   </p>
                 ))}
                 {s.bullets && (
                   <ul className="mt-2 space-y-1.5">
                     {s.bullets.map((b, j) => (
-                      <li key={j} className="flex gap-2.5 text-sm text-black/65 leading-relaxed">
-                        <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-[#E31837] flex-shrink-0" />
+                      <li key={j} className="flex gap-2.5 text-body text-ink-2">
+                        <span aria-hidden className="mt-2 h-1.5 w-1.5 bg-accent flex-shrink-0" />
                         <span>{b}</span>
                       </li>
                     ))}
@@ -87,25 +82,29 @@ export function LegalDocument({
               </div>
             ))}
 
-            <div className="rounded-2xl border border-black/10 bg-zinc-50 p-6">
-              <h2 className="text-lg font-black text-[#023468] tracking-tight mb-3">Contact Us</h2>
-              <address className="not-italic text-sm text-black/65 leading-relaxed">
-                <strong className="text-black/80">{PRIMARY_LOCATION.name}</strong>
+            <div className="border border-line bg-surface p-6">
+              <h2 className="font-display text-h3 text-ink mb-3">Contact Us</h2>
+              <address className="not-italic text-body text-ink-2">
+                <strong className="text-ink">{PRIMARY_LOCATION.name}</strong>
                 <br />
                 {formatAddress(PRIMARY_LOCATION)}
                 <br />
-                <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} className="hover:text-[#E31837] transition-colors">
+                <a
+                  href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                  data-num
+                  className="transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                >
                   {PRIMARY_LOCATION.phone}
                 </a>
                 {" · "}
-                <a href={`mailto:${PRIMARY_LOCATION.email}`} className="hover:text-[#E31837] transition-colors">
+                <a
+                  href={`mailto:${PRIMARY_LOCATION.email}`}
+                  className="transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                >
                   {PRIMARY_LOCATION.email}
                 </a>
               </address>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center h-11 mt-5 px-6 rounded-xl bg-[#023468] hover:bg-[#01254a] text-white text-[11px] font-black uppercase tracking-wider transition-colors"
-              >
+              <Link href="/contact" className={`${buttonVariants({ variant: "primary" })} mt-5`}>
                 Contact AM Group
               </Link>
             </div>

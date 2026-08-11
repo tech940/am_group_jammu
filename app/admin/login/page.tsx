@@ -17,7 +17,7 @@ export default async function AdminLoginPage({
   const { next } = await searchParams
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa] px-6">
+    <div className="flex min-h-screen items-center justify-center bg-ground px-6 py-10">
       <LoginForm next={next ?? "/admin"} />
     </div>
   )

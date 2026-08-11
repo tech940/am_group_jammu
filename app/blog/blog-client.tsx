@@ -1,8 +1,10 @@
 "use client"
 
 import React from "react"
-import { motion } from "framer-motion"
-import { Calendar, Clock, ArrowRight, Share2, Tag } from "lucide-react"
+import Image from "next/image"
+import { motion, useReducedMotion } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/feedback"
 
 const newsArticles = [
   {
@@ -40,96 +42,82 @@ const newsArticles = [
 ]
 
 export default function BlogPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Cinematic Hero Section */}
-      <section className="relative min-h-[50vh] flex items-center bg-zinc-950 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-[#E31837]/5 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[#023468]/10 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4 pointer-events-none" />
-          <div className="absolute inset-0 bg-zinc-950/60 backdrop-blur-3xl pointer-events-none" />
-        </div>
+  const reduce = useReducedMotion()
 
-        <div className="container mx-auto px-6 md:px-12 relative z-10 pt-32">
+  return (
+    <div className="min-h-screen bg-ground">
+      {/* Hero Section */}
+      <section
+        data-ground="deep"
+        className="relative min-h-[50vh] flex items-center bg-deep-2"
+      >
+        <div className="container mx-auto px-5 md:px-10 pt-32">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={reduce ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, ease: [0.21, 1.02, 0.47, 0.98] }}
+            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="mb-10 inline-flex items-center gap-4">
-              <div className="h-[1px] w-12 bg-[#E31837]" />
-              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/50">
+              <span aria-hidden className="h-px w-12 bg-accent" />
+              <span className="text-meta uppercase text-on-deep-2">
                 Media Center
               </span>
             </div>
-            
-            <h1 className="text-[44px] sm:text-[64px] md:text-[120px] font-bold text-white leading-[0.8] tracking-tight mb-12">
+
+            <h1 className="font-display text-display uppercase text-on-deep mb-12">
               News & <br />
-              <span className="text-[#E31837] italic font-light">Updates</span>
+              <span className="text-accent-text-dark">Updates</span>
             </h1>
           </motion.div>
         </div>
       </section>
 
       {/* Blog Grid Section */}
-      <section className="py-32 bg-white">
-        <div className="container mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 xl:gap-16">
+      <section className="py-20 md:py-28 bg-ground">
+        <div className="container mx-auto px-5 md:px-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 xl:gap-12">
             {newsArticles.map((article, i) => (
               <motion.article
                 key={i}
-                initial={{ opacity: 0, y: 20 }}
+                initial={reduce ? false : { opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
+                transition={{ duration: 0.24, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 viewport={{ once: true }}
-                className="group cursor-pointer"
+                className="flex flex-col"
               >
                 {/* Image Container */}
-                <div className="relative aspect-[16/10] rounded-[40px] overflow-hidden mb-10 shadow-2xl group-hover:shadow-[#E31837]/10 transition-all duration-700">
-                  <img 
-                    src={article.image} 
-                    alt={article.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                <div className="relative aspect-[16/10] overflow-hidden border border-line bg-ground-2 mb-6">
+                  <Image
+                    src={article.image}
+                    alt={article.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
                   />
-                  <div className="absolute top-8 left-8">
-                    <span className="bg-white/90 backdrop-blur-xl px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest text-[#023468]">
-                      {article.category}
-                    </span>
+                  <div className="absolute top-4 left-4">
+                    <Badge>{article.category}</Badge>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#023468]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                 </div>
 
                 {/* Content */}
-                <div className="px-4">
-                  <div className="flex items-center gap-6 mb-6 text-[10px] font-black uppercase tracking-widest text-black/30">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-3 w-3 text-[#E31837]" />
-                      {article.date}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-3 w-3 text-[#E31837]" />
-                      3 Min Read
-                    </div>
+                <div className="flex flex-1 flex-col">
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-4 text-meta uppercase text-ink-2">
+                    <span data-num>{article.date}</span>
+                    <span>3 Min Read</span>
                   </div>
 
-                  <h3 className="text-2xl font-bold text-[#023468] mb-6 leading-tight group-hover:text-[#E31837] transition-colors duration-500">
+                  <h3 className="font-display text-h2 uppercase text-ink mb-4">
                     {article.title}
                   </h3>
 
-                  <p className="text-black/50 text-base font-light leading-relaxed mb-10 line-clamp-3">
+                  <p className="text-body text-ink-2 mb-6 line-clamp-3">
                     {article.excerpt}
                   </p>
 
-                  <div className="flex items-center justify-between pt-8 border-t border-black/5">
-                    <button className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-[#023468] group/btn">
+                  <div className="mt-auto border-t border-line pt-4">
+                    <Button type="button" variant="link" className="px-0">
                       Read More
-                      <div className="h-10 w-10 rounded-full border border-black/5 flex items-center justify-center group-hover/btn:bg-[#023468] group-hover/btn:text-white transition-all duration-500">
-                        <ArrowRight className="h-4 w-4" />
-                      </div>
-                    </button>
-                    <button className="h-10 w-10 rounded-full border border-black/5 flex items-center justify-center text-black/30 hover:text-[#E31837] hover:border-[#E31837]/20 transition-all duration-500">
-                      <Share2 className="h-4 w-4" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </motion.article>
@@ -137,38 +125,31 @@ export default function BlogPage() {
           </div>
 
           {/* Load More / Pagination */}
-          <div className="mt-32 text-center">
-             <button className="px-12 py-6 bg-[#023468] text-white rounded-full font-black uppercase tracking-[0.2em] text-xs hover:bg-[#E31837] transition-all duration-500 shadow-2xl shadow-[#023468]/20">
-               View All Updates
-             </button>
+          <div className="mt-20 text-center">
+            <Button type="button" size="lg">
+              View All Updates
+            </Button>
           </div>
         </div>
       </section>
 
       {/* Newsletter Section */}
-      <section className="py-32 bg-zinc-50 border-t border-black/5 relative overflow-hidden">
-        <div className="container mx-auto px-6 md:px-12 relative z-10">
-          <div className="max-w-5xl mx-auto bg-white rounded-[60px] p-12 md:p-24 shadow-2xl relative overflow-hidden border border-black/5">
-            <div className="absolute top-0 right-0 p-12 opacity-5">
-              <Tag className="h-64 w-64 text-[#E31837] rotate-12" />
-            </div>
-            
-            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-16">
-              <div className="lg:w-1/2">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E31837] mb-4 block">Subscribe</span>
-                <h2 className="text-4xl md:text-5xl font-bold text-[#023468] tracking-tight mb-8">Stay Ahead of <br /><span className="text-black/20">The Curve.</span></h2>
-                <p className="text-black/40 text-lg font-light leading-relaxed">
+      <section className="py-20 md:py-28 bg-ground-2 border-t border-line">
+        <div className="container mx-auto px-5 md:px-10">
+          <div className="max-w-5xl mx-auto border border-line bg-surface p-8 md:p-12">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-16">
+              <div className="lg:w-3/5">
+                <span className="text-meta uppercase text-accent-text-light mb-4 block">Subscribe</span>
+                <h2 className="font-display text-h1 uppercase text-ink mb-6">Stay Ahead of <br /><span className="text-ink-3">The Curve.</span></h2>
+                <p className="text-body-lg text-ink-2">
                   Get the latest automotive trends, dealership launches, and group updates delivered directly to your inbox.
                 </p>
               </div>
-              
-              <div className="lg:w-1/2 w-full">
-                <a
-                href="/contact"
-                className="inline-flex items-center justify-center gap-2 h-14 px-8 rounded-full bg-[#023468] hover:bg-[#E31837] text-white text-xs font-black uppercase tracking-widest transition-all"
-              >
-                Contact our team
-              </a>
+
+              <div className="lg:w-2/5 w-full">
+                <Button asChild size="lg">
+                  <a href="/contact">Contact our team</a>
+                </Button>
               </div>
             </div>
           </div>

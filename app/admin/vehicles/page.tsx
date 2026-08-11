@@ -1,7 +1,11 @@
 "use client"
 
-import { Car, Plus, Search, Filter, Edit, Trash2, Eye } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { Dialog, ConfirmDialog } from "@/components/ui/dialog"
+import { Field, Input, Select } from "@/components/ui/field"
+import { Badge } from "@/components/ui/feedback"
+import { SearchGlyph } from "@/components/system/marks"
 
 import { getVehicles, addVehicle, getBrands, deleteVehicle } from "@/lib/actions/inventory"
 import { useEffect, useState } from "react"
@@ -14,6 +18,10 @@ type VehicleWithBrand = Database['public']['Tables']['vehicles']['Row'] & {
 
 type NewVehicle = Database['public']['Tables']['vehicles']['Insert']
 
+/* Admin density is a 36px control, but the desk gets used on phones, so every
+   control keeps the 44px touch floor below md. */
+const DENSE = "min-h-11 md:min-h-0"
+
 export default function VehiclesPage() {
   const { toast } = useToast()
   const [data, setData] = useState<VehicleWithBrand[]>([])
@@ -22,6 +30,10 @@ export default function VehiclesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [showAddModal, setShowAddModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  // The delete target lives in state so the confirmation can be a real Dialog
+  // rather than window.confirm(), which cannot be styled, trapped or themed.
+  const [pendingDelete, setPendingDelete] = useState<VehicleWithBrand | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Form State
   const [formData, setFormData] = useState({
@@ -96,8 +108,6 @@ export default function VehiclesPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this vehicle?")) return
-
     try {
       await deleteVehicle(id)
       toast({
@@ -116,103 +126,123 @@ export default function VehiclesPage() {
 
   }
 
+  const confirmDelete = async () => {
+    if (!pendingDelete) return
+    setIsDeleting(true)
+    try {
+      await handleDelete(pendingDelete.id)
+    } finally {
+      setIsDeleting(false)
+      setPendingDelete(null)
+    }
+  }
+
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-black">Vehicle Management</h1>
-          <p className="text-black/60">Manage your vehicle inventory</p>
+          <h1 className="font-display text-h2 uppercase text-ink">Vehicle Management</h1>
+          <p className="text-small text-ink-2">Manage your vehicle inventory</p>
         </div>
-        <Button
-          onClick={() => setShowAddModal(true)}
-          className="bg-[#023468] hover:bg-[#01254a]"
-        >
-          <Plus className="h-4 w-4 mr-2" />
+        <Button type="button" variant="primary" onClick={() => setShowAddModal(true)}>
           Add Vehicle
         </Button>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-black/40" />
-          <input
-            type="text"
-            placeholder="Search vehicles..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20"
-          />
-        </div>
-        <Button variant="outline">
-          <Filter className="h-4 w-4 mr-2" />
+        <Field label="Search vehicles" hideLabel className="flex-1">
+          {(a11y) => (
+            <div className="relative">
+              <SearchGlyph className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" />
+              <Input
+                {...a11y}
+                type="text"
+                placeholder="Search vehicles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          )}
+        </Field>
+        <Button type="button" variant="secondary">
           Filter
         </Button>
       </div>
 
       {/* Vehicles Table */}
-      <div className="bg-white rounded-2xl border border-black/5 shadow-sm overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-zinc-50 border-b border-black/5">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-bold text-black/60 uppercase tracking-wider">Vehicle</th>
-                <th className="text-left px-6 py-4 text-sm font-bold text-black/60 uppercase tracking-wider">Brand</th>
-                <th className="text-left px-6 py-4 text-sm font-bold text-black/60 uppercase tracking-wider">Type</th>
-                <th className="text-left px-6 py-4 text-sm font-bold text-black/60 uppercase tracking-wider">Price</th>
-                <th className="text-left px-6 py-4 text-sm font-bold text-black/60 uppercase tracking-wider">Status</th>
-                <th className="text-left px-6 py-4 text-sm font-bold text-black/60 uppercase tracking-wider">Actions</th>
+      <div className="border border-line bg-surface">
+        <div
+          role="region"
+          aria-label="Vehicle inventory table"
+          tabIndex={0}
+          className="overflow-x-auto overscroll-x-contain no-scrollbar"
+        >
+          <table className="w-full min-w-[880px] text-table">
+            <thead className="sticky top-0 z-10 bg-ground-2">
+              <tr className="border-b border-line">
+                <th className="text-left px-4 py-3 text-meta uppercase text-ink-2">Vehicle</th>
+                <th className="text-left px-4 py-3 text-meta uppercase text-ink-2">Brand</th>
+                <th className="text-left px-4 py-3 text-meta uppercase text-ink-2">Type</th>
+                <th className="text-left px-4 py-3 text-meta uppercase text-ink-2">Price</th>
+                <th className="text-left px-4 py-3 text-meta uppercase text-ink-2">Status</th>
+                <th className="text-left px-4 py-3 text-meta uppercase text-ink-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-black/40">Loading vehicles...</td>
+                  <td colSpan={6} className="text-center py-12 text-ink-2">Loading vehicles...</td>
                 </tr>
               ) : filteredVehicles.map((vehicle) => (
-                <tr key={vehicle.id} className="border-b border-black/5 hover:bg-zinc-50 transition-colors">
-                  <td className="px-6 py-4">
+                <tr key={vehicle.id} className="border-b border-line hover:bg-ground-2 transition-colors duration-(--duration-1)">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-zinc-100 overflow-hidden">
+                      {/* Missing photography is a reserved plate, not a placeholder icon. */}
+                      <div className="h-12 w-12 shrink-0 overflow-hidden border border-line bg-ground-2">
                         {vehicle.images && vehicle.images.length > 0 ? (
-                          <img
+                          <Image
                             src={vehicle.images[0]}
                             alt={vehicle.name}
+                            width={48}
+                            height={48}
                             className="h-full w-full object-cover"
                           />
-                        ) : (
-                          <div className="h-full w-full flex items-center justify-center bg-zinc-200 text-black/20">
-                            <Car className="h-6 w-6" />
-                          </div>
-                        )}
+                        ) : null}
                       </div>
                       <div>
-                        <p className="font-medium text-black">{vehicle.name}</p>
-                        <p className="text-sm text-black/60">{vehicle.variant}</p>
+                        <p className="text-label text-ink">{vehicle.name}</p>
+                        <p className="text-small text-ink-2">{vehicle.variant}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-black/80">{vehicle.brands?.name}</td>
-                  <td className="px-6 py-4 text-black/80">{vehicle.body_type}</td>
-                  <td className="px-6 py-4 font-medium text-black">₹ {vehicle.price_ex_showroom?.toLocaleString()}</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${vehicle.stock_count > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                      }`}>
+                  <td className="px-4 py-3 text-ink-2">{vehicle.brands?.name}</td>
+                  <td className="px-4 py-3 text-ink-2">{vehicle.body_type}</td>
+                  <td className="px-4 py-3 text-label text-ink" data-num>₹ {vehicle.price_ex_showroom?.toLocaleString()}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={vehicle.stock_count > 0 ? "success" : "danger"}>
                       {vehicle.stock_count > 0 ? 'In Stock' : 'Out of Stock'}
-                    </span>
+                    </Badge>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon">
-                        <Eye className="h-4 w-4 text-black/60" />
+                      <Button type="button" variant="ghost" size="sm" className={DENSE}>
+                        View
                       </Button>
-                      <Button variant="ghost" size="icon">
-                        <Edit className="h-4 w-4 text-black/60" />
+                      <Button type="button" variant="ghost" size="sm" className={DENSE}>
+                        Edit
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(vehicle.id)}>
-                        <Trash2 className="h-4 w-4 text-red-500" />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className={`${DENSE} text-danger-text hover:bg-danger-bg`}
+                        onClick={() => setPendingDelete(vehicle)}
+                      >
+                        Delete
                       </Button>
                     </div>
                   </td>
@@ -224,157 +254,167 @@ export default function VehiclesPage() {
         </div>
 
         {filteredVehicles.length === 0 && (
-          <div className="text-center py-12">
-            <Car className="h-12 w-12 text-black/20 mx-auto mb-4" />
-            <p className="text-black/60">No vehicles found</p>
-          </div>
+          <p className="border-t border-line px-4 py-12 text-center text-body text-ink-2">
+            No vehicles found
+          </p>
         )}
       </div>
 
       {/* Add Vehicle Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-black">Add New Vehicle</h2>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="p-2 hover:bg-zinc-100 rounded-lg transition-colors"
-              >
-                <Trash2 className="h-5 w-5 text-black/60" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Brand</label>
-                  <select
-                    required
-                    value={formData.brand_id}
-                    onChange={(e) => setFormData({ ...formData, brand_id: e.target.value })}
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20 bg-white"
-                  >
-                    <option value="">Select Brand</option>
-                    {brands.map(brand => (
-                      <option key={brand.id} value={brand.id}>{brand.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Model Name</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g., IONIQ 5"
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Variant</label>
-                  <input
-                    type="text"
-                    value={formData.variant}
-                    onChange={(e) => setFormData({ ...formData, variant: e.target.value })}
-                    placeholder="e.g., Signature AWD"
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Body Type</label>
-                  <select
-                    value={formData.body_type}
-                    onChange={(e) => setFormData({ ...formData, body_type: e.target.value })}
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20 bg-white"
-                  >
-                    <option value="">Select Type</option>
-                    <option value="SUV">SUV</option>
-                    <option value="Sedan">Sedan</option>
-                    <option value="Hatchback">Hatchback</option>
-                    <option value="EV">EV</option>
-                    <option value="Luxury">Luxury</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Fuel Type</label>
-                  <select
-                    value={formData.fuel_type}
-                    onChange={(e) => setFormData({ ...formData, fuel_type: e.target.value })}
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20 bg-white"
-                  >
-                    <option value="Petrol">Petrol</option>
-                    <option value="Diesel">Diesel</option>
-                    <option value="Electric">Electric</option>
-                    <option value="Hybrid">Hybrid</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Transmission</label>
-                  <select
-                    value={formData.transmission}
-                    onChange={(e) => setFormData({ ...formData, transmission: e.target.value })}
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20 bg-white"
-                  >
-                    <option value="Manual">Manual</option>
-                    <option value="Automatic">Automatic</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Price (Ex-Showroom)</label>
-                  <input
-                    required
-                    type="number"
-                    value={formData.price_ex_showroom}
-                    onChange={(e) => setFormData({ ...formData, price_ex_showroom: e.target.value })}
-                    placeholder="e.g., 4605000"
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-black mb-2">Initial Stock</label>
-                  <input
-                    type="number"
-                    value={formData.stock_count}
-                    onChange={(e) => setFormData({ ...formData, stock_count: e.target.value })}
-                    placeholder="0"
-                    className="w-full px-4 py-3 border border-black/10 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#023468]/20"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowAddModal(false)}
-                  disabled={isSubmitting}
+      <Dialog
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Add New Vehicle"
+        size="lg"
+        footer={
+          <>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowAddModal(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              form="add-vehicle-form"
+              variant="primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Adding..." : "Add Vehicle"}
+            </Button>
+          </>
+        }
+      >
+        <form id="add-vehicle-form" onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Brand" required>
+              {(a11y) => (
+                <Select
+                  {...a11y}
+                  required
+                  value={formData.brand_id}
+                  onChange={(e) => setFormData({ ...formData, brand_id: e.target.value })}
                 >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-[#023468] hover:bg-[#01254a] flex-1"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Adding..." : "Add Vehicle"}
-                </Button>
-              </div>
-            </form>
-
+                  <option value="">Select Brand</option>
+                  {brands.map(brand => (
+                    <option key={brand.id} value={brand.id}>{brand.name}</option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            <Field label="Model Name" required>
+              {(a11y) => (
+                <Input
+                  {...a11y}
+                  required
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="e.g., IONIQ 5"
+                />
+              )}
+            </Field>
           </div>
-        </div>
-      )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Variant">
+              {(a11y) => (
+                <Input
+                  {...a11y}
+                  type="text"
+                  value={formData.variant}
+                  onChange={(e) => setFormData({ ...formData, variant: e.target.value })}
+                  placeholder="e.g., Signature AWD"
+                />
+              )}
+            </Field>
+            <Field label="Body Type">
+              {(a11y) => (
+                <Select
+                  {...a11y}
+                  value={formData.body_type}
+                  onChange={(e) => setFormData({ ...formData, body_type: e.target.value })}
+                >
+                  <option value="">Select Type</option>
+                  <option value="SUV">SUV</option>
+                  <option value="Sedan">Sedan</option>
+                  <option value="Hatchback">Hatchback</option>
+                  <option value="EV">EV</option>
+                  <option value="Luxury">Luxury</option>
+                </Select>
+              )}
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Fuel Type">
+              {(a11y) => (
+                <Select
+                  {...a11y}
+                  value={formData.fuel_type}
+                  onChange={(e) => setFormData({ ...formData, fuel_type: e.target.value })}
+                >
+                  <option value="Petrol">Petrol</option>
+                  <option value="Diesel">Diesel</option>
+                  <option value="Electric">Electric</option>
+                  <option value="Hybrid">Hybrid</option>
+                </Select>
+              )}
+            </Field>
+            <Field label="Transmission">
+              {(a11y) => (
+                <Select
+                  {...a11y}
+                  value={formData.transmission}
+                  onChange={(e) => setFormData({ ...formData, transmission: e.target.value })}
+                >
+                  <option value="Manual">Manual</option>
+                  <option value="Automatic">Automatic</option>
+                </Select>
+              )}
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Price (Ex-Showroom)" required>
+              {(a11y) => (
+                <Input
+                  {...a11y}
+                  required
+                  type="number"
+                  value={formData.price_ex_showroom}
+                  onChange={(e) => setFormData({ ...formData, price_ex_showroom: e.target.value })}
+                  placeholder="e.g., 4605000"
+                />
+              )}
+            </Field>
+            <Field label="Initial Stock">
+              {(a11y) => (
+                <Input
+                  {...a11y}
+                  type="number"
+                  value={formData.stock_count}
+                  onChange={(e) => setFormData({ ...formData, stock_count: e.target.value })}
+                  placeholder="0"
+                />
+              )}
+            </Field>
+          </div>
+        </form>
+      </Dialog>
+
+      <ConfirmDialog
+        open={pendingDelete !== null}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        title="Delete vehicle"
+        description="Are you sure you want to delete this vehicle?"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        pending={isDeleting}
+      />
     </div>
   )
 }

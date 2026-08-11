@@ -3,7 +3,6 @@
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronRight, Home } from "lucide-react"
 
 export function Breadcrumbs() {
   const pathname = usePathname()
@@ -24,13 +23,16 @@ export function Breadcrumbs() {
   }
 
   return (
-    <nav className="container mx-auto px-4 md:px-8 pt-24 pb-1 md:pb-2 flex items-center gap-2 text-sm text-black/50 overflow-x-auto whitespace-nowrap scrollbar-hide">
+    <nav
+      aria-label="Breadcrumb"
+      tabIndex={0}
+      className="container mx-auto px-4 md:px-8 pt-8 pb-1 md:pb-2 flex items-center gap-2 text-ink-2 overflow-x-auto overscroll-x-contain no-scrollbar whitespace-nowrap"
+    >
       <Link
         href="/"
-        className="flex items-center gap-1.5 hover:text-black transition-colors"
+        className="text-meta uppercase transition-colors duration-(--duration-1) hover:text-ink"
       >
-        <Home className="h-3.5 w-3.5" />
-        <span className="font-bold uppercase tracking-widest text-[10px]">Home</span>
+        Home
       </Link>
 
       {pathSegments.map((segment, index) => {
@@ -39,15 +41,17 @@ export function Breadcrumbs() {
 
         return (
           <React.Fragment key={path}>
-            <ChevronRight className="h-3.5 w-3.5 flex-shrink-0" />
+            <span aria-hidden className="text-ink-3">
+              /
+            </span>
             {isLast ? (
-              <span className="font-bold uppercase tracking-widest text-[10px] text-[#E31837]">
+              <span aria-current="page" className="text-meta uppercase text-accent-text-light">
                 {formatSegment(segment)}
               </span>
             ) : (
               <Link
                 href={path}
-                className="font-bold uppercase tracking-widest text-[10px] hover:text-black transition-colors"
+                className="text-meta uppercase transition-colors duration-(--duration-1) hover:text-ink"
               >
                 {formatSegment(segment)}
               </Link>

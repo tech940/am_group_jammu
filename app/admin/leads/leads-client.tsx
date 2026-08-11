@@ -3,23 +3,37 @@
 import { useMemo, useState, useTransition } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import {
-  Search, Download, Phone, Mail, ChevronLeft, ChevronRight, AlarmClock,
-  AlertTriangle, Inbox, UserX, Loader2, MessageSquare, Car, Database,
-} from "lucide-react"
 import { adminBulkStatus, adminExportCsv } from "@/lib/leads/actions"
 import { LEAD_INTENTS, LEAD_STATUSES } from "@/lib/leads/types"
 import type { LeadFilters, LeadListResult, LeadSort, LeadStats, LeadStatus } from "@/lib/leads/types"
 import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import { Alert, Badge, EmptyState, Spinner } from "@/components/ui/feedback"
+import { Field, Input, Select } from "@/components/ui/field"
+import { AlertGlyph, ChevronGlyph } from "@/components/system/marks"
 
-const STATUS_STYLES: Record<LeadStatus, string> = {
-  New: "bg-blue-50 text-blue-700 border-blue-200",
-  Contacted: "bg-amber-50 text-amber-700 border-amber-200",
-  "Follow-up": "bg-purple-50 text-purple-700 border-purple-200",
-  Qualified: "bg-teal-50 text-teal-700 border-teal-200",
-  Won: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Lost: "bg-zinc-100 text-zinc-500 border-zinc-200",
+/**
+ * Status reads as a semantic tone, never as a palette colour. The previous
+ * chips were `bg-blue-50 text-blue-700 border-blue-200` — Tailwind defaults
+ * that belong to no system and carried no meaning.
+ */
+const STATUS_TONE: Record<LeadStatus, "neutral" | "success" | "warning" | "info"> = {
+  New: "info",
+  Contacted: "warning",
+  "Follow-up": "info",
+  Qualified: "success",
+  Won: "success",
+  Lost: "neutral",
 }
+
+/** Two-state filter chip. Not a Button variant — a toggle is its own thing. */
+const CHIP =
+  "inline-flex h-11 cursor-pointer items-center justify-center rounded-sm border px-4 " +
+  "text-button uppercase transition-colors duration-(--duration-1)"
+const CHIP_ON = "border-deep bg-deep text-on-deep hover:bg-deep-2"
+const CHIP_OFF = "border-line bg-surface text-ink-2 hover:border-line-strong hover:text-ink"
+const CHIP_DUE_ON = "border-accent bg-accent text-ground hover:bg-accent-hover"
+const CHIP_DUE_OFF = "border-line bg-surface text-accent-text-light hover:border-line-strong"
 
 function timeAgo(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -125,33 +139,27 @@ export function LeadsClient({
 
   const kpis = useMemo(
     () => [
-      { label: "Total leads", value: stats.total, icon: Inbox, tone: "text-[#023468]" },
-      { label: "New today", value: stats.newToday, icon: MessageSquare, tone: "text-blue-600" },
-      { label: "Due today", value: stats.dueToday, icon: AlarmClock, tone: "text-amber-600" },
-      { label: "Overdue", value: stats.overdue, icon: AlertTriangle, tone: "text-[#E31837]" },
-      { label: "Unassigned", value: stats.unassigned, icon: UserX, tone: "text-purple-600" },
+      { label: "Total leads", value: stats.total, tone: "text-ink" },
+      { label: "New today", value: stats.newToday, tone: "text-info-text" },
+      { label: "Due today", value: stats.dueToday, tone: "text-warning-text" },
+      { label: "Overdue", value: stats.overdue, tone: "text-danger-text" },
+      { label: "Unassigned", value: stats.unassigned, tone: "text-ink-2" },
     ],
     [stats],
   )
 
   return (
     <div className="space-y-6">
-      {storageWarning && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3">
-          <Database className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-xs font-semibold text-amber-800 leading-relaxed">{storageWarning}</p>
-        </div>
-      )}
+      {storageWarning && <Alert tone="warning">{storageWarning}</Alert>}
 
       {/* KPIs — computed from the real table, not a hardcoded array */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {kpis.map((k) => (
-          <div key={k.label} className="bg-white rounded-2xl border border-black/8 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-black/40">{k.label}</span>
-              <k.icon className={`h-4 w-4 ${k.tone}`} />
-            </div>
-            <p className={`text-2xl font-black ${k.tone}`}>{k.value}</p>
+          <div key={k.label} className="border border-line bg-surface p-4">
+            <p className="text-meta uppercase text-ink-2">{k.label}</p>
+            <p data-num className={`mt-2 font-display text-h2 ${k.tone}`}>
+              {k.value}
+            </p>
           </div>
         ))}
       </div>
@@ -159,11 +167,11 @@ export function LeadsClient({
       {/* Status pipeline */}
       <div className="flex flex-wrap gap-2">
         <button
+          type="button"
           onClick={() => setParam({ status: null, due: null })}
-          className={`px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border transition-all cursor-pointer ${
-            (filters.status ?? "all") === "all" && !filters.dueOnly
-              ? "bg-[#023468] text-white border-[#023468]"
-              : "bg-white text-black/60 border-black/10 hover:border-[#023468]/40"
+          aria-pressed={(filters.status ?? "all") === "all" && !filters.dueOnly}
+          className={`${CHIP} ${
+            (filters.status ?? "all") === "all" && !filters.dueOnly ? CHIP_ON : CHIP_OFF
           }`}
         >
           All {stats.total}
@@ -171,117 +179,122 @@ export function LeadsClient({
         {LEAD_STATUSES.map((s) => (
           <button
             key={s}
+            type="button"
             onClick={() => setParam({ status: s, due: null })}
-            className={`px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border transition-all cursor-pointer ${
-              filters.status === s
-                ? "bg-[#023468] text-white border-[#023468]"
-                : "bg-white text-black/60 border-black/10 hover:border-[#023468]/40"
-            }`}
+            aria-pressed={filters.status === s}
+            className={`${CHIP} ${filters.status === s ? CHIP_ON : CHIP_OFF}`}
           >
             {s} {stats.byStatus[s] ?? 0}
           </button>
         ))}
         <button
+          type="button"
           onClick={() => setParam({ due: filters.dueOnly ? null : "1", status: null })}
-          className={`px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider border transition-all cursor-pointer ${
-            filters.dueOnly
-              ? "bg-[#E31837] text-white border-[#E31837]"
-              : "bg-white text-[#E31837] border-[#E31837]/30 hover:bg-[#E31837]/5"
-          }`}
+          aria-pressed={Boolean(filters.dueOnly)}
+          className={`${CHIP} ${filters.dueOnly ? CHIP_DUE_ON : CHIP_DUE_OFF}`}
         >
-          <AlarmClock className="h-3 w-3 inline mr-1 -mt-0.5" />
           Follow-ups due {stats.dueToday + stats.overdue}
         </button>
       </div>
 
       {/* Toolbar */}
-      <div className="bg-white rounded-2xl border border-black/8 p-4 shadow-sm">
+      <div className="border border-line bg-surface p-4">
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center">
           <form
             onSubmit={(e) => {
               e.preventDefault()
               setParam({ q: search || null })
             }}
-            className="relative flex-1"
+            className="flex-1"
           >
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-black/40" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search name, phone, email or message…"
-              className="w-full bg-zinc-50 border border-black/8 rounded-xl pl-10 pr-4 py-2.5 text-xs font-semibold focus:outline-none focus:border-[#023468]"
-            />
+            <Field label="Search leads" hideLabel>
+              {(field) => (
+                <Input
+                  {...field}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search name, phone, email or message…"
+                />
+              )}
+            </Field>
           </form>
 
-          <select
+          <Select
             value={filters.intent ?? "all"}
             onChange={(e) => setParam({ intent: e.target.value === "all" ? null : e.target.value })}
             aria-label="Filter by enquiry type"
-            className="bg-zinc-50 border border-black/8 rounded-xl px-3 py-2.5 text-xs font-bold cursor-pointer focus:outline-none"
+            className="lg:w-56"
           >
             <option value="all">All enquiry types</option>
             {LEAD_INTENTS.map((i) => (
               <option key={i} value={i}>{i}</option>
             ))}
-          </select>
+          </Select>
 
-          <select
+          <Select
             value={sort}
             onChange={(e) => setParam({ sort: e.target.value })}
             aria-label="Sort leads"
-            className="bg-zinc-50 border border-black/8 rounded-xl px-3 py-2.5 text-xs font-bold cursor-pointer focus:outline-none"
+            className="lg:w-48"
           >
             <option value="newest">Newest first</option>
             <option value="oldest">Oldest first</option>
             <option value="follow-up">Follow-up due</option>
             <option value="name">Name A–Z</option>
-          </select>
+          </Select>
 
-          <button
+          <Button
+            type="button"
+            variant="secondary"
             onClick={handleExport}
             disabled={exporting || result.total === 0}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#023468] hover:bg-[#01254a] disabled:opacity-50 text-white text-xs font-black uppercase tracking-wider transition-all cursor-pointer"
           >
-            {exporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
+            {exporting && <Spinner label="Preparing export" />}
             Export CSV
-          </button>
+          </Button>
         </div>
 
         {selected.size > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-black/5">
-            <span className="text-[11px] font-black uppercase tracking-wider text-black/50">
+          <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-line">
+            <span className="text-meta uppercase text-ink-2">
               {selected.size} selected — mark as
             </span>
             {LEAD_STATUSES.map((s) => (
-              <button
+              <Button
                 key={s}
+                type="button"
+                variant="secondary"
+                className="px-3"
                 onClick={() => handleBulk(s)}
                 disabled={isPending}
-                className="px-2.5 py-1 rounded-full border border-black/10 text-[10px] font-black uppercase tracking-wider hover:bg-[#023468] hover:text-white hover:border-[#023468] transition-all cursor-pointer disabled:opacity-50"
               >
                 {s}
-              </button>
+              </Button>
             ))}
           </div>
         )}
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-black/8 shadow-sm overflow-hidden">
+      <div className={result.leads.length === 0 ? "space-y-4" : "border border-line bg-surface"}>
         {result.leads.length === 0 ? (
-          <div className="p-16 text-center">
-            <Inbox className="h-12 w-12 text-black/20 mx-auto mb-4" />
-            <h3 className="text-lg font-bold text-black mb-1">No leads match these filters</h3>
-            <p className="text-xs text-black/50">
-              {stats.total === 0
+          <EmptyState
+            title="No leads match these filters"
+            description={
+              stats.total === 0
                 ? "Enquiries from the website will appear here as soon as they arrive."
-                : "Try clearing the search or switching status."}
-            </p>
-          </div>
+                : "Try clearing the search or switching status."
+            }
+          />
         ) : (
-          <div className="overflow-x-auto">
+          <div
+            role="region"
+            aria-label="Leads table"
+            tabIndex={0}
+            className="overflow-x-auto overscroll-x-contain no-scrollbar"
+          >
             <table className="w-full text-left">
-              <thead className="bg-zinc-50 border-b border-black/5">
+              <thead className="sticky top-0 z-10 bg-ground-2 border-b border-line">
                 <tr>
                   <th className="px-4 py-3 w-10">
                     <input
@@ -289,101 +302,88 @@ export function LeadsClient({
                       aria-label="Select all"
                       checked={selected.size === result.leads.length && result.leads.length > 0}
                       onChange={toggleAll}
-                      className="h-4 w-4 accent-[#023468] cursor-pointer"
+                      className="h-5 w-5 cursor-pointer rounded-sm border border-line-strong accent-[var(--color-accent)]"
                     />
                   </th>
                   {["Customer", "Enquiry", "Vehicle", "Status", "Follow-up", "Received", ""].map((h) => (
-                    <th key={h} className="px-4 py-3 text-[10px] font-black uppercase tracking-widest text-black/40">
-                      {h}
+                    <th key={h} className="px-4 py-3 text-meta uppercase text-ink-2">
+                      {h || <span className="sr-only">Actions</span>}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-black/5">
+              <tbody className="divide-y divide-line">
                 {result.leads.map((lead) => {
                   const due = dueLabel(lead.nextFollowUpAt)
                   return (
-                    <tr key={lead.id} className="hover:bg-zinc-50/60 transition-colors">
+                    <tr key={lead.id} className="hover:bg-ground transition-colors duration-(--duration-1)">
                       <td className="px-4 py-3">
                         <input
                           type="checkbox"
                           aria-label={`Select ${lead.name}`}
                           checked={selected.has(lead.id)}
                           onChange={() => toggleOne(lead.id)}
-                          className="h-4 w-4 accent-[#023468] cursor-pointer"
+                          className="h-5 w-5 cursor-pointer rounded-sm border border-line-strong accent-[var(--color-accent)]"
                         />
                       </td>
                       <td className="px-4 py-3">
-                        <Link href={`/admin/leads/${lead.id}`} className="group">
-                          <p className="text-sm font-bold text-[#023468] group-hover:text-[#E31837] transition-colors">
+                        <Link href={`/admin/leads/${lead.id}`} className="group block">
+                          <p className="text-table font-semibold text-ink transition-colors duration-(--duration-1) group-hover:text-accent-text-light">
                             {lead.name}
                           </p>
-                          <p className="text-[11px] text-black/50 font-medium">{lead.phone}</p>
-                          {lead.email && <p className="text-[11px] text-black/35 truncate max-w-[200px]">{lead.email}</p>}
+                          <p data-num className="text-small text-ink-2">{lead.phone}</p>
+                          {lead.email && <p className="text-small text-ink-3 truncate max-w-[200px]">{lead.email}</p>}
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-[11px] font-bold text-black/70">{lead.intent}</span>
+                        <span className="text-table text-ink">{lead.intent}</span>
                         {lead.sourcePath && (
-                          <p className="text-[10px] text-black/35 truncate max-w-[160px]">{lead.sourcePath}</p>
+                          <p className="text-small text-ink-3 truncate max-w-[160px]">{lead.sourcePath}</p>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         {lead.vehicle.title ? (
-                          <div className="flex items-center gap-1.5">
-                            <Car className="h-3.5 w-3.5 text-black/30 shrink-0" />
-                            <span className="text-[11px] font-semibold text-black/70 truncate max-w-[160px]">
-                              {lead.vehicle.title}
-                            </span>
-                          </div>
+                          <span className="block text-table text-ink truncate max-w-[160px]">
+                            {lead.vehicle.title}
+                          </span>
                         ) : (
-                          <span className="text-[11px] text-black/25">—</span>
+                          <span className="text-table text-ink-3">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${STATUS_STYLES[lead.status]}`}>
-                          {lead.status}
-                        </span>
+                        <Badge tone={STATUS_TONE[lead.status]}>{lead.status}</Badge>
                       </td>
                       <td className="px-4 py-3">
                         {due ? (
-                          <span className={`text-[11px] font-bold ${due.overdue ? "text-[#E31837]" : "text-black/60"}`}>
-                            {due.overdue && <AlertTriangle className="h-3 w-3 inline mr-1 -mt-0.5" />}
+                          <span
+                            data-num
+                            className={`text-small ${due.overdue ? "font-semibold text-danger-text" : "text-ink-2"}`}
+                          >
+                            {due.overdue && <AlertGlyph className="mr-1 inline-block align-[-0.15em]" />}
                             {due.text}
                           </span>
                         ) : (
-                          <span className="text-[11px] text-black/25">—</span>
+                          <span className="text-table text-ink-3">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="text-[11px] text-black/50 font-medium whitespace-nowrap">
+                        <span data-num className="text-small text-ink-2 whitespace-nowrap">
                           {timeAgo(lead.createdAt)}
                         </span>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
-                          <a
-                            href={`tel:${lead.phone}`}
-                            title="Call"
-                            className="h-8 w-8 rounded-lg bg-zinc-100 hover:bg-[#023468] hover:text-white flex items-center justify-center transition-all"
-                          >
-                            <Phone className="h-3.5 w-3.5" />
-                          </a>
+                          <Button asChild variant="secondary" className="px-3">
+                            <a href={`tel:${lead.phone}`}>Call</a>
+                          </Button>
                           {lead.email && (
-                            <a
-                              href={`mailto:${lead.email}`}
-                              title="Email"
-                              className="h-8 w-8 rounded-lg bg-zinc-100 hover:bg-[#023468] hover:text-white flex items-center justify-center transition-all"
-                            >
-                              <Mail className="h-3.5 w-3.5" />
-                            </a>
+                            <Button asChild variant="secondary" className="px-3">
+                              <a href={`mailto:${lead.email}`}>Email</a>
+                            </Button>
                           )}
-                          <Link
-                            href={`/admin/leads/${lead.id}`}
-                            className="px-3 h-8 rounded-lg bg-[#023468] text-white text-[10px] font-black uppercase tracking-wider flex items-center hover:bg-[#01254a] transition-all"
-                          >
-                            Open
-                          </Link>
+                          <Button asChild variant="secondary" className="px-3">
+                            <Link href={`/admin/leads/${lead.id}`}>Open</Link>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -395,25 +395,35 @@ export function LeadsClient({
         )}
 
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-black/5 bg-zinc-50/50">
-            <span className="text-[11px] font-semibold text-black/50">
+          <div
+            className={`flex items-center justify-between px-4 py-3 bg-ground border-line ${
+              result.leads.length === 0 ? "border" : "border-t"
+            }`}
+          >
+            <span data-num className="text-small text-ink-2">
               Page {result.page} of {totalPages} · {result.total} leads
             </span>
             <div className="flex gap-2">
-              <button
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                aria-label="Previous page"
                 onClick={() => setParam({ page: String(result.page - 1) })}
                 disabled={result.page <= 1 || isPending}
-                className="h-8 w-8 rounded-lg border border-black/10 flex items-center justify-center disabled:opacity-40 hover:bg-white transition-all cursor-pointer"
               >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <button
+                <ChevronGlyph direction="left" />
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                aria-label="Next page"
                 onClick={() => setParam({ page: String(result.page + 1) })}
                 disabled={result.page >= totalPages || isPending}
-                className="h-8 w-8 rounded-lg border border-black/10 flex items-center justify-center disabled:opacity-40 hover:bg-white transition-all cursor-pointer"
               >
-                <ChevronRight className="h-4 w-4" />
-              </button>
+                <ChevronGlyph direction="right" />
+              </Button>
             </div>
           </div>
         )}

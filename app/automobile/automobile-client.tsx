@@ -1,95 +1,78 @@
 "use client"
 
 import React from "react"
-import { motion } from "framer-motion"
-import { Car, Shield, Settings, Zap, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ArrowGlyph, Settle } from "@/components/system/marks"
 import { GroupBrands } from "@/components/sections/group-brands"
 import type { HomeInventory } from "@/lib/inventory/server"
 
+const PILLARS = [
+  { title: "Premium Fleet", desc: "Curated selection of high-performance and luxury vehicles." },
+  { title: "Certified Quality", desc: "Every vehicle undergoes rigorous multi-point inspections." },
+  { title: "Expert Service", desc: "State-of-the-art service centers with factory-trained technicians." },
+  { title: "Innovation", desc: "Leading the transition to sustainable and electric mobility." },
+]
+
 export default function AutomobilePage({ byBodyType }: { byBodyType: HomeInventory["byBodyType"] }) {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-ground">
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] flex items-center bg-zinc-950 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-white/[0.03] rounded-full blur-[150px] -translate-y-1/2 translate-x-1/4 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-[#E31837]/5 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4 pointer-events-none" />
-          <div className="absolute inset-0 bg-zinc-950/80 backdrop-blur-3xl pointer-events-none" />
-        </div>
-
-        <div className="container mx-auto px-6 md:px-12 relative z-10 pt-32">
+      <section data-ground="deep" className="flex min-h-[80vh] items-center bg-deep-2">
+        <div className="mx-auto w-full max-w-[1400px] px-5 pt-28 md:px-10 md:pt-32">
           <div className="max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, ease: [0.21, 1.02, 0.47, 0.98] }}
-            >
+            <Settle>
               <div className="mb-10 inline-flex items-center gap-4">
-                <div className="h-[1px] w-12 bg-[#E31837]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#E31837]">
+                <span aria-hidden className="h-px w-12 bg-accent" />
+                <span className="text-meta uppercase text-accent-text-dark">
                   Automotive Excellence
                 </span>
               </div>
-              
-              <h1 className="text-[54px] md:text-[96px] font-bold text-white leading-[0.9] tracking-tight mb-12">
+
+              <h1 className="mb-12 font-display text-display uppercase text-on-deep">
                 Redefining the <br />
-                <span className="text-[#E31837] italic font-light">Driving</span> Experience
+                <span className="text-accent-text-dark">Driving</span> Experience
               </h1>
-              
-              <p className="text-white/40 text-xl md:text-2xl font-light leading-relaxed max-w-2xl border-l border-white/5 pl-10 mb-12">
-                AM Group Jammu brings you the world&apos;s most prestigious automotive brands with 
+
+              <p className="mb-12 max-w-2xl border-l border-line-on-deep pl-6 text-body-lg text-on-deep-2 md:pl-10">
+                AM Group Jammu brings you the world&apos;s most prestigious automotive brands with
                 unparalleled service and expertise.
               </p>
 
-              <Button size="xl" className="bg-[#E31837] hover:bg-[#c4152f] text-white rounded-full px-12 py-8 font-black uppercase tracking-widest text-xs transition-all duration-500 shadow-2xl shadow-[#E31837]/20">
+              <Button type="button" size="lg">
                 Explore Brands
-                <ArrowRight className="ml-4 h-5 w-5" />
+                <ArrowGlyph />
               </Button>
-            </motion.div>
+            </Settle>
           </div>
         </div>
       </section>
 
       {/* Excellence Section */}
-      <section className="py-32 bg-white">
-        <div className="container mx-auto px-6 md:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            {[
-              { icon: Car, title: "Premium Fleet", desc: "Curated selection of high-performance and luxury vehicles." },
-              { icon: Shield, title: "Certified Quality", desc: "Every vehicle undergoes rigorous multi-point inspections." },
-              { icon: Settings, title: "Expert Service", desc: "State-of-the-art service centers with factory-trained technicians." },
-              { icon: Zap, title: "Innovation", desc: "Leading the transition to sustainable and electric mobility." },
-            ].map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group"
-              >
-                <div className="h-16 w-16 bg-zinc-50 rounded-[24px] flex items-center justify-center mb-8 group-hover:bg-[#E31837] transition-all duration-500">
-                  <item.icon className="h-8 w-8 text-[#023468] group-hover:text-white transition-colors" />
+      <section className="bg-ground py-20 md:py-28">
+        <div className="mx-auto max-w-[1400px] px-5 md:px-10">
+          <div className="grid grid-cols-1 gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-4">
+            {PILLARS.map((item, index) => (
+              <Settle key={item.title} delay={index * 0.08}>
+                <div className="border-t border-line pt-6">
+                  <h3 className="font-display text-h3 uppercase text-ink">{item.title}</h3>
+                  <p className="mt-3 text-body text-ink-2">{item.desc}</p>
                 </div>
-                <h3 className="text-xl font-bold text-[#023468] mb-4 uppercase tracking-tight">{item.title}</h3>
-                <p className="text-black/50 leading-relaxed font-light">{item.desc}</p>
-              </motion.div>
+              </Settle>
             ))}
           </div>
         </div>
       </section>
 
       {/* Brand Gallery Section */}
-      <div className="bg-[#FAFAFA] pt-24 pb-12">
-        <div className="container mx-auto px-6 md:px-12">
-           <div className="mb-16">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#E31837] mb-4 block">Our Portfolio</span>
-              <h2 className="text-4xl font-bold text-[#023468]">Strategic Brand <span className="text-black/20">Partnerships</span></h2>
-           </div>
+      <section className="bg-ground-2">
+        <div className="mx-auto max-w-[1400px] px-5 pb-12 pt-20 md:px-10 md:pt-28">
+          <p className="text-meta uppercase text-accent-text-light">Our Portfolio</p>
+          <h2 className="mt-4 font-display text-h1 uppercase text-ink">
+            Strategic Brand <span className="text-ink-3">Partnerships</span>
+          </h2>
         </div>
-        <GroupBrands byBodyType={byBodyType} />
-      </div>
+      </section>
+      <GroupBrands byBodyType={byBodyType} />
     </div>
   )
 }

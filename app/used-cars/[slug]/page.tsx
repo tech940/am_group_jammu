@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { MapPin, Phone, ShieldCheck, Star } from "lucide-react"
 import { FeaturedInventory } from "@/components/sections/inventory"
+import { Button } from "@/components/ui/button"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
@@ -69,7 +69,7 @@ export default async function UsedCarsLandingPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-ground">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -83,44 +83,34 @@ export default async function UsedCarsLandingPage({ params }: Props) {
       />
 
       {/* Hero: H1 carries the exact phrase the page targets */}
-      <section className="border-b border-black/5 bg-gradient-to-b from-zinc-50 to-white">
+      <section className="border-b border-line bg-ground-2">
         <div className="container mx-auto px-4 md:px-8 py-10 md:py-14">
-          <span className="flex items-center text-[#E31837] text-[10px] font-black uppercase tracking-[0.3em] mb-4">
-            <MapPin className="h-4 w-4 mr-2" /> {landing.cityName}
+          <span className="block text-meta uppercase text-accent-text-light mb-4">
+            {landing.cityName}
           </span>
 
-          <h1 className="text-3xl md:text-5xl font-black text-[#023468] tracking-tight mb-5 max-w-4xl">
+          <h1 className="font-display text-h1 text-ink mb-5 max-w-4xl">
             {landing.heading}
           </h1>
 
           <div className="max-w-3xl space-y-3">
             {landing.intro.map((p, i) => (
-              <p key={i} className="text-sm md:text-[15px] text-black/60 leading-relaxed">
+              <p key={i} className="text-body text-ink-2">
                 {p}
               </p>
             ))}
           </div>
 
-          <div className="flex flex-wrap gap-3 mt-7">
-            <div className="flex items-center gap-2.5 rounded-full border border-black/10 bg-white px-4 py-2">
-              <ShieldCheck className="h-4 w-4 text-[#023468]" />
-              <span className="text-[11px] font-black uppercase tracking-wider text-black/70">
-                Inspected &amp; verified
-              </span>
-            </div>
-            <div className="flex items-center gap-2.5 rounded-full border border-black/10 bg-white px-4 py-2">
-              <Star className="h-4 w-4 text-[#023468]" />
-              <span className="text-[11px] font-black uppercase tracking-wider text-black/70">
-                Since 1968
-              </span>
-            </div>
-            <a
-              href="tel:+919419100000"
-              className="flex items-center gap-2.5 rounded-full bg-[#023468] px-5 py-2 text-white hover:bg-[#01254a] transition-colors"
-            >
-              <Phone className="h-4 w-4" />
-              <span className="text-[11px] font-black uppercase tracking-wider">+91 94191 00000</span>
-            </a>
+          <div className="flex flex-wrap items-center gap-3 mt-7">
+            <span className="inline-flex items-center rounded-sm border border-line bg-surface px-3 py-1.5 text-meta uppercase text-ink-2">
+              Inspected &amp; verified
+            </span>
+            <span className="inline-flex items-center rounded-sm border border-line bg-surface px-3 py-1.5 text-meta uppercase text-ink-2">
+              Since 1968
+            </span>
+            <Button asChild variant="primary">
+              <a href="tel:+919419100000">+91 94191 00000</a>
+            </Button>
           </div>
         </div>
       </section>
@@ -133,22 +123,28 @@ export default async function UsedCarsLandingPage({ params }: Props) {
       />
 
       {/* Long-form copy */}
-      <section className="py-16 bg-white border-t border-black/5">
+      <section className="py-16 bg-ground-2 border-t border-line">
         <div className="container mx-auto px-4 md:px-8 max-w-4xl space-y-9">
           {landing.sections.map((block) => (
             <article key={block.heading}>
-              <h2 className="text-xl md:text-2xl font-black text-[#023468] mb-3">{block.heading}</h2>
-              <p className="text-sm md:text-[15px] text-black/60 leading-relaxed">{block.body}</p>
+              <h2 className="font-display text-h2 text-ink mb-3">{block.heading}</h2>
+              <p className="text-body text-ink-2">{block.body}</p>
             </article>
           ))}
 
-          <p className="text-sm text-black/50 leading-relaxed border-t border-black/5 pt-6">
+          <p className="text-body text-ink-2 border-t border-line pt-6">
             Browse the{" "}
-            <Link href="/inventory" className="font-bold text-[#023468] hover:text-[#E31837] underline">
+            <Link
+              href="/inventory"
+              className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light"
+            >
               full used car inventory in Jammu
             </Link>
             , or call us on{" "}
-            <a href="tel:+919419100000" className="font-bold text-[#023468] hover:text-[#E31837]">
+            <a
+              href="tel:+919419100000"
+              className="font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
+            >
               +91 94191 00000
             </a>{" "}
             and we will tell you what has just arrived.

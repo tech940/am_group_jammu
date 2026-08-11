@@ -4,14 +4,15 @@ import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, ArrowRight, Check, Shield, Zap, Phone, Mail, MapPin, Gauge, Fuel, Settings2, Calendar, Palette, Cog, ImageOff, FileText, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react"
+import { ChevronGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/feedback"
 import { VehicleCard } from "@/components/ui/vehicle-card"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import type { FaqItem } from "@/components/seo/faq-section"
-import { FrequentSearches, SeoLinkDirectory } from "@/components/seo/frequent-searches"
+import { FrequentSearches } from "@/components/seo/frequent-searches"
 import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
 import type { VehicleNeighbour } from "@/lib/inventory/server"
 import type { InventoryVehicle } from "@/lib/inventory/types"
@@ -52,15 +53,15 @@ export default function VehicleClient({
 
   /* Every spec is conditional — this listing only shows what it actually has. */
   const specs = [
-    vehicle.year !== null && { label: "Year", value: String(vehicle.year), icon: Calendar },
-    vehicle.mileage !== null && { label: "KMs Driven", value: vehicle.mileageLabel, icon: Gauge },
-    vehicle.fuel && { label: "Fuel", value: vehicle.fuel, icon: Fuel },
-    vehicle.transmission && { label: "Transmission", value: vehicle.transmission, icon: Settings2 },
-    vehicle.drivetrain && { label: "Drivetrain", value: vehicle.drivetrain, icon: Cog },
-    vehicle.bodyType && { label: "Body Type", value: vehicle.bodyType, icon: Shield },
-    vehicle.colour && { label: "Colour", value: vehicle.colour, icon: Palette },
-    vehicle.engine && { label: "Engine", value: vehicle.engine, icon: Zap },
-  ].filter(Boolean) as { label: string; value: string; icon: React.ElementType }[]
+    vehicle.year !== null && { label: "Year", value: String(vehicle.year) },
+    vehicle.mileage !== null && { label: "KMs Driven", value: vehicle.mileageLabel },
+    vehicle.fuel && { label: "Fuel", value: vehicle.fuel },
+    vehicle.transmission && { label: "Transmission", value: vehicle.transmission },
+    vehicle.drivetrain && { label: "Drivetrain", value: vehicle.drivetrain },
+    vehicle.bodyType && { label: "Body Type", value: vehicle.bodyType },
+    vehicle.colour && { label: "Colour", value: vehicle.colour },
+    vehicle.engine && { label: "Engine", value: vehicle.engine },
+  ].filter(Boolean) as { label: string; value: string }[]
 
   // Keyed on vehicle.id, not []: the prev/next links swap the vehicle without
   // remounting this component, so an empty dep array would miss those views.
@@ -75,7 +76,7 @@ export default function VehicleClient({
   const heading = `${vehicle.year ? `${vehicle.year} ` : ""}${vehicle.title}`
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-ground">
       <Breadcrumbs
         items={[
           { label: "Used Cars in Jammu", href: "/inventory" },
@@ -91,10 +92,9 @@ export default function VehicleClient({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Link
             href="/inventory"
-            className="inline-flex items-center gap-2 text-black/60 hover:text-black transition-colors"
+            className="inline-flex min-h-11 items-center text-body font-medium text-ink-2 hover:text-ink transition-colors duration-(--duration-1)"
           >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="text-sm font-medium">Back to Inventory</span>
+            Back to Inventory
           </Link>
 
           <nav aria-label="Vehicle pagination" className="flex items-center gap-2">
@@ -103,17 +103,17 @@ export default function VehicleClient({
                 href={`/inventory/${prev.slug}`}
                 rel="prev"
                 title={`${prev.year ?? ""} ${prev.title}`.trim()}
-                className="h-9 px-3 rounded-xl border border-black/10 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-[#023468] hover:bg-[#023468] hover:text-white transition-all"
+                className="h-11 px-3 rounded-sm border border-line-strong flex items-center text-meta uppercase text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
               >
-                <ChevronLeft className="h-3.5 w-3.5" /> Prev
+                Prev
               </Link>
             ) : (
-              <span className="h-9 px-3 rounded-xl border border-black/5 bg-zinc-50 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/20">
-                <ChevronLeft className="h-3.5 w-3.5" /> Prev
+              <span className="h-11 px-3 rounded-sm border border-line bg-ground-2 flex items-center text-meta uppercase text-ink-3">
+                Prev
               </span>
             )}
 
-            <span className="text-[11px] font-bold text-black/40 px-1 whitespace-nowrap">
+            <span className="text-meta text-ink-2 px-1 whitespace-nowrap" data-num>
               Car {position} of {total}
             </span>
 
@@ -122,13 +122,13 @@ export default function VehicleClient({
                 href={`/inventory/${next.slug}`}
                 rel="next"
                 title={`${next.year ?? ""} ${next.title}`.trim()}
-                className="h-9 px-3 rounded-xl border border-black/10 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-[#023468] hover:bg-[#023468] hover:text-white transition-all"
+                className="h-11 px-3 rounded-sm border border-line-strong flex items-center text-meta uppercase text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
               >
-                Next <ChevronRight className="h-3.5 w-3.5" />
+                Next
               </Link>
             ) : (
-              <span className="h-9 px-3 rounded-xl border border-black/5 bg-zinc-50 flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-black/20">
-                Next <ChevronRight className="h-3.5 w-3.5" />
+              <span className="h-11 px-3 rounded-sm border border-line bg-ground-2 flex items-center text-meta uppercase text-ink-3">
+                Next
               </span>
             )}
           </nav>
@@ -140,7 +140,7 @@ export default function VehicleClient({
           {/* MAIN COLUMN */}
           <div className="lg:col-span-3 space-y-12">
             {/* Gallery */}
-            <div className="relative h-[380px] md:h-[560px] bg-zinc-100 rounded-3xl overflow-hidden shadow-2xl">
+            <div className="relative h-[380px] md:h-[560px] bg-ground-2 border border-line overflow-hidden">
               {hasImages ? (
                 <>
                   <AnimatePresence mode="wait">
@@ -149,7 +149,7 @@ export default function VehicleClient({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
                       className="absolute inset-0"
                     >
                       <Image
@@ -166,18 +166,19 @@ export default function VehicleClient({
                   {images.length > 1 && (
                     <>
                       <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 flex justify-between z-20">
-                        <button onClick={prevImage} aria-label="Previous photo"
-                          className="h-12 w-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center hover:bg-white shadow-xl transition-all cursor-pointer">
-                          <ArrowLeft className="h-5 w-5 text-black" />
+                        <button type="button" onClick={prevImage} aria-label="Previous photo"
+                          className="h-11 w-11 rounded-sm border border-line bg-surface text-ink flex items-center justify-center hover:bg-ground-2 transition-colors duration-(--duration-1) cursor-pointer">
+                          <ChevronGlyph direction="left" />
                         </button>
-                        <button onClick={nextImage} aria-label="Next photo"
-                          className="h-12 w-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center hover:bg-white shadow-xl transition-all cursor-pointer">
-                          <ArrowRight className="h-5 w-5 text-black" />
+                        <button type="button" onClick={nextImage} aria-label="Next photo"
+                          className="h-11 w-11 rounded-sm border border-line bg-surface text-ink flex items-center justify-center hover:bg-ground-2 transition-colors duration-(--duration-1) cursor-pointer">
+                          <ChevronGlyph direction="right" />
                         </button>
                       </div>
 
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full">
-                        <span className="text-white text-xs font-bold">
+                      {/* Scrim over photography — legitimate, so the count stays readable. */}
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/80 px-3 py-1 rounded-sm">
+                        <span className="text-on-deep text-caption" data-num>
                           {currentImage + 1} / {images.length}
                         </span>
                       </div>
@@ -185,9 +186,8 @@ export default function VehicleClient({
                   )}
                 </>
               ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-black/25">
-                  <ImageOff className="h-10 w-10" />
-                  <span className="text-xs font-black uppercase tracking-widest">
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-ink-3">
+                  <span className="text-meta uppercase">
                     Photos for this car are coming soon
                   </span>
                 </div>
@@ -200,10 +200,12 @@ export default function VehicleClient({
                 {images.map((src, i) => (
                   <button
                     key={src}
+                    type="button"
                     onClick={() => setCurrentImage(i)}
                     aria-label={`View photo ${i + 1}`}
-                    className={`relative aspect-4/3 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                      i === currentImage ? "border-[#023468] scale-95" : "border-transparent hover:border-black/20"
+                    aria-pressed={i === currentImage}
+                    className={`relative aspect-4/3 rounded-sm overflow-hidden border-2 transition-colors duration-(--duration-1) cursor-pointer ${
+                      i === currentImage ? "border-accent" : "border-transparent hover:border-line-strong"
                     }`}
                   >
                     <Image src={src} alt="" fill sizes="120px" className="object-cover" />
@@ -214,19 +216,18 @@ export default function VehicleClient({
 
             {/* Specifications */}
             {specs.length > 0 && (
-              <div className="bg-zinc-50 rounded-[40px] p-8 md:p-12 border border-black/5">
-                <h2 className="text-2xl font-black text-[#023468] mb-10 flex items-center gap-3">
-                  <div className="h-8 w-1 bg-[#E31837] rounded-full" />
+              <div className="bg-surface p-8 md:p-12 border border-line">
+                <h2 className="font-display text-h2 text-ink mb-10 flex items-center gap-3">
+                  <span aria-hidden className="h-7 w-1 bg-accent shrink-0" />
                   Vehicle Specifications
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-1">
                   {specs.map((spec) => (
-                    <div key={spec.label} className="flex justify-between items-center py-4 border-b border-black/5">
-                      <span className="flex items-center gap-2.5 text-black/40 text-xs font-bold uppercase tracking-widest">
-                        <spec.icon className="h-4 w-4" />
+                    <div key={spec.label} className="flex justify-between items-center py-4 border-b border-line">
+                      <span className="text-meta uppercase text-ink-2">
                         {spec.label}
                       </span>
-                      <span className="font-black text-[#023468] text-right">{spec.value}</span>
+                      <span className="text-body font-semibold text-ink text-right" data-num>{spec.value}</span>
                     </div>
                   ))}
                 </div>
@@ -235,14 +236,13 @@ export default function VehicleClient({
 
             {/* SELLER'S NOTES */}
             <section>
-              <h2 className="text-2xl font-black text-[#023468] mb-6 flex items-center gap-3">
-                <div className="h-8 w-1 bg-[#E31837] rounded-full" />
-                <FileText className="h-5 w-5" />
+              <h2 className="font-display text-h2 text-ink mb-6 flex items-center gap-3">
+                <span aria-hidden className="h-7 w-1 bg-accent shrink-0" />
                 Seller&apos;s Notes
               </h2>
               <div className="space-y-4">
                 {sellerNotes.map((para, i) => (
-                  <p key={i} className="text-black/70 text-[15px] md:text-base leading-relaxed">
+                  <p key={i} className="text-body text-ink-2">
                     {para}
                   </p>
                 ))}
@@ -262,9 +262,9 @@ export default function VehicleClient({
                       : "—",
                   },
                 ].map((item) => (
-                  <div key={item.k} className="rounded-2xl bg-zinc-50 border border-black/5 px-4 py-3">
-                    <dt className="text-[9px] font-black uppercase tracking-widest text-black/35">{item.k}</dt>
-                    <dd className="text-sm font-black text-[#023468] mt-0.5">{item.v}</dd>
+                  <div key={item.k} className="bg-surface border border-line px-4 py-3">
+                    <dt className="text-meta uppercase text-ink-2">{item.k}</dt>
+                    <dd className="text-body font-semibold text-ink mt-0.5" data-num>{item.v}</dd>
                   </div>
                 ))}
               </dl>
@@ -276,31 +276,27 @@ export default function VehicleClient({
             <div>
               <div className="flex flex-wrap items-center gap-3 mb-4">
                 {(vehicle.year || vehicle.make) && (
-                  <span className="text-sm font-black uppercase tracking-widest text-black/40">
+                  <span className="text-meta uppercase text-ink-2" data-num>
                     {[vehicle.year, vehicle.make].filter(Boolean).join(" • ")}
                   </span>
                 )}
-                {vehicle.condition && (
-                  <span className="px-3 py-1 bg-[#023468] text-white text-xs font-black uppercase tracking-widest rounded-full">
-                    {vehicle.condition}
-                  </span>
-                )}
+                {vehicle.condition && <Badge tone="info">{vehicle.condition}</Badge>}
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold text-[#023468] mb-4">{vehicle.title}</h1>
+              <h1 className="font-display text-h1 text-ink mb-4">{vehicle.title}</h1>
             </div>
 
             {/* Price */}
-            <div className="bg-zinc-50 rounded-3xl p-8 border border-black/5">
+            <div className="bg-surface p-8 border border-line">
               <div className="text-center mb-6">
-                <span className="text-sm text-black/60 uppercase tracking-widest">
+                <span className="text-meta uppercase text-ink-2">
                   {vehicle.price === null ? "Price" : "Asking Price"}
                 </span>
-                <div className="text-4xl font-bold text-[#023468] mt-2">{vehicle.priceLabel}</div>
+                <div className="font-display text-h1 text-ink mt-2" data-num>{vehicle.priceLabel}</div>
                 {vehicle.originalPriceLabel && (
                   <div className="mt-2 flex items-center justify-center gap-3">
-                    <span className="text-sm text-black/35 line-through">{vehicle.originalPriceLabel}</span>
+                    <span className="text-small text-ink-3 line-through" data-num>{vehicle.originalPriceLabel}</span>
                     {vehicle.discountPercent !== null && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#E31837] text-white text-[10px] font-black uppercase tracking-widest">
+                      <span className="px-2 py-0.5 rounded-sm bg-accent text-ground text-meta uppercase" data-num>
                         {vehicle.discountPercent}% off
                       </span>
                     )}
@@ -310,15 +306,20 @@ export default function VehicleClient({
 
               <div className="space-y-3">
                 <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  full
                   onClick={() => onOpen(vehicle, { intent: "Vehicle Enquiry", sourceLabel: "vdp-best-price" })}
-                  className="w-full h-14 bg-[#023468] hover:bg-[#01254a] text-white font-black uppercase tracking-widest text-sm"
                 >
                   Get Best Price
                 </Button>
                 <Button
-                  variant="outline"
+                  type="button"
+                  variant="secondary"
+                  size="lg"
+                  full
                   onClick={() => onOpen(vehicle, { intent: "Test Drive", sourceLabel: "vdp-test-drive" })}
-                  className="w-full h-14 border-black/20 hover:bg-black hover:text-white font-black uppercase tracking-widest text-sm"
                 >
                   Schedule Test Drive
                 </Button>
@@ -326,61 +327,57 @@ export default function VehicleClient({
                 {/* WhatsApp is usually the highest-volume enquiry channel for a
                     J&K dealership — prefilled with this exact car so the buyer
                     does not have to describe it. */}
-                <a
-                  href={whatsappUrl(
-                    `Hi AM Group, I'm interested in the ${heading}` +
-                      `${vehicle.price !== null ? ` listed at ${vehicle.priceLabel}` : ""}. ` +
-                      `Is it still available? (Ref #${vehicle.id})`,
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-track-location="vdp-whatsapp"
-                  className="w-full h-14 rounded-md bg-[#25D366] hover:bg-[#1da851] text-white font-black uppercase tracking-widest text-sm flex items-center justify-center gap-2.5 transition-colors"
-                >
-                  <MessageCircle className="h-5 w-5" />
-                  WhatsApp Us
-                </a>
+                <Button asChild variant="secondary" size="lg" full>
+                  <a
+                    href={whatsappUrl(
+                      `Hi AM Group, I'm interested in the ${heading}` +
+                        `${vehicle.price !== null ? ` listed at ${vehicle.priceLabel}` : ""}. ` +
+                        `Is it still available? (Ref #${vehicle.id})`,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-track-location="vdp-whatsapp"
+                  >
+                    WhatsApp Us
+                  </a>
+                </Button>
               </div>
             </div>
 
             {/* Quick contact */}
-            <div className="bg-white rounded-3xl p-6 border border-black/5">
-              <h2 className="text-lg font-bold text-black mb-4">Quick Contact</h2>
-              <div className="space-y-3">
-                <a href="tel:+919419100000" data-track-location="vdp-quick-contact" className="flex items-center gap-3 text-black/70 hover:text-[#023468] transition-colors">
-                  <Phone className="h-5 w-5" />
-                  <span>+91 94191 00000</span>
+            <div className="bg-surface p-6 border border-line">
+              <h2 className="font-display text-h3 text-ink mb-4">Quick Contact</h2>
+              <div className="flex flex-col">
+                <a href="tel:+919419100000" data-track-location="vdp-quick-contact" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)" data-num>
+                  +91 94191 00000
                 </a>
-                <a href="mailto:info@amgroupind.com" className="flex items-center gap-3 text-black/70 hover:text-[#023468] transition-colors">
-                  <Mail className="h-5 w-5" />
-                  <span>info@amgroupind.com</span>
+                <a href="mailto:info@amgroupind.com" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)">
+                  info@amgroupind.com
                 </a>
-                <div className="flex items-start gap-3 text-black/70">
-                  <MapPin className="h-5 w-5 shrink-0 mt-0.5" />
-                  <span>AM Business Park, N-H 1 Bye-Pass Road, Jammu</span>
-                </div>
+                <address className="not-italic py-3 text-body text-ink-2">
+                  AM Business Park, N-H 1 Bye-Pass Road, Jammu
+                </address>
               </div>
             </div>
 
-            <div className="bg-white rounded-3xl p-6 border border-black/5">
-              <h2 className="text-lg font-bold text-black mb-4">Why Buy From Us</h2>
-              <div className="space-y-3">
+            <div className="bg-surface p-6 border border-line">
+              <h2 className="font-display text-h3 text-ink mb-4">Why Buy From Us</h2>
+              <ul className="border-t border-line">
                 {[
-                  { icon: Shield, text: "Verified documentation & history" },
-                  { icon: Check, text: "Multi-point inspection before sale" },
-                  { icon: Zap, text: "Finance & exchange assistance" },
-                ].map((item) => (
-                  <div key={item.text} className="flex items-center gap-3">
-                    <item.icon className="h-5 w-5 text-[#023468] shrink-0" />
-                    <span className="text-black/70 text-sm">{item.text}</span>
-                  </div>
+                  "Verified documentation & history",
+                  "Multi-point inspection before sale",
+                  "Finance & exchange assistance",
+                ].map((text) => (
+                  <li key={text} className="border-b border-line py-3 text-body text-ink-2">
+                    {text}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Related browse links keep this page connected to the wider site */}
-            <div className="bg-white rounded-3xl p-6 border border-black/5">
-              <h2 className="text-lg font-bold text-black mb-4">Browse similar</h2>
+            <div className="bg-surface p-6 border border-line">
+              <h2 className="font-display text-h3 text-ink mb-4">Browse similar</h2>
               <div className="flex flex-wrap gap-2">
                 {(
                   [
@@ -395,7 +392,7 @@ export default function VehicleClient({
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="px-3 py-1.5 rounded-full border border-black/10 text-[11px] font-bold text-[#023468] hover:bg-[#023468] hover:text-white transition-all"
+                    className="inline-flex min-h-11 items-center px-3 rounded-sm border border-line-strong text-small font-medium text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
                   >
                     {link.label}
                   </Link>
@@ -409,8 +406,8 @@ export default function VehicleClient({
       {/* SIMILAR */}
       {similar.length > 0 && (
         <div className="container mx-auto px-6 md:px-12 pb-16">
-          <div className="border-t border-black/5 pt-12">
-            <h2 className="text-3xl font-bold text-black mb-8">Similar Vehicles</h2>
+          <div className="border-t border-line pt-12">
+            <h2 className="font-display text-h2 text-ink mb-8">Similar Vehicles</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {similar.map((v, index) => (
                 <VehicleCard

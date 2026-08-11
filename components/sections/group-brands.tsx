@@ -1,9 +1,8 @@
 "use client"
 
-import { motion } from "framer-motion"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowRight, ImageOff } from "lucide-react"
+import { ArrowGlyph, Settle } from "@/components/system/marks"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 
 /**
@@ -20,70 +19,65 @@ export function GroupBrands({
   if (byBodyType.length === 0) return null
 
   return (
-    <section className="py-20 bg-white border-t border-black/5">
-      <div className="container mx-auto px-4 md:px-8">
+    <section className="border-t border-line bg-ground">
+      <div className="mx-auto max-w-[1400px] px-5 py-20 md:px-10 md:py-28">
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12 gap-4">
+        <div className="mb-12 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <h2 className="text-3xl md:text-4xl font-black text-[#023468]">
+            <h2 className="font-display text-h2 uppercase text-ink">
               Explore by Body Style
             </h2>
-            <p className="text-black/60 text-sm font-medium mt-1">
+            <p className="mt-2 text-body text-ink-2">
               Find the perfect category tailored to your driving style.
             </p>
           </div>
           <Link
             href="/inventory"
-            className="text-xs font-extrabold uppercase tracking-widest text-[#023468] hover:text-[#E31837] transition-colors flex items-center gap-1.5"
+            className="inline-flex min-h-11 items-center gap-2 text-meta uppercase text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
           >
             <span>View All Inventory</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowGlyph />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {byBodyType.slice(0, 4).map((style, idx) => {
             const cover = style.vehicles.find((v) => v.primaryImage)?.primaryImage ?? null
             return (
-              <motion.div
-                key={style.slug}
-                initial={{ opacity: 0, y: 25 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
+              <Settle key={style.slug} delay={idx * 0.08} className="h-full">
                 <Link
                   href={`/inventory?bodyType=${encodeURIComponent(style.label)}`}
-                  className="group block"
+                  className="group block h-full"
                 >
-                  <div className="bg-white rounded-[28px] overflow-hidden border border-black/10 shadow-sm hover:shadow-xl transition-all duration-500">
-                    <div className="relative h-48 w-full bg-zinc-100 overflow-hidden">
+                  <article className="flex h-full flex-col border border-line bg-surface transition-colors duration-(--duration-1) group-hover:border-line-strong">
+                    <div className="relative h-48 w-full overflow-hidden bg-ground-2">
                       {cover ? (
                         <Image
                           src={cover}
                           alt={`${style.label} cars available at AM Group Jammu`}
                           fill
                           sizes="(max-width: 768px) 100vw, 25vw"
-                          className="object-cover group-hover:scale-105 transition-transform duration-700"
+                          className="object-cover"
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center text-black/20">
-                          <ImageOff className="h-8 w-8" />
-                        </div>
+                        /* Missing photography is declared, never faked. */
+                        <span className="absolute inset-0 flex items-center justify-center text-meta uppercase text-ink-3">
+                          No photograph
+                        </span>
                       )}
                     </div>
 
                     <div className="p-6 text-left">
-                      <h3 className="text-lg font-extrabold text-[#023468] group-hover:text-[#E31837] transition-colors">
+                      <h3 className="font-display text-h3 uppercase text-ink transition-colors duration-(--duration-1) group-hover:text-accent-text-light">
                         {style.label}
                       </h3>
-                      <p className="text-xs font-bold text-black/50 mt-1">
+                      <p className="mt-1 text-small text-ink-2" data-num>
                         {style.count} {style.count === 1 ? "vehicle" : "vehicles"} in stock
                       </p>
                     </div>
-                  </div>
+                  </article>
                 </Link>
-              </motion.div>
+              </Settle>
             )
           })}
         </div>

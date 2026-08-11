@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ChevronLeft, ChevronRight } from "lucide-react"
+import { ChevronGlyph } from "@/components/system/marks"
 
 /**
  * Crawlable pagination.
@@ -39,7 +39,9 @@ export function Pagination({
   const last = Math.min(page * pageSize, totalItems)
 
   const base =
-    "h-10 min-w-10 px-3 rounded-xl border text-xs font-black flex items-center justify-center transition-all"
+    "h-11 min-w-11 px-3 rounded-sm border text-button flex items-center justify-center transition-colors duration-(--duration-1)"
+  const enabled = `${base} border-line-strong bg-surface text-ink hover:bg-deep hover:text-on-deep`
+  const disabled = `${base} border-line bg-ground-2 text-ink-3`
 
   return (
     <nav aria-label="Pagination" className="mt-12 flex flex-col items-center gap-4">
@@ -49,57 +51,49 @@ export function Pagination({
             href={buildHref(page - 1)}
             rel="prev"
             aria-label="Previous page"
-            className={`${base} border-black/10 bg-white text-[#023468] hover:bg-[#023468] hover:text-white`}
+            className={enabled}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronGlyph direction="left" />
           </Link>
         ) : (
-          <span className={`${base} border-black/5 bg-zinc-50 text-black/20`} aria-disabled="true">
-            <ChevronLeft className="h-4 w-4" />
+          <span className={disabled} aria-disabled="true">
+            <ChevronGlyph direction="left" />
           </span>
         )}
 
         {pages.map((p, i) =>
           p === "gap" ? (
-            <span key={`gap-${i}`} className="px-1 text-black/30 text-xs font-black">
+            <span key={`gap-${i}`} className="px-1 text-ink-3 text-button">
               …
             </span>
           ) : p === page ? (
             <span
               key={p}
               aria-current="page"
-              className={`${base} border-[#023468] bg-[#023468] text-white`}
+              data-num
+              className={`${base} border-deep bg-deep text-on-deep`}
             >
               {p}
             </span>
           ) : (
-            <Link
-              key={p}
-              href={buildHref(p)}
-              className={`${base} border-black/10 bg-white text-[#023468] hover:bg-[#023468] hover:text-white`}
-            >
+            <Link key={p} href={buildHref(p)} data-num className={enabled}>
               {p}
             </Link>
           ),
         )}
 
         {page < totalPages ? (
-          <Link
-            href={buildHref(page + 1)}
-            rel="next"
-            aria-label="Next page"
-            className={`${base} border-black/10 bg-white text-[#023468] hover:bg-[#023468] hover:text-white`}
-          >
-            <ChevronRight className="h-4 w-4" />
+          <Link href={buildHref(page + 1)} rel="next" aria-label="Next page" className={enabled}>
+            <ChevronGlyph direction="right" />
           </Link>
         ) : (
-          <span className={`${base} border-black/5 bg-zinc-50 text-black/20`} aria-disabled="true">
-            <ChevronRight className="h-4 w-4" />
+          <span className={disabled} aria-disabled="true">
+            <ChevronGlyph direction="right" />
           </span>
         )}
       </div>
 
-      <p className="text-xs font-semibold text-black/45">
+      <p data-num className="text-small text-ink-2">
         Showing {first}–{last} of {totalItems} cars · Page {page} of {totalPages}
       </p>
     </nav>

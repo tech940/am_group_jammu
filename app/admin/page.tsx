@@ -1,10 +1,9 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import {
-  Inbox, MessageSquare, AlarmClock, AlertTriangle, UserX, ArrowRight, Car, Database, Phone,
-} from "lucide-react"
 import { adminGetStats, adminGetStorageInfo, adminListLeads } from "@/lib/leads/actions"
 import { getInventory } from "@/lib/inventory/server"
+import { Alert, EmptyState } from "@/components/ui/feedback"
+import { PhoneGlyph } from "@/components/system/marks"
 import type { LeadStatus } from "@/lib/leads/types"
 
 export const metadata: Metadata = {
@@ -12,13 +11,16 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow",
 }
 
+// Semantic tokens, not Tailwind's default palette. Six statuses across five
+// tones, so the pipeline reads as a progression: tinted while in play, filled
+// once won, drained once lost.
 const STATUS_STYLES: Record<LeadStatus, string> = {
-  New: "bg-blue-50 text-blue-700 border-blue-200",
-  Contacted: "bg-amber-50 text-amber-700 border-amber-200",
-  "Follow-up": "bg-purple-50 text-purple-700 border-purple-200",
-  Qualified: "bg-teal-50 text-teal-700 border-teal-200",
-  Won: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  Lost: "bg-zinc-100 text-zinc-500 border-zinc-200",
+  New: "bg-info-bg text-info-text border-info-line",
+  Contacted: "bg-warning-bg text-warning-text border-warning-line",
+  "Follow-up": "bg-surface text-ink border-line-strong",
+  Qualified: "bg-success-bg text-success-text border-success-line",
+  Won: "bg-success text-ground border-success",
+  Lost: "bg-ground-2 text-ink-3 border-line",
 }
 
 export default async function AdminDashboard() {
@@ -32,71 +34,69 @@ export default async function AdminDashboard() {
     getInventory(),
   ])
 
+  // One accent on the board, and it is the number that means someone is being
+  // kept waiting. Everything else is ink.
   const kpis = [
-    { label: "Total leads", value: stats.total, icon: Inbox, tone: "text-[#023468]", href: "/admin/leads" },
-    { label: "New today", value: stats.newToday, icon: MessageSquare, tone: "text-blue-600", href: "/admin/leads?status=New" },
-    { label: "Follow-ups due", value: stats.dueToday + stats.overdue, icon: AlarmClock, tone: "text-amber-600", href: "/admin/leads?due=1" },
-    { label: "Overdue", value: stats.overdue, icon: AlertTriangle, tone: "text-[#E31837]", href: "/admin/leads?due=1" },
-    { label: "Unassigned", value: stats.unassigned, icon: UserX, tone: "text-purple-600", href: "/admin/leads" },
-    { label: "Cars in stock", value: inventory.total, icon: Car, tone: "text-emerald-600", href: "/inventory" },
+    { label: "Total leads", value: stats.total, tone: "text-ink", href: "/admin/leads" },
+    { label: "New today", value: stats.newToday, tone: "text-ink", href: "/admin/leads?status=New" },
+    { label: "Follow-ups due", value: stats.dueToday + stats.overdue, tone: "text-ink", href: "/admin/leads?due=1" },
+    { label: "Overdue", value: stats.overdue, tone: "text-accent-text-light", href: "/admin/leads?due=1" },
+    { label: "Unassigned", value: stats.unassigned, tone: "text-ink", href: "/admin/leads" },
+    { label: "Cars in stock", value: inventory.total, tone: "text-ink", href: "/inventory" },
   ]
 
   return (
     <div className="space-y-6">
-      {storage.warning && (
-        <div className="flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3">
-          <Database className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-xs font-semibold text-amber-800 leading-relaxed">{storage.warning}</p>
-        </div>
-      )}
+      {storage.warning && <Alert tone="warning">{storage.warning}</Alert>}
 
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
         {kpis.map((k) => (
           <Link
             key={k.label}
             href={k.href}
-            className="bg-white rounded-2xl border border-black/8 p-4 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all"
+            className="border border-line bg-surface p-4 transition-colors duration-(--duration-1) hover:bg-ground-2"
           >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-black/40">{k.label}</span>
-              <k.icon className={`h-4 w-4 ${k.tone}`} />
-            </div>
-            <p className={`text-2xl font-black ${k.tone}`}>{k.value}</p>
+            <span className="block text-meta uppercase text-ink-2">{k.label}</span>
+            <p data-num className={`mt-2 font-display text-h2 ${k.tone}`}>{k.value}</p>
           </Link>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Recent leads */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-black/8 shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-black/5">
-            <h2 className="text-sm font-black uppercase tracking-widest text-[#023468]">Recent enquiries</h2>
-            <Link href="/admin/leads" className="text-[10px] font-black uppercase tracking-widest text-[#023468] hover:text-[#E31837] flex items-center gap-1">
-              View all <ArrowRight className="h-3 w-3" />
+        <div className="border border-line bg-surface lg:col-span-2">
+          <div className="flex min-h-14 items-center justify-between gap-4 border-b border-line px-4">
+            <h2 className="font-display text-h4 uppercase text-ink">Recent enquiries</h2>
+            <Link
+              href="/admin/leads"
+              className="inline-flex h-11 items-center text-meta uppercase text-ink-2 transition-colors duration-(--duration-1) hover:text-accent-text-light"
+            >
+              View all
             </Link>
           </div>
 
           {recent.leads.length === 0 ? (
-            <div className="p-12 text-center">
-              <Inbox className="h-10 w-10 text-black/20 mx-auto mb-3" />
-              <p className="text-sm font-bold text-black/70">No enquiries yet</p>
-              <p className="text-xs text-black/45 mt-1">
-                Leads from the website will appear here the moment they arrive.
-              </p>
-            </div>
+            <EmptyState
+              className="border-transparent"
+              title="No enquiries yet"
+              description="Leads from the website will appear here the moment they arrive."
+            />
           ) : (
-            <ul className="divide-y divide-black/5">
+            <ul className="divide-y divide-line">
               {recent.leads.map((lead) => (
                 <li key={lead.id}>
-                  <Link href={`/admin/leads/${lead.id}`} className="flex items-center justify-between gap-4 px-5 py-3 hover:bg-zinc-50/70 transition-colors">
+                  <Link
+                    href={`/admin/leads/${lead.id}`}
+                    className="flex min-h-11 items-center justify-between gap-4 px-4 py-3 transition-colors duration-(--duration-1) hover:bg-ground"
+                  >
                     <div className="min-w-0">
-                      <p className="text-sm font-bold text-[#023468] truncate">{lead.name}</p>
-                      <p className="text-[11px] text-black/50 font-medium">
+                      <p className="truncate text-table font-semibold text-ink">{lead.name}</p>
+                      <p className="text-caption text-ink-2">
                         {lead.phone} · {lead.intent}
                         {lead.vehicle.title ? ` · ${lead.vehicle.title}` : ""}
                       </p>
                     </div>
-                    <span className={`shrink-0 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${STATUS_STYLES[lead.status]}`}>
+                    <span className={`shrink-0 rounded-sm border px-2 py-0.5 text-meta uppercase ${STATUS_STYLES[lead.status]}`}>
                       {lead.status}
                     </span>
                   </Link>
@@ -107,25 +107,25 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Follow-up queue */}
-        <div className="bg-white rounded-2xl border border-black/8 shadow-sm">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-black/5">
-            <h2 className="text-sm font-black uppercase tracking-widest text-[#023468]">Call back now</h2>
-            <AlarmClock className="h-4 w-4 text-amber-600" />
+        <div className="border border-line bg-surface">
+          <div className="flex min-h-14 items-center border-b border-line px-4">
+            <h2 className="font-display text-h4 uppercase text-ink">Call back now</h2>
           </div>
 
           {dueSoon.leads.length === 0 ? (
-            <div className="p-10 text-center">
-              <p className="text-sm font-bold text-black/70">Nothing due</p>
-              <p className="text-xs text-black/45 mt-1">No follow-ups are outstanding.</p>
-            </div>
+            <EmptyState
+              className="border-transparent"
+              title="Nothing due"
+              description="No follow-ups are outstanding."
+            />
           ) : (
-            <ul className="divide-y divide-black/5">
+            <ul className="divide-y divide-line">
               {dueSoon.leads.map((lead) => (
-                <li key={lead.id} className="px-5 py-3">
+                <li key={lead.id} className="px-4 py-3">
                   <div className="flex items-center justify-between gap-3">
-                    <Link href={`/admin/leads/${lead.id}`} className="min-w-0">
-                      <p className="text-sm font-bold text-[#023468] truncate">{lead.name}</p>
-                      <p className="text-[11px] text-[#E31837] font-bold">
+                    <Link href={`/admin/leads/${lead.id}`} className="flex min-h-11 min-w-0 flex-col justify-center">
+                      <p className="truncate text-table font-semibold text-ink">{lead.name}</p>
+                      <p data-num className="text-caption font-semibold text-accent-text-light">
                         {lead.nextFollowUpAt
                           ? new Date(lead.nextFollowUpAt).toLocaleString("en-IN", {
                               day: "numeric", month: "short", hour: "2-digit", minute: "2-digit",
@@ -135,10 +135,11 @@ export default async function AdminDashboard() {
                     </Link>
                     <a
                       href={`tel:${lead.phone}`}
-                      className="h-8 w-8 shrink-0 rounded-lg bg-[#023468] text-white flex items-center justify-center hover:bg-[#01254a] transition-all"
+                      aria-label={`Call ${lead.name}`}
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm bg-deep text-on-deep transition-colors duration-(--duration-1) hover:bg-deep-2"
                       title={`Call ${lead.name}`}
                     >
-                      <Phone className="h-3.5 w-3.5" />
+                      <PhoneGlyph />
                     </a>
                   </div>
                 </li>

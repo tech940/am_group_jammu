@@ -3,9 +3,21 @@
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
 
+import { CloseGlyph } from "@/components/system/marks"
 import { cn } from "@/lib/utils"
+
+/**
+ * Toast.
+ *
+ * One of the two things in the system allowed to carry a shadow — it genuinely
+ * floats over content — so it keeps `shadow-raised` and drops `shadow-lg`.
+ * Everything else here moved onto tokens: surface + hairline instead of the
+ * shadcn `bg-background`/`border-destructive` aliases, the type ramp instead of
+ * `text-sm`/`text-xs`, and the 44px touch floor on the action and close
+ * controls. Focus rings are removed rather than restyled: the one focus system
+ * lives in the base layer of globals.css.
+ */
 
 const ToastProvider = ToastPrimitives.Provider
 
@@ -16,7 +28,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse gap-3 p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
       className
     )}
     {...props}
@@ -25,13 +37,16 @@ const ToastViewport = React.forwardRef<
 ToastViewport.displayName = ToastPrimitives.Viewport.displayName
 
 const toastVariants = cva(
-  "group pointer-events-auto relative flex w-full items-center justify-between space-x-2 overflow-hidden rounded-md border p-4 pr-6 shadow-lg transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none",
+  "group pointer-events-auto relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-md border p-4 shadow-raised " +
+    "transition-colors duration-(--duration-2) " +
+    "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom-2 " +
+    "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 " +
+    "data-[swipe=end]:animate-out data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none",
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
-        destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
+        default: "border-line bg-surface text-ink",
+        destructive: "destructive border-danger-line bg-danger-bg text-danger-text",
       },
     },
     defaultVariants: {
@@ -62,7 +77,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium transition-colors hover:bg-secondary focus:outline-none focus:ring-1 focus:ring-ring disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-11 shrink-0 items-center justify-center rounded-sm border border-line-strong bg-surface px-4 text-button text-ink transition-colors duration-(--duration-1) hover:bg-ground-2 disabled:pointer-events-none disabled:opacity-55",
       className
     )}
     {...props}
@@ -76,14 +91,17 @@ const ToastClose = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Close
     ref={ref}
+    // Always visible, not revealed on hover: a hover-gated dismiss control does
+    // not exist for a touch or keyboard user.
     className={cn(
-      "absolute right-1 top-1 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-1 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      "-my-1.5 -mr-1.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm text-ink-2 transition-colors duration-(--duration-1) hover:text-ink",
       className
     )}
     toast-close=""
+    aria-label="Dismiss notification"
     {...props}
   >
-    <X className="h-4 w-4" />
+    <CloseGlyph />
   </ToastPrimitives.Close>
 ))
 ToastClose.displayName = ToastPrimitives.Close.displayName
@@ -94,7 +112,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={cn("text-sm font-semibold [&+div]:text-xs", className)}
+    className={cn("text-label", className)}
     {...props}
   />
 ))
@@ -106,7 +124,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={cn("text-sm opacity-90", className)}
+    className={cn("text-small text-ink-2", className)}
     {...props}
   />
 ))

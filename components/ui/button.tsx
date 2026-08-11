@@ -3,36 +3,46 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
+/**
+ * The application's button.
+ *
+ * Replaces the shadcn default this project shipped with, which carried a
+ * `shadow` on the primary variant, `rounded-md`, a 36px default height (under
+ * the 44px touch floor), and a `premium` variant that existed to paper over the
+ * fact that the default did not match the brand.
+ *
+ * Sizes are touch-first: `md` is 44px because that is the WCAG 2.5.8 floor and
+ * most of this audience is on a phone. `sm` at 36px is for dense admin toolbars
+ * only, where a pointer is a safe assumption.
+ */
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm text-button " +
+    "transition-colors duration-(--duration-1) cursor-pointer " +
+    "disabled:pointer-events-none disabled:opacity-55 active:scale-[0.98] motion-reduce:active:scale-100",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        premium: "bg-white text-black hover:bg-white/90 rounded-none tracking-wider uppercase font-bold",
+        // Accent fill. The one loud control on a screen; if two are competing,
+        // one of them is the wrong variant.
+        primary: "bg-accent text-ground hover:bg-accent-hover",
+        // Default action on a light ground.
+        secondary: "border border-line-strong bg-surface text-ink hover:bg-ground-2",
+        // On dark grounds.
+        onDeep: "border border-line-on-deep text-on-deep hover:bg-ground hover:text-ink",
+        ghost: "text-ink hover:bg-ground-2",
+        danger: "bg-danger text-ground hover:bg-accent-hover",
+        link: "text-accent-text-light underline-offset-4 hover:underline px-0",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        xl: "h-14 px-10 text-base",
-        icon: "h-9 w-9",
+        sm: "h-9 px-3.5",
+        md: "h-11 px-5",
+        lg: "h-12 px-7",
+        icon: "h-11 w-11 px-0",
       },
+      full: { true: "w-full", false: "" },
     },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
+    defaultVariants: { variant: "primary", size: "md", full: false },
+  },
 )
 
 export interface ButtonProps
@@ -41,18 +51,14 @@ export interface ButtonProps
   asChild?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    )
-  }
-)
-Button.displayName = "Button"
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { className, variant, size, full, asChild = false, ...props },
+  ref,
+) {
+  const Comp = asChild ? Slot : "button"
+  return (
+    <Comp className={cn(buttonVariants({ variant, size, full, className }))} ref={ref} {...props} />
+  )
+})
 
 export { Button, buttonVariants }
