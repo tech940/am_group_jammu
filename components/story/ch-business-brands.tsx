@@ -99,7 +99,7 @@ export function ChapterBusinesses() {
                     <li key={d.key} className="border-t border-current/15 last:border-b">
                       <div
                         className={`flex items-baseline gap-5 py-4 transition-opacity duration-(--duration-3) md:py-5 ${
-                          on ? "opacity-100" : "opacity-35"
+                          on ? "opacity-100" : "opacity-60"
                         }`}
                       >
                         <span
@@ -139,26 +139,33 @@ export function ChapterBusinesses() {
                 </div>
               </ol>
 
-              {/* The stage. One image mounted at a time. */}
+              {/* The stage.
+                  All four layers are PERSISTENT, and only opacity changes.
+                  This previously used AnimatePresence in its default "sync"
+                  mode, so the outgoing image ran its exit while the incoming
+                  one mounted from opacity 0 — for a few frames both were
+                  semi-transparent and the graphite ground showed through as a
+                  flash between divisions. Cross-fading fixed layers cannot do
+                  that: something is always fully opaque. */}
               <figure className="relative order-1 aspect-[4/3] overflow-hidden lg:order-2 lg:aspect-[3/2]">
-                <AnimatePresence initial={false}>
+                {DIVISIONS.map((d, i) => (
                   <motion.div
-                    key={division.key}
+                    key={d.key}
                     className="absolute inset-0"
-                    initial={{ opacity: 0, scale: 1.03 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
+                    initial={false}
+                    animate={{ opacity: i === active ? 1 : 0 }}
                     transition={{ duration: 0.5, ease: EASE_OUT }}
                   >
                     <Image
-                      src={division.image}
-                      alt={division.imageAlt}
+                      src={d.image}
+                      alt={i === active ? d.imageAlt : ""}
                       fill
                       sizes="(max-width:1024px) 100vw, 55vw"
+                      loading={i === 0 ? undefined : "lazy"}
                       className="object-cover"
                     />
                   </motion.div>
-                </AnimatePresence>
+                ))}
               </figure>
             </div>
           </div>
@@ -261,7 +268,7 @@ export function ChapterBrands() {
                         />
                       </figure>
                     ) : (
-                      <span className="block text-meta uppercase text-ink-3">Photography pending</span>
+                      <span className="block text-meta uppercase text-ink-2">Photography pending</span>
                     )}
                   </div>
                 </div>

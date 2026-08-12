@@ -47,6 +47,10 @@ export const YEARS_TRADING = new Date().getFullYear() - FOUNDED
 
 export const SCALE = {
   outlets: 26, // "26 dealership outlets across the union territory" — company About page
+  // 8 = 7 CURRENT appointments + Chevrolet, which ended in 2017 and is carried
+  // in FRANCHISES as category "Heritage". Anything written in the present tense
+  // must therefore say SEVEN — the homepage said "eight vehicle franchises"
+  // while its own scale chapter said seven, and contradicted itself.
   franchises: 8, // Hyundai, Tata, Kia, MG, Bajaj, KTM, Honda 2W + Chevrolet (heritage)
   divisions: 4, // Automobile, Petroleum, Real Estate, Retail — company Our Businesses page
   cities: ["Jammu", "Srinagar", "Udhampur", "Kathua"],
@@ -76,7 +80,7 @@ export const DIVISIONS: Division[] = [
     name: "Automobile",
     since: 2004,
     summary:
-      "Eight vehicle franchises across passenger cars and two-wheelers, with sales, authorised service and certified pre-owned stock.",
+      "Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock.",
     href: "/automobile",
     image: SUPABASE_MEDIA.divisions.automobile,
     imageAlt: "AM Hyundai & Kia dealership campus in Jammu with state-of-the-art service bays",
@@ -277,7 +281,7 @@ export interface CircuitStop {
 
 export const CIRCUIT: CircuitStop[] = [
   { label: "Discover", detail: "Browse live certified stock — real photos, recorded odometer readings.", href: "/inventory" },
-  { label: "Buy", detail: "New across 8 franchises, or certified pre-owned held in Jammu.", href: "/used-cars/jammu" },
+  { label: "Buy", detail: "New across 7 current franchises, or certified pre-owned held in Jammu.", href: "/used-cars/jammu" },
   { label: "Finance", detail: "Bank finance arranged in-house, indicative decisions same day.", href: "/contact" },
   { label: "Insure", detail: "Motor insurance and renewals handled at the dealership.", href: "/contact" },
   { label: "Service", detail: "Authorised workshops with genuine parts.", href: "/contact" },

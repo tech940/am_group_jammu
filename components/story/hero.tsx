@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import * as React from "react"
 import { AM_KIA_SHOWROOM } from "@/lib/supabase-media"
 import { useStoryMotion, EASE_OUT, DUR } from "./motion"
@@ -43,6 +43,10 @@ export function StoryHero({ founded }: { founded: number }) {
   // the page hands off to Chapter 01.
   const scrimOpacity = useTransform(scrollYProgress, [0, 1], [0.28, 0.72])
 
+  // Same rule as the chapter plates: promote only while the hero is in play.
+  // Once the reader is chapters deep, these two layers are pure GPU memory.
+  const near = useInView(ref, { margin: "50% 0px 50% 0px" })
+
   return (
     <section
       ref={ref}
@@ -66,7 +70,7 @@ export function StoryHero({ founded }: { founded: number }) {
         <motion.div
           aria-hidden
           className="absolute inset-0 bg-void"
-          style={reduce ? { opacity: 0.32 } : { opacity: scrimOpacity, willChange: "opacity" }}
+          style={reduce ? { opacity: 0.32 } : { opacity: scrimOpacity, willChange: near ? "opacity" : "auto" }}
         />
         <div
           aria-hidden
@@ -80,7 +84,11 @@ export function StoryHero({ founded }: { founded: number }) {
 
       <motion.div
         className="mx-auto w-full max-w-[1400px] px-5 pb-16 md:px-10 md:pb-24"
-        style={reduce ? undefined : { y: titleY, opacity: titleOpacity, willChange: "transform, opacity" }}
+        style={
+          reduce
+            ? undefined
+            : { y: titleY, opacity: titleOpacity, willChange: near ? "transform, opacity" : "auto" }
+        }
       >
         <motion.div
           initial={reduce ? false : { opacity: 0, y: 12 }}

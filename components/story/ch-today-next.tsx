@@ -116,7 +116,12 @@ export function ChapterToday({
         )}
 
         <motion.div {...settleProps(0.1)} className="mt-16 md:mt-20">
-          <figure className="relative aspect-[21/9] overflow-hidden border border-line-on-deep">
+          {/* figcaption must be a CHILD of figure — it has no other permitted
+              parent, and only that association is exposed programmatically.
+              The aspect ratio and clipping move to an inner div so the caption
+              is not dragged inside the cropped box. */}
+          <figure>
+            <div className="relative aspect-[21/9] overflow-hidden border border-line-on-deep">
             <Image
               src={SUPABASE_MEDIA.awards}
               alt="Award trophies presented to AM Group by Hyundai and General Motors"
@@ -125,10 +130,11 @@ export function ChapterToday({
               loading="lazy"
               className="object-cover"
             />
+            </div>
+            <figcaption className="mt-3 text-meta uppercase text-on-deep-2">
+              {awards} awards on record — Los Angeles 2009 to Rio de Janeiro 2019
+            </figcaption>
           </figure>
-          <figcaption className="mt-3 text-meta uppercase text-on-deep-2">
-            {awards} awards on record — Los Angeles 2009 to Rio de Janeiro 2019
-          </figcaption>
         </motion.div>
       </div>
     </Chapter>
@@ -183,7 +189,7 @@ export function ChapterNext() {
             <p className="mt-4 max-w-[46ch] text-body-lg leading-relaxed text-on-deep">
               {latest.note}
             </p>
-            <p className="mt-6 max-w-[46ch] text-body leading-relaxed text-on-deep-2">
+            <p className="mt-6 max-w-[46ch] text-body leading-relaxed text-on-deep">
               Retail came next — the first business outside automotive and energy in{" "}
               {YEARS_TRADING} years.
             </p>

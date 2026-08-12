@@ -845,6 +845,75 @@ The about page's "Timeline of Excellence" is the same eight milestones as Chapte
 - **Still no photograph per milestone.** Only four of eight have a real matching image; a logo is the marque itself, not a stand-in for a place.
 - `Milestone.mark` added to `content.ts` as an optional field, so the data stays in the content layer.
 
+### Text-over-photography contrast — fixed 2026-08-12
+
+Chapter 01's secondary prose was unreadable over the forecourt plate.
+
+**The average was lying.** Against the photograph's *mean* composite, `on-deep-2` measured 5.93:1 — a pass. But a photograph is not its average: a sky, a windscreen or white signage creates local bright patches where that same text collapses. Contrast over imagery has to be evaluated against the **brightest patch**, not the mean.
+
+Worst case taken as a ~240-luminance patch:
+
+| Text colour | Scrim needed for 4.5:1 |
+|---|---|
+| `on-deep` `#F4F3EE` | **0.56** |
+| `on-deep-2` `#A9BFDD` | **0.70** |
+
+Chapter 01 ran a 0.6 scrim with `on-deep-2` — below the 0.70 that tone requires. **The fix was the text colour, not more black over the photograph**, since darkening further would have re-created the "it's just black" problem. `on-deep-2` is the secondary tone for FLAT dark grounds; over a plate, prose uses `on-deep` and takes its hierarchy from size and measure instead.
+
+Verified across every plated chapter against a worst-case bright patch: Origin (0.6) **5.0** · Growth (0.82) **6.4** · Next (0.74) **4.83** — all pass AA.
+
+The rule is documented on `ChapterPlate.scrim` in `components/story/chapter.tsx`, with the numbers, so scrim and text colour are chosen together rather than independently.
+
+### Interaction principles from reference study — 2026-08-12
+
+Client supplied Porsche, Porsche Consulting, Charles Leclerc and Bright Biotech as references for INTERACTION, explicitly not for visuals. The Taste skill was deliberately **not** used: it extracts colour/type/spacing tokens, which is exactly what was ruled out. Motion behaviour is invisible to a static capture, so each site was instrumented live in Playwright — sampling computed transform/opacity/clip-path across scroll positions to separate scroll-LINKED motion from TRIGGERED motion, and counting pinned elements and section backgrounds.
+
+| | Porsche | Consulting | Leclerc | Bright Biotech | AM Group (before) |
+|---|---|---|---|---|---|
+| Scroll screens | 6.5 | 1 | 34.1 | 12.1 | 17.4 |
+| Pinned / fixed | 1 | 1 | 32 | 20 | 9 |
+| Scroll-linked elements | 6 | 2 | 4 | 0 | 3 |
+| Distinct section backgrounds | — | — | — | **2** (12 transparent) | **7** (0 transparent) |
+
+**Principles extracted:**
+1. **Restraint is the house style.** Porsche changes 6 elements across a third of the page; Consulting runs 2 scroll-linked against 51 static. Serious corporate motion is a handful of deliberate moves.
+2. **Pin heavily, animate lightly.** Leclerc pins 32 elements but animates 4. Pinning builds the stage; motion inside it stays minimal.
+3. **Imagery and typography move as one unit.** Leclerc's image and its title change together as a paired swap, never independently.
+4. **Continuity is structural, not decorative.** Bright Biotech's 13 sections share 2 backgrounds — 12 are transparent over one persistent canvas.
+
+**What this changed here.** Our motion restraint already matched the references (3 scroll-linked, inside the 2–6 band). The gap was #4: all 8 chapters painted their own opaque ground, so 7 hard colour switches punctuated the page — the exact seam a continuous narrative must not have.
+
+`components/story/stage.tsx` inverts it. One persistent fixed surface paints ground for the whole story; chapters carry text colour only. The stage colour is claimed by whichever chapter owns the middle of the viewport, via IntersectionObserver, and CSS-transitions over 700ms.
+
+Scroll-linked interpolation was tried and rejected: chapters run 775px to 3187px, so mapping scroll progress evenly desyncs colour from content, and a continuously interpolating ground spends long stretches at a value where neither light nor dark text has contrast. Observing real positions keeps the change tied to content and keeps text contrast a two-colour problem.
+
+Verified: **8/8 sections transparent** (was 0/8), **1 distinct section background** (was 7), stage colour correct at every sampled chapter, plated-chapter contrast unchanged (origin 5.0 · growth 6.4 · next 4.83, all AA), light chapters still render ink text, the rule still counts 1968 → 2026.
+
+### Final audit + motion-performance pass — 2026-08-12
+
+Five independent lenses (motion-performance, accessibility, visual craft, narrative coherence, data honesty) over `components/story/*` and `app/page.tsx`, then **every finding handed to a skeptic instructed to refute it**. 38 reported → 24 verified → **10 confirmed, 14 refuted**. The 14 unverified findings were not acted on.
+
+**Measured performance (899 real frames during keyboard scroll):** median **16.7ms**, p95 16.9ms, **0 frames over 33ms**, **0 long tasks**, 99.7% smooth. The impeccable detector reports **0 findings** on the story files.
+
+**Confirmed and fixed:**
+
+| Finding | Fix |
+|---|---|
+| The rule's stations used `Math.floor(v * chapters.length)` — eight EQUAL bands of document progress, while real chapter spans run 0.86vh to 4.4vh. The thread confidently named the wrong chapter. | Stations now read the active chapter from the stage's IntersectionObserver. **This was the same even-division bug already fixed for the stage and left in the rule** — a genuine oversight. |
+| The page contradicted itself on franchise count: `content.ts` said "Eight vehicle franchises" and "8 franchises" (both rendered) while Ch07 said 7 current + 1 heritage. Chevrolet ended 2017. | Present-tense strings corrected to **seven**, with the reason recorded on `SCALE.franchises`. |
+| Ch05's route SVG has `viewBox="0 0 1000 80"` on a `w-full` svg, scaling the coordinate system by width/1000 — `fontSize="11"` rendered at **~3.7px** on a phone. | Route labels moved OUT of the SVG into HTML, where 11px means 11px. Verified: **11px, 0 SVG text nodes**. |
+| Chapter 01 emitted no heading at any level — a screen-reader user navigating by heading skipped from the hero to Chapter 02. | The 1968 display number promoted to `h2`. Verified: **1 h1 + 8 h2**, one per chapter. |
+| `<figcaption>` was a sibling of `<figure>`, not a child — invalid HTML, and the caption/image association is lost. | Ratio and clipping moved to an inner div. Verified: **0 figcaptions outside a figure**. |
+| Ch03's division stage used `AnimatePresence` in default *sync* mode: outgoing exit ran while incoming mounted at opacity 0, flashing the ground between divisions. | Four persistent layers cross-fading on opacity — something is always fully opaque. |
+| "Photography pending" used `ink-3` at **2.35:1**. | Raised to `ink-2`. |
+| Ch03 inactive register rows at `opacity-35` on graphite. | Raised to `opacity-60`. |
+| `will-change` held on 5 elements, **all off-screen**, one 11,321px away — GPU layers pinned for elements nowhere near the viewport. | Gated on `useInView` proximity. Verified: **1 held, and it is adjacent to the viewport** (was 5 held / 0 on-screen). |
+| Five of eight chapters ran a full `useScroll` measurement pipeline whose output is never rendered (only 3 chapters have plates). | Noted, not yet fixed — see below. |
+
+**Regression check after the fixes:** median frame 16.7ms · 0 frames >33ms · 0 long tasks · 0 forbidden colours (no red, no gold) · 8/8 sections still transparent.
+
+**Deliberately not done.** The dead `useScroll` pipelines in plate-less chapters are real but measured at tens of microseconds inside an already-batched read phase with no forced reflow — the verifier itself downgraded its own P1 to "P2/P3 in magnitude". The clean fix splits `Chapter` into three variants to keep the hook with the ref that owns it; that is a structural refactor of the page's most load-bearing component for no measurable gain at 0 dropped frames. Recorded here rather than done.
+
 ### Honesty decisions
 
 - **CH01 has no archival photograph.** None exists in either Supabase project or `public/media`. The chapter carries 1968 typographically over a present-day AM Kia plate, captioned "Photographed 2026 … No photography survives from 1968". Sepia or grain on a modern showroom would manufacture a document that does not exist.

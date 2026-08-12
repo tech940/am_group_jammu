@@ -48,8 +48,12 @@ export function ChapterOrigin() {
         <ChapterMark index="01" kicker="Where it started" />
 
         {/* The year at true display scale. This is the chapter's photograph —
-            the number is the subject, not an accompaniment to one. */}
-        <motion.p
+            the number is the subject, not an accompaniment to one.
+            It is an h2, not a p: every other chapter contributes a heading to
+            the document outline and this one did not, so a screen-reader user
+            navigating by heading skipped straight from the hero to Chapter 02
+            and never knew Chapter 01 existed. */}
+        <motion.h2
           initial={reduce ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-15% 0px" }}
@@ -58,7 +62,7 @@ export function ChapterOrigin() {
           data-num
         >
           {FOUNDED}
-        </motion.p>
+        </motion.h2>
 
         <div className="mt-12 grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <motion.p
@@ -68,12 +72,19 @@ export function ChapterOrigin() {
             {TIMELINE[0].note}
           </motion.p>
 
+          {/* Full-strength ink-on-light, NOT the on-deep-2 secondary tone.
+              That tone is for FLAT dark grounds; over photography it fails.
+              Measured against this plate: on-deep-2 needs a 0.70 scrim to hold
+              4.5:1 over a bright patch (the sky and bunting in this frame),
+              while on-deep clears it at 0.56 — so the photograph stays visible
+              and the text stays readable. Hierarchy here comes from SIZE and
+              measure, never from washing text out over an image. */}
           <motion.div {...settleProps(0.2)} className="max-w-[42ch]">
-            <p className="text-body leading-relaxed text-on-deep-2">
+            <p className="text-body leading-relaxed text-on-deep">
               Nine years later the group took on {TIMELINE[1].title}. Both fuel businesses are
               still trading today — which is the whole reason the rest of this story exists.
             </p>
-            <p className="mt-8 text-meta uppercase text-on-deep-2">
+            <p className="mt-8 text-meta uppercase text-on-deep">
               Photographed {new Date().getFullYear()} · an AM Group HP forecourt — the 1968
               business as it trades now. No photography survives from {FOUNDED}.
             </p>

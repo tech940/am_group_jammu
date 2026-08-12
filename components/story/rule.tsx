@@ -3,6 +3,7 @@
 import * as React from "react"
 import { motion, useScroll, useSpring, useTransform } from "framer-motion"
 import { useStoryMotion } from "./motion"
+import { useStage } from "./stage"
 
 /**
  * THE RULE — the one element that connects the whole homepage.
@@ -59,7 +60,19 @@ export function StoryRule({
   const fillScale = useTransform(progress, [0, 1], [0, 1])
 
   const [year, setYear] = React.useState(founded)
-  const [activeId, setActiveId] = React.useState(chapters[0]?.id ?? "")
+
+  // The active chapter comes from the STAGE, which learns it from an
+  // IntersectionObserver on the real sections.
+  //
+  // It used to be derived here as `Math.floor(v * chapters.length)` — eight
+  // equal bands of document progress. That is wrong for the same reason the
+  // stage cannot interpolate evenly: the chapters are nothing like equal.
+  // Measured spans run from 0.86vh (origin) to 4.4vh (businesses), so the
+  // station labels drifted out of step with what was actually on screen and the
+  // rule confidently named the wrong chapter. Observing real positions is the
+  // only way this can be right.
+  const stage = useStage()
+  const activeId = stage?.activeId || chapters[0]?.id || ""
 
   React.useEffect(() => {
     // Under reduced motion the year is DERIVED (see displayYear below), not
@@ -74,12 +87,8 @@ export function StoryRule({
       const span = currentYear - founded
       const next = Math.round(founded + v * span)
       setYear((prev) => (prev === next ? prev : next))
-
-      const idx = Math.min(chapters.length - 1, Math.floor(v * chapters.length))
-      const id = chapters[idx]?.id
-      if (id) setActiveId((prev) => (prev === id ? prev : id))
     })
-  }, [progress, founded, currentYear, chapters, reduce])
+  }, [progress, founded, currentYear, reduce])
 
   // Reduced motion shows the finished story: the rule is complete and the
   // year has already arrived at today.

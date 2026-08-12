@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import Image from "next/image"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import { useStoryMotion, EASE_OUT, DUR } from "./motion"
+import { useStage } from "./stage"
 
 /**
  * The chapter shell.
@@ -26,14 +27,33 @@ import { useStoryMotion, EASE_OUT, DUR } from "./motion"
 
 export type Ground = "void" | "ink" | "deep" | "deep-2" | "graphite" | "ground" | "ground-2"
 
+/**
+ * TEXT COLOUR ONLY — no background.
+ *
+ * Chapters are transparent so the persistent StoryStage shows through; that is
+ * what makes eight chapters read as one continuous surface instead of seven
+ * hard seams. The stage is told which ground to paint by whichever chapter owns
+ * the viewport (see stage.tsx).
+ */
 const GROUND_CLASS: Record<Ground, string> = {
-  void: "bg-void text-on-deep",
-  ink: "bg-ink text-on-deep",
-  deep: "bg-deep text-on-deep",
-  "deep-2": "bg-deep-2 text-on-deep",
-  graphite: "bg-graphite text-on-deep",
-  ground: "bg-ground text-ink",
-  "ground-2": "bg-ground-2 text-ink",
+  void: "text-on-deep",
+  ink: "text-on-deep",
+  deep: "text-on-deep",
+  "deep-2": "text-on-deep",
+  graphite: "text-on-deep",
+  ground: "text-ink",
+  "ground-2": "text-ink",
+}
+
+/** The actual surface colour each ground claims from the stage. */
+export const GROUND_COLOR: Record<Ground, string> = {
+  void: "#0b0e12",
+  ink: "#14161a",
+  deep: "#133a63",
+  "deep-2": "#0d2a4a",
+  graphite: "#1c2229",
+  ground: "#f4f3ee",
+  "ground-2": "#eae8e0",
 }
 
 /** Dark grounds flip the global focus outline to paper via [data-ground]. */
@@ -52,7 +72,23 @@ export interface ChapterPlate {
   alt: string
   /** Opening frame only — everything else waits. */
   priority?: boolean
-  /** 0–1. How far the scrim darkens the photograph. */
+  /**
+   * 0–1. How far the scrim darkens the photograph.
+   *
+   * THIS VALUE AND THE TEXT COLOUR ARE ONE DECISION. Contrast must hold against
+   * the BRIGHTEST patch of the photograph, not its average — a sky, a
+   * windscreen or white signage will locally wash out text that measures fine
+   * on the mean. Worst case taken as a ~240-luminance patch:
+   *
+   *   text-on-deep    (#F4F3EE)  needs scrim >= 0.56 for 4.5:1
+   *   text-on-deep-2  (#A9BFDD)  needs scrim >= 0.70 for 4.5:1
+   *
+   * So `on-deep-2` — the secondary tone — is for FLAT dark grounds. Over a
+   * plate, prose uses `on-deep` and takes its hierarchy from size and measure
+   * instead. Chapter 01 shipped at 0.6 with on-deep-2 and was unreadable over
+   * the forecourt's sky; the fix was the text colour, not more black over the
+   * photograph.
+   */
   scrim?: number
   /** object-position, for photographs whose subject is off-centre. */
   position?: string
@@ -76,6 +112,24 @@ export function Chapter({
 }) {
   const ref = React.useRef<HTMLElement>(null)
   const { reduce } = useStoryMotion()
+  const stage = useStage()
+
+  // Whichever chapter covers the middle of the viewport owns the stage colour.
+  // An observer on a zero-height band at 50% is the cheapest way to ask "which
+  // chapter am I actually reading" without measuring on every scroll frame.
+  React.useEffect(() => {
+    const el = ref.current
+    const claim = stage?.claim
+    if (!el || !claim) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) if (e.isIntersecting) claim(id, GROUND_COLOR[ground])
+      },
+      { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [stage?.claim, ground, id])
 
   // Progress across THIS chapter: 0 as its top meets the viewport bottom,
   // 1 as its bottom leaves the viewport top.
@@ -93,6 +147,13 @@ export function Chapter({
   // A very small drift. 4% over a whole chapter reads as depth, not parallax —
   // large-scale parallax is a vestibular trigger and is disabled under reduce.
   const plateScale = useTransform(scrollYProgress, [0, 1], [1.04, 1])
+
+  // will-change is promoted ONLY while this chapter is near the viewport.
+  // Left unconditional it pinned a GPU layer for every plate on the page at all
+  // times — measured with one plate 11,321px away still holding a layer. It is
+  // a hint that an element is ABOUT to animate, not a standing declaration, and
+  // the layer memory matters most on the midrange Android this audience uses.
+  const near = useInView(ref, { margin: "100% 0px 100% 0px" })
 
   return (
     <section
@@ -116,7 +177,11 @@ export function Chapter({
               style={
                 reduce
                   ? undefined
-                  : { opacity: plateOpacity, scale: plateScale, willChange: "opacity, transform" }
+                  : {
+                      opacity: plateOpacity,
+                      scale: plateScale,
+                      willChange: near ? "opacity, transform" : "auto",
+                    }
               }
             >
             <Image

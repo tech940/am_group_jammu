@@ -73,43 +73,45 @@ export function ChapterPlaces() {
             offsets against this element and warns (and mis-measures) when the
             target is statically positioned. */}
         <div ref={ref} className="relative mt-16 md:mt-24">
+          {/* The route is drawn in SVG but LABELLED IN HTML.
+              A viewBox of 0 0 1000 80 on a w-full svg scales the whole
+              coordinate system by (width / 1000) — measured 26.8px tall at a
+              375px viewport, which rendered fontSize="11" at roughly 3.7px.
+              SVG text cannot opt out of that scaling, so the labels live
+              outside the svg where 11px means 11px. */}
           <svg
-            viewBox="0 0 1000 80"
+            viewBox="0 0 1000 24"
             className="w-full"
+            preserveAspectRatio="none"
+            style={{ height: 24 }}
             role="img"
             aria-label="Route between the Jammu and Srinagar sites along National Highway 44"
           >
-            <line x1="60" y1="40" x2="940" y2="40" className="stroke-current opacity-20" strokeWidth="1" />
+            <line x1="6" y1="12" x2="994" y2="12" className="stroke-current opacity-20" strokeWidth="1" vectorEffect="non-scaling-stroke" />
             <motion.line
-              x1="60"
-              y1="40"
-              x2="940"
-              y2="40"
+              x1="6"
+              y1="12"
+              x2="994"
+              y2="12"
               className="stroke-accent"
               strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
               style={reduce ? { pathLength: 1 } : { pathLength: draw }}
             />
-            {[
-              { x: 60, label: LOCATIONS[0]?.city ?? "Jammu" },
-              { x: 940, label: LOCATIONS[1]?.city ?? "Srinagar" },
-            ].map((s) => (
-              <g key={s.label}>
-                <circle cx={s.x} cy="40" r="5" className="fill-accent" />
-                <text
-                  x={s.x}
-                  y="70"
-                  textAnchor={s.x < 500 ? "start" : "end"}
-                  className="fill-current text-meta uppercase"
-                  fontSize="11"
-                >
-                  {s.label}
-                </text>
-              </g>
-            ))}
-            <text x="500" y="26" textAnchor="middle" className="fill-current opacity-60" fontSize="11">
-              NH&nbsp;44
-            </text>
           </svg>
+
+          {/* Station dots and labels, in HTML so type stays on the ramp. */}
+          <div className="relative -mt-[18px] flex items-start justify-between">
+            {[LOCATIONS[0]?.city ?? "Jammu", LOCATIONS[1]?.city ?? "Srinagar"].map((city, i) => (
+              <span key={city} className={i === 0 ? "flex flex-col items-start gap-2" : "flex flex-col items-end gap-2"}>
+                <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-accent" />
+                <span className="text-meta uppercase text-on-deep">{city}</span>
+              </span>
+            ))}
+            <span aria-hidden className="absolute left-1/2 top-0 -translate-x-1/2 text-meta uppercase text-on-deep-2">
+              NH&nbsp;44
+            </span>
+          </div>
         </div>
 
         {/* The two sites, with real NAP. */}

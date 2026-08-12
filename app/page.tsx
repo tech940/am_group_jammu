@@ -3,6 +3,7 @@ import { getHomeInventory } from "@/lib/inventory/server"
 import { FOUNDED, SCALE, YEARS_TRADING } from "@/components/home/content"
 import { StoryHero } from "@/components/story/hero"
 import { StoryRule, StoryRuleMobile, type Chapter } from "@/components/story/rule"
+import { StoryStage } from "@/components/story/stage"
 import { ChapterOrigin, ChapterGrowth } from "@/components/story/ch-origin-growth"
 import { ChapterBusinesses, ChapterBrands } from "@/components/story/ch-business-brands"
 import { ChapterPlaces, ChapterPeople } from "@/components/story/ch-places-people"
@@ -55,27 +56,32 @@ export default async function Page() {
   const thisYear = FOUNDED + YEARS_TRADING
 
   return (
-    <div data-world="story" className="bg-void text-on-deep">
-      {/* The thread. Rendered once, outside every chapter, so it is genuinely
-          continuous rather than restarted per section. */}
-      <StoryRule
-        chapters={CHAPTERS}
-        founded={FOUNDED}
-        currentYear={thisYear}
-        quietFor={["places"]}
-      />
-      <StoryRuleMobile founded={FOUNDED} currentYear={thisYear} />
+    // No background on this wrapper: StoryStage is the only element that paints
+    // ground, so the eight chapters read as one continuous surface rather than
+    // eight sections with seven seams between them.
+    <div data-world="story" className="text-on-deep">
+      <StoryStage initial="#0b0e12" initialId="origin">
+        {/* The thread. Rendered once, outside every chapter, so it is genuinely
+            continuous rather than restarted per section. */}
+        <StoryRule
+          chapters={CHAPTERS}
+          founded={FOUNDED}
+          currentYear={thisYear}
+          quietFor={["places"]}
+        />
+        <StoryRuleMobile founded={FOUNDED} currentYear={thisYear} />
 
-      <StoryHero founded={FOUNDED} />
+        <StoryHero founded={FOUNDED} />
 
-      <ChapterOrigin />
-      <ChapterGrowth />
-      <ChapterBusinesses />
-      <ChapterBrands />
-      <ChapterPlaces />
-      <ChapterPeople />
-      <ChapterToday stockCount={inventory.total} degraded={inventory.degraded} />
-      <ChapterNext />
+        <ChapterOrigin />
+        <ChapterGrowth />
+        <ChapterBusinesses />
+        <ChapterBrands />
+        <ChapterPlaces />
+        <ChapterPeople />
+        <ChapterToday stockCount={inventory.total} degraded={inventory.degraded} />
+        <ChapterNext />
+      </StoryStage>
     </div>
   )
 }
