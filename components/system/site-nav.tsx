@@ -146,8 +146,15 @@ export function SiteNav() {
     <>
       {/* data-ground switches the global focus outline to paper — the accent
           outline muddies against ink. */}
+      {/* data-world="story" on the homepage only.
+          The header lives in the root layout, above the page's own story
+          wrapper, so without this the shared accent (#c13a2a red) leaks onto a
+          page where red is banned — the "Book test drive" fill was the one red
+          element left on it. Scoping here repaints the header to champagne on
+          "/" and leaves the other 25 routes untouched. */}
       <header
         data-ground="deep"
+        data-world={overDarkHero ? "story" : undefined}
         className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
           filled ? "border-line-on-deep bg-ink" : "border-transparent bg-transparent"
         }`}
@@ -233,7 +240,7 @@ export function SiteNav() {
             <button
               type="button"
               onClick={bookTestDrive}
-              className="inline-flex h-11 items-center rounded-sm bg-accent px-5 text-button text-on-deep transition-colors duration-(--duration-1) hover:bg-accent-hover"
+              className="inline-flex h-11 items-center rounded-sm bg-accent px-5 text-button text-on-accent transition-colors duration-(--duration-1) hover:bg-accent-hover"
             >
               Book test drive
             </button>
@@ -245,7 +252,7 @@ export function SiteNav() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-controls="site-menu"
-            className="self-center rounded-sm border border-line-on-deep px-4 py-2 text-button text-on-deep transition-colors duration-(--duration-1) lg:hidden"
+            className="my-auto flex h-11 items-center rounded-sm border border-line-on-deep px-4 text-button text-on-deep transition-colors duration-(--duration-1) lg:hidden"
           >
             {open ? "Close" : "Menu"}
           </button>
@@ -262,6 +269,7 @@ export function SiteNav() {
           ref={sheetRef}
           tabIndex={-1}
           data-ground="deep"
+          data-world={overDarkHero ? "story" : undefined}
           className="fixed inset-0 z-40 bg-ink lg:hidden"
         >
           <div className="flex h-full flex-col px-5 pb-10 pt-24">
@@ -303,7 +311,7 @@ export function SiteNav() {
               <button
                 type="button"
                 onClick={bookTestDrive}
-                className="inline-flex h-12 items-center justify-center rounded-sm bg-accent px-6 text-button text-on-deep transition-colors duration-(--duration-1) hover:bg-accent-hover"
+                className="inline-flex h-12 items-center justify-center rounded-sm bg-accent px-6 text-button text-on-accent transition-colors duration-(--duration-1) hover:bg-accent-hover"
               >
                 Book test drive
               </button>

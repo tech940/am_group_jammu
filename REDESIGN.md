@@ -791,6 +791,105 @@ Mobile overflow re-checked at 320 and 375 across the affected routes after the c
 
 `seoGroups` remains passed-but-unused on the inventory page components. Left alone — removing it crosses the server/client prop boundary and belongs with the Phase 6 inventory work.
 
+## 3.11 Homepage rebuilt as an 8-chapter scroll narrative — 2026-08-11
+
+Homepage only. Every other route untouched.
+
+**The thread.** One element connects the page: a hairline down the left gutter carrying a year that counts 1968 → 2026 as you scroll. It is simultaneously the timeline, the progress indicator and the connective tissue, so none of the three reads as a bolted-on widget. `components/story/rule.tsx`. Below `lg` it becomes a 2px bar under the header carrying the same year — adapted, not removed.
+
+**Chapters overlap rather than replace.** Each `Chapter` owns a sticky full-height plate; as it scrolls out its plate fades, revealing the next chapter's plate already pinned beneath. Only `opacity` and `transform` animate, so every transition is compositor-only regardless of photograph size.
+
+**Scrubbed vs triggered** (`components/story/motion.ts`) is the load-bearing distinction. Scroll-*linked* motion inherits scroll speed — wrong for content, right for "you are moving through 58 years". So the rule, the year, and chapter dissolves are scrubbed; all text, rows and plates are triggered at fixed duration and never rubber-band to the wheel.
+
+**Palette — light is the accent.** No red, and no chromatic accent at all. On dark grounds the accent is warm white `#F4F3EE`; on light grounds it inverts to ink `#14161A`. The rule, the year and the CTAs are simply the brightest (or darkest) thing present, so nothing competes with the photography — the showroom's own warm interior light is the only colour in the composition.
+
+This replaced a champagne accent, which read as decoration sitting on top of the story rather than part of it.
+
+Applied via a `[data-world="story"]` scope, **not** a token edit — `--color-accent` drives 47 migrated files on other routes, and `--color-danger` shares its hex, so a global change would have repainted the site and stripped its error colour. The shared nav and footer opt into the scope on `/` only, which is what removed the last red element (the header's "Book test drive" fill).
+
+Two consequences of a colourless accent, both handled structurally rather than by hand:
+- **`ChapterMark` inherits `currentColor`** instead of naming the accent. A fixed `text-accent` would be warm white on the two warm-white chapters and vanish. Verified: white on all five dark chapters, ink on both light ones.
+- **The rule uses `mix-blend-mode: difference`.** It is fixed and crosses both light and dark chapters, so a white hairline would disappear on the light ones. Difference blending keeps it white over ink and flips it to near-black over paper — one element, legible on every ground, no JavaScript.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| Red on the homepage | **0** occurrences in computed styles, including nav + footer |
+| lucide icons | **0** |
+| Chapters rendering | 8 — origin, growth, businesses, brands, places, people, today, next |
+| Scroll length | 21.4 viewports |
+| Thread year | 1968 → 1979 → 1991 → 2002 → 2014 → **2026** |
+| Thread station | Started → Grew → Marques → Places → Today → **Next** |
+| Progress fill | 788px at `scaleY(0.875)` on 88% scroll, `rgb(201,184,150)` |
+| `tsc` / `eslint` / build | 0 / 0 errors · 96 pages |
+
+### Mobile pass — 2026-08-12
+
+Scanned at **320 · 375 · 414 · 768** in same-origin iframes, measuring real layout.
+
+| | Before | After |
+|---|---|---|
+| Horizontal overflow | 0 | **0** |
+| Targets under 44px | **17** | **0** |
+| Broken images | 0 | **0** (25 images) |
+
+Fixed: the nav **Menu** toggle (32px — the primary mobile control), the hero scroll cue (40px), footer index links (14px, text-height rows), the footer phone button (41px), and the Privacy/Terms legal links (14px). The mobile rule renders as a bar under the header while the desktop gutter rule correctly hides below `lg`.
+
+### Timeline of Excellence — folded into Chapter 02
+
+The about page's "Timeline of Excellence" is the same eight milestones as Chapter 02, rendered as a four-column grid of year + logo cards. Adding it as a ninth chapter would have stated the same data twice, so instead the thing that grid *has* and a bare list does not — **the marques** — moved onto the timeline itself. Each row now carries the marque appointed in that year.
+
+- **Logos self-hosted** at `public/marques/` (8 files, 128 KB). They were hot-linked from `amgroupind.com/wp-content/`, which is being decommissioned — the same fragility as the logo and the 32 remaining page images.
+- **Never recoloured.** All eight are dark artwork on transparent (KTM is pure black, mean luminance 0), so on Chapter 02's ink ground they would be invisible. Each sits on a light chip: a trademark is not ours to restyle, so the ground moves instead of the logo.
+- **Still no photograph per milestone.** Only four of eight have a real matching image; a logo is the marque itself, not a stand-in for a place.
+- `Milestone.mark` added to `content.ts` as an optional field, so the data stays in the content layer.
+
+### Honesty decisions
+
+- **CH01 has no archival photograph.** None exists in either Supabase project or `public/media`. The chapter carries 1968 typographically over a present-day AM Kia plate, captioned "Photographed 2026 … No photography survives from 1968". Sepia or grain on a modern showroom would manufacture a document that does not exist.
+- **CH04 ships two rows without a plate.** `content.ts` points Tata at a central-workshop interior and Chevrolet at the Srinagar Hyundai building, both captioned as the named brand's premises. Those render as type with "Photography pending" until real images exist.
+- **"8 franchises" corrected to 7 + 1 heritage.** Chevrolet is `category: "Heritage"` (2004–2017).
+- **CH05 maps 2 sites, not 26.** Only two `Location` records have a real address. 26 is stated as an attributed group figure, typographically separate from the route.
+- **CH06 has no faces**, per the agreed approach — built on family continuity plus three verbatim Google reviews naming real advisors.
+- **CH07 omits employees and customers entirely.** No source exists; `PRODUCT.md` bans the old "500,000 customers". Six sourced figures only, and the live stock tile is *suppressed* (not zeroed) when the scrape is degraded.
+- **CH08 makes no forecast.** No roadmap is published, so it closes on the 2024 expansion and the six services that exist today.
+
+### The NAT64 image failure — diagnosed and fixed properly
+
+`⨯ upstream image … resolved to private ip ["64:ff9b::…"]`
+
+**Cause.** `64:ff9b::/96` is the RFC 6052 NAT64 prefix. On any network running DNS64/NAT64 — IPv6-only, and some mobile and corporate networks — every external hostname *also* resolves to a synthesised address in that range. next/image fetches upstream images from the Next server and rejects the request if **any** address DNS returns is private or reserved. Both Supabase projects were blocked.
+
+**What did not fix it, tested:**
+| Attempt | Result |
+|---|---|
+| `--dns-result-order=ipv4first` | The host does have real IPv4 (`104.18.38.10`, `172.64.149.246`), and this reorders them first — but the synthesised addresses remain in the list and Next checks all of them. Still blocked. |
+| Supabase transform CDN (`/render/image/...`) | `403 FeatureNotEnabled` — a paid tenant add-on. |
+| `unoptimized` | Would ship a 5.8MB original to a phone. Rejected. |
+
+**The fix:** `app/api/media/[project]/[...path]/route.ts` — a same-origin proxy. The image becomes a local path, so the SSRF check never runs, and next/image still resizes and re-encodes normally. Which is the point: without optimisation these originals reach 4229×2506 / 5.8MB.
+
+Two design details worth keeping:
+- **Path segments, not `?src=`.** Next's default `images.localPatterns` only allows local images with an *empty* search string, so a query-param proxy is rejected by the optimiser. The docs also warn that widening `search` lets an attacker optimise arbitrary URLs.
+- **Not `force-cache`.** Next's data cache refuses entries over 2MB, so it warned once per request and cached nothing. Caching happens downstream instead, where it matters: next/image holds each optimised variant for `minimumCacheTTL` (30 days).
+
+**Bounded against SSRF** — project must be one of two known tenants, the upstream path is rebuilt as a public storage object rather than taken verbatim, traversal segments rejected, no headers or credentials forwarded, image content types only. Verified: `evil.example.com` → 403, `/rest/v1/leads` on an allowed host → 403, `file:///etc/passwd` → 403.
+
+**Verified working in the browser:** 16 images, **0 broken**, **335 KB total** across 11 optimised requests. The 5.76MB Kia original serves at **5.6 KB** (w=256) and 131 KB at w=1920.
+
+*Note: `curl` against `/_next/image` gave persistent false 400s throughout this diagnosis due to shell URL encoding — including for `/icon.png`, which the browser loaded fine. Browser measurement is the reliable check here.*
+
+### Other environment artifacts (not code defects)
+- **Programmatic `scrollTo` does not emit scroll events** in either the in-app browser or Playwright's `evaluate`. This made the thread appear frozen. Verified with real keyboard input (`End`/`Home`) instead — the mechanic works.
+- **`tsc --noEmit` gave a false green** on a JSX syntax error because of `tsconfig.tsbuildinfo` incremental caching. Deleting it surfaced the truth; worth knowing for future verification.
+
+### Still open
+
+- `MEDIA_SUPABASE_ANON_KEY` in `.env` is the anon key for **`nhceknbaslqdqofefyla`** (the lead-data project), not `ehcmjypfxucvcvuofozx` where the new photography lives — it 403s with "signature verification failed". Until the correct project's key is supplied, CH03/04/05 use the older ~1600px library.
+- Reduced-motion paths are implemented throughout but were **not runtime-verified** — neither browser in this environment can emulate `prefers-reduced-motion`.
+- The placeholder phone `+91 94191 00000` is no longer wired into any homepage CTA (CH05 leads with Directions, CH08 with email), but it remains live in the nav, footer and every other route.
+
 ## 3.2 Risks
 
 | Risk | Mitigation |

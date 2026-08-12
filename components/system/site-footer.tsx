@@ -65,12 +65,12 @@ function LinkColumn({
       <h3 className="border-b border-line-on-deep pb-2 text-meta uppercase text-on-deep-2">
         {title}
       </h3>
-      <ul className="mt-3 space-y-2">
+      <ul className="mt-1">
         {links.map((l) => (
           <li key={l.href}>
             <Link
               href={l.href}
-              className="text-small leading-snug text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
+              className="flex min-h-11 items-center text-small leading-snug text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
             >
               {l.label}
               {typeof l.count === "number" && (
@@ -89,12 +89,20 @@ function LinkColumn({
 export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
   const year = new Date().getFullYear()
   const flagship = PRIMARY_LOCATION
-  const withStockDirectory = showsStockDirectory(usePathname())
+  const pathname = usePathname()
+  const withStockDirectory = showsStockDirectory(pathname)
 
   return (
     // data-ground switches the global focus outline to paper — the accent
     // outline muddies against ink.
-    <footer data-ground="deep" className="bg-ink text-on-deep">
+    // data-world="story" on the homepage: the footer is shared with 25 other
+    // routes, so the homepage's red ban is applied by scope rather than by
+    // editing the global accent.
+    <footer
+      data-ground="deep"
+      data-world={pathname === "/" ? "story" : undefined}
+      className="bg-ink text-on-deep"
+    >
       <div className="mx-auto max-w-[1400px] px-5 pt-16 md:px-10 md:pt-20">
         {withStockDirectory ? (
           <>
@@ -153,12 +161,12 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
 
           <div className="self-end">
             <h3 className="text-meta uppercase text-on-deep-2">Showrooms</h3>
-            <ul className="mt-3 space-y-1.5">
+            <ul className="mt-1">
               {LOCATIONS.map((l) => (
                 <li key={l.slug}>
                   <Link
                     href={`/locations/${l.slug}`}
-                    className="text-small text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
+                    className="flex min-h-11 items-center text-small text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
                   >
                     {l.shortName}
                   </Link>
@@ -171,13 +179,13 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
             <a
               href={`tel:${flagship.phoneE164}`}
               data-track-location="site-footer"
-              className="inline-flex items-center gap-2 rounded-sm border border-line-on-deep px-5 py-3 text-button text-on-deep transition-colors duration-(--duration-1) hover:bg-ground hover:text-ink"
+              className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-on-deep px-5 py-3 text-button text-on-deep transition-colors duration-(--duration-1) hover:bg-ground hover:text-ink"
             >
               <PhoneGlyph /> {flagship.phone}
             </a>
             <a
               href={`mailto:${flagship.email}`}
-              className="text-small text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
+              className="flex min-h-11 items-center text-small text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
             >
               {flagship.email}
             </a>
@@ -192,7 +200,7 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Link
               href="/privacy-policy"
-              className="transition-colors duration-(--duration-1) hover:text-on-deep"
+              className="inline-flex min-h-11 items-center transition-colors duration-(--duration-1) hover:text-on-deep"
             >
               Privacy policy
             </Link>
@@ -201,7 +209,7 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
             </span>
             <Link
               href="/terms"
-              className="transition-colors duration-(--duration-1) hover:text-on-deep"
+              className="inline-flex min-h-11 items-center transition-colors duration-(--duration-1) hover:text-on-deep"
             >
               Terms
             </Link>

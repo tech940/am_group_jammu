@@ -39,6 +39,12 @@
   --color-deep: #133a63;        /* dark ground: hero, admin rail, footer */
   --color-deep-2: #0d2a4a;      /* deepest ground */
 
+  /* Two further grounds used only by the homepage story world. Declared here
+     because Tailwind generates `bg-*` utilities from @theme and nowhere else —
+     a scoped override can change their VALUE but cannot create the class. */
+  --color-void: #0b0e12;        /* deeper than ink; the opening frame */
+  --color-graphite: #1c2229;    /* the neutral dark between navy chapters */
+
   /* Ink */
   --color-ink: #14161a;         /* primary text on light */
   --color-ink-2: #565e6a;       /* secondary text on light */
@@ -58,6 +64,11 @@
   --color-accent-hover: #a32e20;
   --color-accent-text-light: #a32e20;  /* small accent text on ground/surface */
   --color-accent-text-dark: #f08a70;   /* small accent text on deep/ink */
+  /* Text sitting ON an accent fill. It is a token, not a fixed colour, because
+     the homepage overrides the accent to warm white — where light-on-light
+     would be invisible. Any accent-filled control uses `text-on-accent` so it
+     stays legible in both worlds. */
+  --color-on-accent: #f4f3ee;
 
   /* Semantic — derived, muted. Never Tailwind's default palette. */
   --color-success: #1f6b4a;
@@ -229,6 +240,53 @@
   /* --color-gold (#d4af37) is deliberately absent. It was the incumbent
      template's accent, it has no equivalent in this system, and it is not
      coming back as an alias. */
+}
+
+/* =============================================================================
+   THE STORY WORLD — homepage only
+   Scoped to [data-world="story"], never to :root.
+
+   Two reasons this is a scope and not a token edit:
+     1. The brief is "redesign ONLY the homepage". --color-accent now drives 47
+        migrated files across the rest of the app; changing it globally would
+        repaint every route.
+     2. --color-danger and --color-accent are the SAME hex (#c13a2a) in the
+        global theme. Retiring red at the token level would silently strip the
+        site's error and destructive colour along with it.
+
+   Red is banned on this page, and so is a chromatic accent of any kind.
+   THE ACCENT IS LIGHT. On dark grounds it is warm white; on light grounds it is
+   ink. The rule, the year and the CTAs are simply the brightest (or darkest)
+   thing present, so nothing on the page competes with the photography — the
+   showroom's own warm interior light is the only colour in the composition.
+
+   This replaced a champagne accent, which read as decoration sitting on top of
+   the story rather than part of it.
+   ============================================================================= */
+@layer base {
+  [data-world="story"] {
+    /* Accent — light itself. Fills, the rule, the active year. */
+    --color-accent: #f4f3ee;
+    --color-accent-hover: #ffffff;
+    /* A white fill needs dark text. Globally this is warm white, because the
+       global accent is red. */
+    --color-on-accent: #14161a;
+    /* Ground-specific variants, as the global accent has: pure light is
+       invisible on a light ground, so there it inverts to ink. */
+    --color-accent-text-light: #14161a; /* on ground / ground-2 / surface */
+    --color-accent-text-dark: #f4f3ee; /* on void / ink / deep */
+
+    /* Grounds. The story darkens toward the opening and lifts through the
+       middle chapters, so it needs one ground deeper than ink. */
+    --color-void: #0b0e12;
+    --color-graphite: #1c2229;
+
+    /* The incumbent world's aliases still resolve inside components/home/*,
+       so they are repointed here rather than left pointing at red. */
+    --color-redline: var(--color-accent);
+    --color-redline-hi: var(--color-accent-text-dark);
+    --color-redline-deep: var(--color-accent-text-light);
+  }
 }
 
 @layer base {

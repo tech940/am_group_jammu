@@ -1,69 +1,81 @@
 import type { Metadata } from "next"
 import { getHomeInventory } from "@/lib/inventory/server"
-import { HomeHero } from "@/components/home/hero"
-import { Story } from "@/components/home/timeline"
-import { Divisions } from "@/components/home/divisions"
-import { Brands } from "@/components/home/brands"
-import { Locations } from "@/components/home/locations"
-import { Manifest } from "@/components/home/manifest"
-import { Provenance } from "@/components/home/provenance"
-import { Ecosystem } from "@/components/home/ecosystem"
-import { Closing } from "@/components/home/closing"
+import { FOUNDED, SCALE, YEARS_TRADING } from "@/components/home/content"
+import { StoryHero } from "@/components/story/hero"
+import { StoryRule, StoryRuleMobile, type Chapter } from "@/components/story/rule"
+import { ChapterOrigin, ChapterGrowth } from "@/components/story/ch-origin-growth"
+import { ChapterBusinesses, ChapterBrands } from "@/components/story/ch-business-brands"
+import { ChapterPlaces, ChapterPeople } from "@/components/story/ch-places-people"
+import { ChapterToday, ChapterNext } from "@/components/story/ch-today-next"
 
-const CONTRACT = `
-THESIS: A 58-year family conglomerate presented as its own master drawing set —
-measured, annotated, verifiable. Refuses the category default: the dark
-navy/gold "luxury dealership" template of hero + card grids.
-OWN-WORLD: Drafting paper (#F4F3EE), cyanotype print blue (#133A63), ink
-(#14161A), redline (#C13A2A). Barlow Condensed display caps, Archivo text,
-Fragment Mono annotation. Title blocks, dimension lines, registration marks,
-photography as captioned plates with sharp edges. Recognizable with all
-content removed.
-STORY: A buyer in J&K understands this is the region's oldest automotive
-house, sees the proof drawn to scale (timeline, register, site plan, live
-stock), and calls, visits, or opens the inventory.
-FIRST VIEWPORT: Split cover sheet — left 7/12 print-blue drawn field with
-title block, masthead "Keeping J&K moving since 1968", dimension line
-1968⊢58 years⊣2026, facts paragraph, two actions (Read the drawings /
-N cars in stock); right 5/12 full-bleed plate FIG.01, real AM Kia showroom.
-FORM: Engineering drawing office — candidate 6 of 7 on the ordered list,
-seed key 2486ed40.
-FINISH: unreviewed and undocumented is unfinished; this build ends with the
-finish review, the verdict, and DESIGN.md
-`
+/**
+ * The homepage as one continuous story.
+ *
+ * Eight chapters, one thread. The reader scrolls from 1968 to now and out the
+ * other side; the rule down the left edge counts the years and never unmounts,
+ * so chapters overlap and dissolve rather than starting and stopping.
+ *
+ * `data-world="story"` scopes the homepage palette (see app/globals.css). Red is
+ * banned on this page and the accent is champagne; the scope exists so that
+ * changing it does not repaint the other 25 routes, and so the site's `danger`
+ * colour — which shares a hex with the global accent — is left intact.
+ *
+ * Everything stated here is sourced. What has no source is absent, not filled:
+ * no employee count, no customers-served figure, no roadmap, no archival
+ * photograph, and no map pin for the 24 outlets that have no published address.
+ */
 
 export async function generateMetadata(): Promise<Metadata> {
   const { total, facets } = await getHomeInventory()
   const makes = facets.makes.map((m) => m.label).join(", ")
 
   return {
-    title: "AM Group Jammu | J&K's Automotive & Industrial House Since 1968",
+    title: `AM Group Jammu | J&K's Automotive & Industrial House Since ${FOUNDED}`,
     description:
       total > 0
-        ? `26 dealership outlets, 8 vehicle franchises, fuel, real estate and retail across Jammu & Kashmir since 1968. ${total} certified used cars in stock${makes ? ` — ${makes}` : ""}.`
-        : "26 dealership outlets, 8 vehicle franchises, fuel, real estate and retail across Jammu & Kashmir since 1968.",
+        ? `${SCALE.outlets} dealership outlets, fuel, real estate and retail across Jammu & Kashmir since ${FOUNDED}. ${total} certified used cars in stock${makes ? ` — ${makes}` : ""}.`
+        : `${SCALE.outlets} dealership outlets, fuel, real estate and retail across Jammu & Kashmir since ${FOUNDED}.`,
     alternates: { canonical: "/" },
   }
 }
 
+const CHAPTERS: Chapter[] = [
+  { id: "origin", label: "Started", year: 1968 },
+  { id: "growth", label: "Grew", year: 1990 },
+  { id: "businesses", label: "Businesses", year: 2004 },
+  { id: "brands", label: "Marques", year: 2012 },
+  { id: "places", label: "Places", year: 2017 },
+  { id: "people", label: "People", year: 2020 },
+  { id: "today", label: "Today", year: 2024 },
+  { id: "next", label: "Next", year: FOUNDED + YEARS_TRADING },
+]
+
 export default async function Page() {
   const inventory = await getHomeInventory()
+  const thisYear = FOUNDED + YEARS_TRADING
 
   return (
-    <div className="bg-ground text-ink">
-      <HomeHero stockCount={inventory.total} />
-      <Story />
-      <Divisions />
-      <Brands />
-      <Locations />
-      <Manifest
-        vehicles={inventory.latest.length > 0 ? inventory.latest : inventory.bestValue}
-        total={inventory.total}
-        degraded={inventory.degraded}
+    <div data-world="story" className="bg-void text-on-deep">
+      {/* The thread. Rendered once, outside every chapter, so it is genuinely
+          continuous rather than restarted per section. */}
+      <StoryRule
+        chapters={CHAPTERS}
+        founded={FOUNDED}
+        currentYear={thisYear}
+        quietFor={["places"]}
       />
-      <Provenance />
-      <Ecosystem />
-      <Closing />
+      <StoryRuleMobile founded={FOUNDED} currentYear={thisYear} />
+
+      <StoryHero founded={FOUNDED} />
+
+      <ChapterOrigin />
+      <ChapterGrowth />
+      <ChapterBusinesses />
+      <ChapterBrands />
+      <ChapterPlaces />
+      <ChapterPeople />
+      <ChapterToday stockCount={inventory.total} degraded={inventory.degraded} />
+      <ChapterNext />
     </div>
   )
 }

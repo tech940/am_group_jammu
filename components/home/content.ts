@@ -16,17 +16,26 @@ export interface Milestone {
   year: number
   title: string
   note: string
+  /**
+   * The marque's own mark, as published on the company's About page
+   * ("Timeline of Excellence"). Self-hosted under /public/marques rather than
+   * hot-linked from wp-content, which is being decommissioned.
+   *
+   * All eight are DARK artwork on transparent, so they are never recoloured —
+   * a trademark is not ours to restyle. They sit on a light chip instead.
+   */
+  mark?: string
 }
 
 export const TIMELINE: Milestone[] = [
-  { year: 1968, title: "Hindustan Petroleum", note: "The group begins with HPCL gas stations and kerosene distribution in Jammu." },
-  { year: 1977, title: "Indian Oil", note: "IOCL dealership extends the petroleum business across the region." },
-  { year: 2004, title: "Chevrolet", note: "First passenger-car franchise; GM awards follow from 2006." },
-  { year: 2008, title: "Hyundai", note: "AM Hyundai opens — the group's largest car business to this day." },
-  { year: 2010, title: "Honda 2-Wheelers", note: "Diamond Honda brings the group into two-wheelers." },
-  { year: 2012, title: "KTM", note: "The only KTM showroom in Jammu." },
-  { year: 2017, title: "Tata Motors", note: "AM Tata adds India's home-grown passenger range." },
-  { year: 2024, title: "Bajaj · Kia · MG", note: "Three franchises in one year — the group's broadest expansion since 1968." },
+  { year: 1968, title: "Hindustan Petroleum", note: "The group begins with HPCL gas stations and kerosene distribution in Jammu." , mark: "/marques/hp.png" },
+  { year: 1977, title: "Indian Oil", note: "IOCL dealership extends the petroleum business across the region." , mark: "/marques/iocl.png" },
+  { year: 2004, title: "Chevrolet", note: "First passenger-car franchise; GM awards follow from 2006." , mark: "/marques/chevrolet.png" },
+  { year: 2008, title: "Hyundai", note: "AM Hyundai opens — the group's largest car business to this day." , mark: "/marques/hyundai.png" },
+  { year: 2010, title: "Honda 2-Wheelers", note: "Diamond Honda brings the group into two-wheelers." , mark: "/marques/honda.png" },
+  { year: 2012, title: "KTM", note: "The only KTM showroom in Jammu." , mark: "/marques/ktm.png" },
+  { year: 2017, title: "Tata Motors", note: "AM Tata adds India's home-grown passenger range." , mark: "/marques/tata.png" },
+  { year: 2024, title: "Bajaj · Kia · MG", note: "Three franchises in one year — the group's broadest expansion since 1968." , mark: "/marques/bajaj-kia-mg.png" },
 ]
 
 export const FOUNDED = 1968

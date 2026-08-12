@@ -7,11 +7,52 @@
 const SUPABASE_STORAGE_BASE =
   process.env.NEXT_PUBLIC_SUPABASE_URL || "https://nhceknbaslqdqofefyla.supabase.co"
 
+/**
+ * Storage project keys, matching app/api/media/[project]/[...path]/route.ts.
+ *   m = media library (the client's photography)
+ *   l = lead-data project (legacy branch photography)
+ */
+export type MediaProject = "m" | "l"
+
+/**
+ * Build a same-origin URL for a Supabase Storage object.
+ *
+ * next/image cannot fetch these hosts directly on any network running
+ * DNS64/NAT64: Next rejects the upstream because the hostname also resolves to
+ * a synthesised `64:ff9b::/96` address, which it classifies as private. Routing
+ * through our own origin skips that check while keeping full next/image
+ * optimisation — which matters, because the originals reach 5.8MB.
+ * See the route handler for the full reasoning and the allow-list.
+ *
+ * To serve storage directly instead (no DNS64 on your network, and you would
+ * rather skip the hop), return the absolute Supabase URL here and add the host
+ * to `images.remotePatterns`.
+ */
+export function mediaPath(project: MediaProject, objectPath: string): string {
+  if (!objectPath) return ""
+  const clean = objectPath.replace(/^\/+/, "")
+  return `/api/media/${project}/${clean}`
+}
+
 export function getSupabaseMediaUrl(path: string): string {
   if (!path) return ""
-  if (path.startsWith("http://") || path.startsWith("https://")) return path
-  const cleanPath = path.replace(/^\/+/, "")
-  return `${SUPABASE_STORAGE_BASE}/storage/v1/object/public/am_group_files/${cleanPath}`
+  if (path.startsWith("/api/media")) return path
+  // Absolute URLs are mapped back onto the proxy by host.
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    try {
+      const u = new URL(path)
+      const marker = "/storage/v1/object/public/am_group_files/"
+      const i = u.pathname.indexOf(marker)
+      if (i !== -1) {
+        const project: MediaProject = u.hostname.startsWith("ehcm") ? "m" : "l"
+        return mediaPath(project, u.pathname.slice(i + marker.length))
+      }
+    } catch {
+      /* fall through to returning the input unchanged */
+    }
+    return path
+  }
+  return mediaPath("l", path)
 }
 
 /**
@@ -27,8 +68,7 @@ export function getSupabaseMediaUrl(path: string): string {
  * server and serves an AVIF variant per breakpoint, so the browser never sees
  * the megabytes.
  */
-export const AM_KIA_SHOWROOM =
-  "https://ehcmjypfxucvcvuofozx.supabase.co/storage/v1/object/public/am_group_files/kia/service/untitled-09028.jpg"
+export const AM_KIA_SHOWROOM = mediaPath("m", "kia/service/untitled-09028.jpg")
 
 export const SUPABASE_MEDIA = {
   heroBg: AM_KIA_SHOWROOM,
