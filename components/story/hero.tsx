@@ -90,22 +90,20 @@ export function StoryHero({ founded }: { founded: number }) {
             : { y: titleY, opacity: titleOpacity, willChange: near ? "transform, opacity" : "auto" }
         }
       >
-        <motion.div
+        {/* The name is SET, not drawn.
+            The graphic mark lives in the fixed header, which sits directly over
+            this frame — showing it twice within one viewport read as a
+            duplicate, and the two collided as the header filled in on scroll.
+            A tracked wordmark says the same thing in a different register, so
+            the header keeps the mark and the frame keeps the name. */}
+        <motion.p
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: DUR.reveal, ease: EASE_OUT }}
+          className="font-display text-h3 uppercase leading-none tracking-[0.22em] text-on-deep md:text-h2"
         >
-          {/* The brand mark, unfiltered — white artwork on a dark frame is
-              exactly the condition it was drawn for. */}
-          <Image
-            src="/logo-am-group.png"
-            alt="AM Group"
-            width={169}
-            height={112}
-            priority
-            className="h-12 w-auto object-contain md:h-16"
-          />
-        </motion.div>
+          AM Group
+        </motion.p>
 
         <motion.h1
           initial={reduce ? false : { opacity: 0, y: 14 }}
