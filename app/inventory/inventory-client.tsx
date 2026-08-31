@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CloseGlyph, SearchGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
+import { PRIMARY_LOCATION } from "@/lib/locations"
 import { Input, Select } from "@/components/ui/field"
 import { VehicleCard } from "@/components/ui/vehicle-card"
 import { InventoryFilters } from "@/components/ui/inventory-filters"
@@ -299,7 +300,7 @@ export default function InventoryClient({
               <Button type="button" variant="secondary" onClick={() => setIsFilterOpen(true)}>
                 <span>Filters</span>
                 {activeCount > 0 && (
-                  <span className="h-5 min-w-5 px-1 rounded-sm bg-accent text-ground text-meta flex items-center justify-center" data-num>
+                  <span className="h-5 min-w-5 px-1 rounded-sm bg-accent text-on-accent text-meta flex items-center justify-center" data-num>
                     {activeCount}
                   </span>
                 )}
@@ -358,7 +359,7 @@ export default function InventoryClient({
               <h3 className="font-display text-h3 text-ink mb-2">Inventory temporarily unavailable</h3>
               <p className="text-body text-ink-2 mb-6">
                 We could not load live stock just now. Please try again shortly, or call us on{" "}
-                <a href="tel:+919419100000" className="font-semibold text-accent-text-light underline underline-offset-4" data-num>+91 94191 00000</a>.
+                <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="inventory-degraded" className="font-semibold text-accent underline underline-offset-4" data-num>{PRIMARY_LOCATION.phone}</a>.
               </p>
             </div>
           ) : vehicles.length === 0 ? (

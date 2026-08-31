@@ -32,64 +32,92 @@
      Every raw hex in the app resolves to one of these.
      --------------------------------------------------------------------------- */
 
-  /* Grounds */
-  --color-ground: #f4f3ee;      /* page background */
-  --color-ground-2: #eae8e0;    /* alternating band */
-  --color-surface: #ffffff;     /* data surfaces: cards, tables, modals */
-  --color-deep: #133a63;        /* dark ground: hero, admin rail, footer */
-  --color-deep-2: #0d2a4a;      /* deepest ground */
+  /* Grounds — cool graphite darks under an almost-neutral paper.
 
-  /* Two further grounds used only by the homepage story world. Declared here
-     because Tailwind generates `bg-*` utilities from @theme and nowhere else —
-     a scoped override can change their VALUE but cannot create the class. */
-  --color-void: #0b0e12;        /* deeper than ink; the opening frame */
-  --color-graphite: #1c2229;    /* the neutral dark between navy chapters */
+     Third palette of the rebuild, and the reasoning is recorded because the
+     first two were rejected: navy + scarlet read as a corporate template, and
+     off-white + forest + brass read as a luxury one. This one carries no brand
+     hue in the grounds at all. The darks are near-neutral graphite, the lights
+     are a hair cool, and the only colour in the system is an ice blue that
+     behaves like a light source rather than a fill. Every value was measured
+     against WCAG before it was written; ratios are in DESIGN.md. */
+  --color-ground: #f6f7f8;      /* page background */
+  --color-ground-2: #e9ecef;    /* alternating band */
+  --color-surface: #ffffff;     /* data surfaces: cards, tables, modals */
+  --color-deep: #14181e;        /* dark ground: photographic bands, admin rail */
+  --color-deep-2: #0c0e12;      /* deepest ground: footer, filled nav, scrim base */
+
+  /* Aliases left from the retired homepage "story world"; nothing routed uses
+     them, and they resolve onto the deep family so the unrouted
+     components/home, /story, /ferrari-home and /worldclass-home directories
+     still render until they are deleted. */
+  --color-void: var(--color-deep-2);
+  --color-graphite: var(--color-deep);
 
   /* Ink */
-  --color-ink: #14161a;         /* primary text on light */
-  --color-ink-2: #565e6a;       /* secondary text on light */
-  --color-ink-3: #9aa1ab;       /* tertiary text, placeholders */
-  --color-on-deep: #f4f3ee;     /* primary text on dark */
-  --color-on-deep-2: #a9bfdd;   /* secondary text on dark */
+  --color-ink: #12151a;         /* primary text on light   — 17.1:1 on ground */
+  --color-ink-2: #4c555f;       /* secondary text on light —  7.1:1 on ground */
+  --color-ink-3: #5f6971;       /* tertiary text, placeholders — 5.2:1 on ground */
+  --color-on-deep: #f6f7f8;     /* primary text on dark    — 16.6:1 on deep */
+  --color-on-deep-2: #aebdc9;   /* secondary text on dark  —  9.3:1 on deep */
 
   /* Line */
-  --color-line: rgb(20 22 26 / 0.12);        /* hairline rules, table borders */
-  --color-line-strong: rgb(20 22 26 / 0.24); /* input borders */
-  --color-line-deep: #9fb6d6;                /* rules on dark grounds */
-  --color-line-on-deep: rgb(244 243 238 / 0.16);
+  --color-line: rgb(18 21 26 / 0.12);        /* hairline rules, table borders */
+  --color-line-strong: rgb(18 21 26 / 0.24); /* input borders */
+  --color-line-deep: #6a7b8b;                /* rules on dark grounds — 4.1:1 */
+  --color-line-on-deep: rgb(246 247 248 / 0.16);
 
-  /* Accent — one colour. Fills use the base; small text must use a variant,
-     because base accent is ~4.0:1 on ground and fails AA below 18px. */
-  --color-accent: #c13a2a;
-  --color-accent-hover: #a32e20;
-  --color-accent-text-light: #a32e20;  /* small accent text on ground/surface */
-  --color-accent-text-dark: #f08a70;   /* small accent text on deep/ink */
-  /* Text sitting ON an accent fill. It is a token, not a fixed colour, because
-     the homepage overrides the accent to warm white — where light-on-light
-     would be invisible. Any accent-filled control uses `text-on-accent` so it
-     stays legible in both worlds. */
-  --color-on-accent: #f4f3ee;
+  /* Accent — one hue, two ends, because an ice blue cannot do both jobs.
 
-  /* Semantic — derived, muted. Never Tailwind's default palette. */
-  --color-success: #1f6b4a;
-  --color-success-bg: #e8f0eb;
-  --color-success-line: #b8d4c4;
-  --color-success-text: #17543a;
+     A pale blue is invisible as a button on a near-white page, and a deep blue
+     is invisible as a light source on a graphite one. So the hue is anchored at
+     both ends and each end has exactly one ground it belongs to:
 
-  --color-warning: #a66a00;
-  --color-warning-bg: #fbf1df;
-  --color-warning-line: #e8ce9a;
-  --color-warning-text: #7a4e00;
+       accent        deep end   — CTA fills and small accent text on LIGHT grounds
+       accent-bright pale end   — CTA fills, hairlines, glass edges and small
+                                  accent text on DARK grounds
 
-  --color-danger: #c13a2a;
-  --color-danger-bg: #f7e9e6;
-  --color-danger-line: #e4bdb6;
-  --color-danger-text: #a32e20;
+     `accent` on `deep` measures 2.7:1 and `accent-bright` on `ground` measures
+     1.6:1. Neither is a usable pairing; picking the wrong end is a defect, not
+     a style choice. */
+  --color-accent: #146287;             /* 6.3:1 on ground, 5.7:1 on ground-2 */
+  --color-accent-hover: #0f4e6d;
+  --color-on-accent: #f6f7f8;          /* label on an accent fill — 6.3:1 */
 
-  --color-info: #133a63;
-  --color-info-bg: #e7edf5;
-  --color-info-line: #b9cce2;
-  --color-info-text: #0d2a4a;
+  --color-accent-bright: #8fc7e8;      /* 9.8:1 on deep, 10.6:1 on deep-2 */
+  --color-accent-bright-hover: #aedaf1;
+  --color-on-accent-bright: #0c0e12;   /* label on a bright fill — 10.6:1 */
+
+  /* The ground-specific names the rest of the app already addresses. They are
+     aliases of the two ends above, so no call site had to change. */
+  --color-accent-text-light: var(--color-accent);
+  --color-accent-text-dark: var(--color-accent-bright);
+
+  /* Semantic — derived, muted, every `-text` ≥6.8:1 on its own `-bg`.
+
+     `danger` is deliberately NOT the accent. Under the original navy system the
+     two shared a hex, which meant retiring the brand colour would have stripped
+     every error and destructive colour in the application with it. */
+  --color-success: #1f7a55;
+  --color-success-bg: #e4f0ea;
+  --color-success-line: #b4d5c4;
+  --color-success-text: #175b3f;
+
+  --color-warning: #b15a0b;
+  --color-warning-bg: #faede1;
+  --color-warning-line: #ebcaa6;
+  --color-warning-text: #813f06;
+
+  --color-danger: #b3372a;
+  --color-danger-hover: #95291f;
+  --color-danger-bg: #f8e9e7;
+  --color-danger-line: #e5bfb9;
+  --color-danger-text: #95291f;
+
+  --color-info: #146287;
+  --color-info-bg: #e4eef4;
+  --color-info-line: #b7d2e1;
+  --color-info-text: #0f4e6d;
 
   /* ---------------------------------------------------------------------------
      TYPE SCALE — weights are 400/500/600/700 only. Nothing below 11px.
@@ -154,12 +182,18 @@
   --text-table--line-height: 1.45;
 
   /* ---------------------------------------------------------------------------
-     RADIUS — four values. Replaces the 15 in the previous build.
+     RADIUS — five values.
+
+     The system used to be hard-edged (0 / 2 / 4). It now lifts off zero:
+     controls are 6px, surfaces 10px, floating layers 12px. `none` is still the
+     default for full-bleed bands and hairline dividers — a rounded corner on a
+     section band is not softness, it is a gap.
      --------------------------------------------------------------------------- */
   --radius-none: 0px;
-  --radius-sm: 2px;    /* inputs, buttons, chips */
-  --radius-md: 4px;    /* modals, drawers, popovers */
-  --radius-full: 9999px; /* avatars, status dots, the year stamp — nothing else */
+  --radius-sm: 6px;    /* buttons, inputs, chips, badges */
+  --radius-md: 10px;   /* cards, photographic plates, panels, tables */
+  --radius-lg: 12px;   /* modals, drawers, popovers */
+  --radius-full: 9999px; /* avatars and status dots — nothing else */
 
   /* ---------------------------------------------------------------------------
      ELEVATION — exactly two, and only for surfaces that float over content.
@@ -243,49 +277,252 @@
 }
 
 /* =============================================================================
-   THE STORY WORLD — homepage only
-   Scoped to [data-world="story"], never to :root.
+   BACKDROPS
 
-   Two reasons this is a scope and not a token edit:
-     1. The brief is "redesign ONLY the homepage". --color-accent now drives 47
-        migrated files across the rest of the app; changing it globally would
-        repaint every route.
-     2. --color-danger and --color-accent are the SAME hex (#c13a2a) in the
-        global theme. Retiring red at the token level would silently strip the
-        site's error and destructive colour along with it.
+   Decorative background layers. Every one of them obeys four rules, because a
+   background that breaks any of them stops being atmosphere and starts being a
+   defect:
 
-   Red is banned on this page, and so is a chromatic accent of any kind.
-   THE ACCENT IS LIGHT. On dark grounds it is warm white; on light grounds it is
-   ink. The rule, the year and the CTAs are simply the brightest (or darkest)
-   thing present, so nothing on the page competes with the photography — the
-   showroom's own warm interior light is the only colour in the composition.
-
-   This replaced a champagne accent, which read as decoration sitting on top of
-   the story rather than part of it.
+     1. NEVER BETWEEN THE READER AND THE TEXT. Each layer is `aria-hidden`,
+        `pointer-events-none`, and sits at a negative z-index inside an
+        `isolate` parent. Contrast is measured against the composited result,
+        not against the token.
+     2. INTENSITY IS A CEILING, NOT A STARTING POINT. On light grounds these run
+        at 3-7% — enough to read as texture at arm's length and not enough to
+        move ink off 17:1. On dark grounds they sit UNDER the photo scrim.
+     3. NO FILTER: BLUR ON LARGE AREAS. Aurora and orbs are soft radial
+        gradients, which the compositor draws for free. `filter: blur()` over a
+        viewport-sized element is one of the most expensive things a page can
+        do, and it buys nothing a gradient stop cannot.
+     4. MOTION IS OPT-IN. Everything that moves lives inside
+        `prefers-reduced-motion: no-preference`, so reduce gets the static
+        composition rather than a frozen half-state.
    ============================================================================= */
-@layer base {
-  [data-world="story"] {
-    /* Accent — light itself. Fills, the rule, the active year. */
-    --color-accent: #f4f3ee;
-    --color-accent-hover: #ffffff;
-    /* A white fill needs dark text. Globally this is warm white, because the
-       global accent is red. */
-    --color-on-accent: #14161a;
-    /* Ground-specific variants, as the global accent has: pure light is
-       invisible on a light ground, so there it inverts to ink. */
-    --color-accent-text-light: #14161a; /* on ground / ground-2 / surface */
-    --color-accent-text-dark: #f4f3ee; /* on void / ink / deep */
+:root {
+  /* One grain tile, reused by every surface. feTurbulence is rasterised once by
+     the browser and then tiled, so this costs a single small texture rather
+     than a filter pass. */
+  /* Channel triplets for the backdrop layers. Declared once, here, so no
+     component in the app carries a literal colour — the backdrops are built
+     from the SAME four tokens as everything else (accent, accent-bright, ink,
+     ground) and simply vary the alpha. An intermediate blue invented inside a
+     component is palette drift, which is the defect DESIGN.md's "raw hex in a
+     component" rule exists to catch. */
+  --backdrop-bright: 143 199 232;  /* = accent-bright #8fc7e8 */
+  --backdrop-accent: 20 98 135;    /* = accent        #146287 */
+  --backdrop-ink: 18 21 26;        /* = ink           #12151a */
+  --backdrop-paper: 246 247 248;   /* = ground        #f6f7f8 */
 
-    /* Grounds. The story darkens toward the opening and lifts through the
-       middle chapters, so it needs one ground deeper than ink. */
-    --color-void: #0b0e12;
-    --color-graphite: #1c2229;
+  --grain-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-    /* The incumbent world's aliases still resolve inside components/home/*,
-       so they are repointed here rather than left pointing at red. */
-    --color-redline: var(--color-accent);
-    --color-redline-hi: var(--color-accent-text-dark);
-    --color-redline-deep: var(--color-accent-text-light);
+@layer components {
+  /* --- Noise / grain ------------------------------------------------------
+     Sits over everything in a band. The opacity is deliberately near the
+     threshold of visibility: grain you can see is a texture, grain you can
+     notice is dirt. */
+  .grain-layer {
+    background-image: var(--grain-tile);
+    background-repeat: repeat;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+  }
+  .grain-layer-light {
+    opacity: 0.035;
+  }
+
+  /* Noise animation — a 1px-scale drift, so the grain shimmers like film
+     rather than sliding like a texture. */
+  @media (prefers-reduced-motion: no-preference) {
+    .grain-animate {
+      animation: grain-drift 6s steps(6, end) infinite;
+    }
+  }
+  @keyframes grain-drift {
+    0%   { transform: translate(0, 0); }
+    16%  { transform: translate(-2%, 1%); }
+    33%  { transform: translate(1%, -2%); }
+    50%  { transform: translate(-1%, 2%); }
+    66%  { transform: translate(2%, 1%); }
+    83%  { transform: translate(1%, -1%); }
+    100% { transform: translate(0, 0); }
+  }
+
+  /* --- Animated gradient --------------------------------------------------
+     Background-position only, over 28s. Long enough that it reads as light
+     changing rather than as an animation playing. */
+  @media (prefers-reduced-motion: no-preference) {
+    .aurora-animate {
+      background-size: 180% 180%;
+      animation: aurora-drift 28s ease-in-out infinite;
+    }
+  }
+  @keyframes aurora-drift {
+    0%, 100% { background-position: 0% 40%; }
+    50%      { background-position: 100% 60%; }
+  }
+
+  /* --- Grid / dot matrix --------------------------------------------------
+     Both are masked so they fade before they reach the content, which is what
+     stops a technical texture from turning into a wallpaper. */
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, var(--backdrop-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--backdrop-line) 1px, transparent 1px);
+    background-size: var(--backdrop-cell, 56px) var(--backdrop-cell, 56px);
+  }
+  .dot-matrix {
+    background-image: radial-gradient(var(--backdrop-line) 1px, transparent 1px);
+    background-size: var(--backdrop-cell, 22px) var(--backdrop-cell, 22px);
+  }
+
+  /* --- Mask fades ---------------------------------------------------------
+     A mask only reads the alpha channel, so the colour in these gradients is
+     meaningless — which is exactly why they live in CSS rather than as literals
+     inside a component. */
+  .fade-y-both {
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 70%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, #000 70%, transparent 100%);
+  }
+  .fade-y-top {
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 80%);
+  }
+  .fade-y-bottom {
+    mask-image: linear-gradient(to top, #000 0%, transparent 80%);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 80%);
+  }
+  .fade-radial {
+    mask-image: radial-gradient(70% 60% at 50% 50%, transparent 0%, #000 85%);
+    -webkit-mask-image: radial-gradient(70% 60% at 50% 50%, transparent 0%, #000 85%);
+  }
+
+  /* --- Perspective grid ---------------------------------------------------
+     The grid laid flat and tilted away from the reader. Masked to nothing at
+     the horizon, because an un-masked perspective grid terminates in a hard
+     line that reads as a rendering bug. */
+  .perspective-grid {
+    transform: perspective(680px) rotateX(62deg);
+    transform-origin: 50% 100%;
+    mask-image: linear-gradient(to top, #000 0%, transparent 78%);
+    -webkit-mask-image: linear-gradient(to top, #000 0%, transparent 78%);
+  }
+}
+
+/* =============================================================================
+   GLASS
+
+   Frosted panels, used only where there is photography behind them to refract:
+   the hero, the record band, and the closing call. A blurred panel over a flat
+   ground has nothing to blur and is just a grey box with a border.
+
+   Three things make this safe rather than decorative:
+
+   1. THE PANEL IS DARK, NOT LIGHT. Over uncontrolled photography a light
+      translucent panel inherits whatever is behind it, which is exactly how the
+      first build measured a 2.11:1 subhead. These panels darken what is behind
+      them, so the text sits on a floor that a bright photograph cannot lift.
+      The ice-blue is the EDGE and the tint, not the fill.
+
+   2. THERE IS A NO-BLUR FALLBACK. `backdrop-filter` is unsupported or disabled
+      often enough to matter, and without it a 55%-opaque panel over a photo is
+      unreadable. The default declaration is the opaque-enough fallback; the
+      translucent version is applied only inside @supports.
+
+   3. TRANSPARENCY IS A PREFERENCE. `prefers-reduced-transparency: reduce` gets
+      the solid panel — the same one the no-blur fallback uses.
+
+   Blur is a compositor cost that scales with painted area, so these are whole
+   panels, never many small ones, and blur is never animated.
+   ============================================================================= */
+:root {
+  --glass-blur: 18px;
+  /* Panel over photography. Cool graphite at 58%, lifted a few points toward
+     the accent hue so it reads as glass rather than as a grey scrim. */
+  --glass-tint: rgb(16 24 32 / 0.58);
+  /* What the same panel becomes with no blur available, or when the reader has
+     asked for reduced transparency. */
+  --glass-solid: rgb(13 19 26 / 0.92);
+  /* The lit edge. This is the accent doing the one job a pale blue is good at. */
+  --glass-edge: rgb(143 199 232 / 0.30);
+  --glass-edge-strong: rgb(143 199 232 / 0.48);
+}
+
+@layer components {
+  .glass {
+    background-color: var(--glass-solid);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-md);
+  }
+
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass {
+      background-color: var(--glass-tint);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass {
+      background-color: var(--glass-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* The frosted bar: the same material with no radius and no border of its own,
+     so the caller can put the edge on whichever side it needs — bottom for the
+     header, top for the mobile action bar.
+
+     The header uses this while it sits over a photographic hero: a fully
+     transparent header over a photograph is a contrast gamble against an image
+     nobody controls, and the showroom ceiling in this one is nearly white. */
+  .glass-bar {
+    background-color: var(--glass-solid);
+  }
+
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-bar {
+      background-color: var(--glass-tint);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-bar {
+      background-color: var(--glass-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* The same panel with no blur.
+
+     Blur is a compositor cost that scales with PAINTED AREA and is recomputed
+     as the page scrolls, so a screen-height panel full of text is the expensive
+     case, not the impressive one. Large content regions on a dark ground use
+     this instead: identical tint, identical lit edge, no backdrop-filter. Glass
+     is spent where it is actually seen refracting something — the hero, the
+     closing call — and not on a wall of table rows. */
+  .panel {
+    background-color: var(--glass-solid);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-md);
+  }
+
+  /* The scrim a photographic band paints under its glass. Two stops, because a
+     single flat tint either crushes the photograph or fails to hold the type:
+     this keeps the image readable at the top and guarantees a dark floor where
+     the panels actually sit. */
+  .photo-scrim {
+    background-image: linear-gradient(
+      to bottom,
+      rgb(12 14 18 / 0.55) 0%,
+      rgb(12 14 18 / 0.72) 45%,
+      rgb(12 14 18 / 0.88) 100%
+    );
   }
 }
 
@@ -316,8 +553,10 @@
   /* ---------------------------------------------------------------------------
      FOCUS — one system, every interactive element, keyboard only.
      --------------------------------------------------------------------------- */
+  /* The darker accent, not the base: base brass measures 2.9:1 on ground-2,
+     which is under the 3:1 a focus indicator has to hold (WCAG 2.4.11). */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 2px solid var(--color-accent-text-light);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
@@ -329,7 +568,7 @@
 
   ::selection {
     background-color: var(--color-accent);
-    color: var(--color-ground);
+    color: var(--color-on-accent);
   }
 
   /* Numerals align in every column, price and odometer reading. */

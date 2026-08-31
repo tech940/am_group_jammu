@@ -12,19 +12,7 @@ import { ADMIN_COOKIE, verifySessionToken } from '@/lib/admin/session'
  * lib/leads/actions.ts, because actions are publicly invocable endpoints that
  * a proxy matcher on page routes does not cover.
  */
-/**
- * Dead WordPress URLs that must not be redirected anywhere.
- *
- * These are Motors-plugin utility shells — a comparison tray, a user dashboard,
- * a "submit your listing" form, a login screen, and the plugin's demo listing
- * templates (which render a fictional BMW M5 at ₹120,000). They carry no
- * content a person searched for, and they are all in the AIOSEO sitemap.
- *
- * A 301 would launder them into a real page and invite Google to treat that
- * page as their replacement. 410 Gone says the resource is deliberately
- * retired, which drops them from the index faster than a 404 and passes nothing
- * on. That is the correct signal for a page that should never have been public.
- */
+
 const GONE_EXACT = new Set([
   '/compare',
   '/compare-page',
@@ -44,6 +32,12 @@ function isGone(pathname: string): boolean {
 
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl
+
+  // ONLY gate /admin routes and 410 retired WP URLs.
+  // Public pages (/, /about, /inventory, /locations, etc.) MUST NEVER BE GATED.
+  if (!pathname.startsWith('/admin') && !isGone(pathname)) {
+    return NextResponse.next()
+  }
 
   if (isGone(pathname)) {
     return new NextResponse(null, {
@@ -71,7 +65,6 @@ export const config = {
   matcher: [
     '/admin',
     '/admin/:path*',
-    // Retired WordPress URLs answered with 410 — see GONE_EXACT above.
     '/compare',
     '/compare-page',
     '/profile-page',

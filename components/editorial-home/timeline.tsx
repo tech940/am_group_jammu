@@ -1,9 +1,10 @@
 "use client"
 
 import Image from "next/image"
-import { motion, useScroll, useSpring, useTransform } from "framer-motion"
+import { motion, useScroll } from "framer-motion"
 import * as React from "react"
 import { TIMELINE, YEARS_TRADING } from "@/components/home/content"
+import { useProgress } from "./shared/motion"
 
 export function EditorialTimeline() {
   const containerRef = React.useRef<HTMLDivElement>(null)
@@ -11,45 +12,38 @@ export function EditorialTimeline() {
     target: containerRef,
     offset: ["start 0.8", "end 0.2"],
   })
-  const scaleY = useSpring(scrollYProgress, { stiffness: 100, damping: 25 })
+  // Keeps tracking the reader's scroll under reduce; loses only the spring's
+  // overshoot, so the register still shows how far through the chronology it is.
+  const scaleY = useProgress(scrollYProgress)
 
   return (
-    <section ref={containerRef} className="bg-[#FFFFFF] px-6 py-28 text-[#0F172A] md:px-16 md:py-40 border-t border-[#E2E8F0]">
+    <section ref={containerRef} className="bg-[#111315] px-6 py-36 text-white md:px-16 md:py-48 border-t border-white/10">
       <div className="mx-auto max-w-7xl">
         {/* Archival Register Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex items-center justify-between border-b border-[#CBD5E1] pb-6 font-mono text-[11px] uppercase tracking-[0.3em] text-[#64748B]"
-        >
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 bg-[#2563EB]" />
-            <span>CHRONOLOGY 1968–2024</span>
-          </div>
+        <div className="flex items-center justify-between border-b border-white/15 pb-6 font-mono text-[11px] uppercase tracking-[0.3em] text-[#94A3B8]">
+          <span>CHRONOLOGY 1968–2024</span>
           <span>CHAPTER 02 / GROWTH</span>
           <span>8 APPOINTMENTS</span>
-        </motion.div>
+        </div>
 
         {/* Section Heading */}
         <div className="mt-16 max-w-3xl">
-          <span className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-[#2563EB]">
-            58-YEAR CHRONOLOGICAL REGISTER
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-[#38BDF8]">
+            CHRONOLOGICAL REGISTER
           </span>
-          <h2 className="mt-3 font-sans text-3xl font-black uppercase tracking-tight text-[#0F172A] sm:text-5xl">
+          <h2 className="mt-4 font-serif text-3xl font-black uppercase tracking-tight text-white sm:text-5xl">
             Eight Appointments in {YEARS_TRADING} Years
           </h2>
-          <p className="mt-4 text-base text-[#475569] leading-relaxed">
-            Petroleum distribution provided the stable capital foundation. 27 years later, the group made its landmark entry into passenger car retail.
+          <p className="mt-4 text-lg text-[#CBD5E1] leading-relaxed font-sans">
+            Petroleum distribution provided the stable capital foundation. Twenty-seven years of fuel distribution funded the landmark entry into passenger vehicle showrooms.
           </p>
         </div>
 
-        {/* Dynamic Scroll-Driven Timeline Register */}
-        <div className="relative mt-16 border-t border-[#CBD5E1]">
+        {/* Dynamic Timeline Register */}
+        <div className="relative mt-20 border-t border-white/15">
           {/* Scroll-linked progress line */}
           <motion.div
-            className="absolute left-0 top-0 w-1 bg-[#2563EB] origin-top hidden md:block"
+            className="absolute left-0 top-0 w-1 bg-[#38BDF8] origin-top hidden md:block"
             style={{ height: "100%", scaleY }}
           />
 
@@ -61,30 +55,19 @@ export function EditorialTimeline() {
             return (
               <div key={item.year}>
                 {isLongGap && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    className="flex items-center justify-between border-b border-[#CBD5E1] bg-[#F1F5F9] px-6 py-4 font-mono text-xs font-bold text-[#1E3A8A]"
-                  >
+                  <div className="flex items-center justify-between border-b border-white/15 bg-[#181A1D] px-6 py-5 font-mono text-xs font-bold text-[#38BDF8]">
                     <span className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-[#2563EB]" />
-                      <span>INTERVAL: {gap} YEARS SILENCE</span>
+                      <span className="h-2 w-2 rounded-full bg-[#38BDF8]" />
+                      <span>INTERVAL: {gap} YEARS OF PETROLEUM TRADING</span>
                     </span>
-                    <span className="hidden sm:inline">PETROLEUM TRADING FUNDS CAR SHOWROOM MOVE</span>
+                    <span className="hidden sm:inline">FUEL TRADING FUNDS CAR SHOWROOM MOVE</span>
                     <span>1977 ➔ 2004</span>
-                  </motion.div>
+                  </div>
                 )}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-10% 0px" }}
-                  transition={{ duration: 0.5, delay: (idx % 4) * 0.08 }}
-                  className="group relative grid grid-cols-1 items-center border-b border-[#E2E8F0] py-8 transition-colors duration-200 hover:bg-[#F8FAFC] md:grid-cols-12 md:gap-8 md:px-8"
-                >
+                <div className="group relative grid grid-cols-1 items-center border-b border-white/10 py-8 transition-colors duration-200 hover:bg-[#181A1D] md:grid-cols-12 md:gap-8 md:px-8">
                   {/* Year */}
                   <div className="md:col-span-2">
-                    <span className="font-sans text-4xl font-black text-[#0F172A] group-hover:text-[#2563EB] transition-colors duration-200">
+                    <span className="font-serif text-4xl font-black text-white group-hover:text-[#38BDF8] transition-colors duration-200">
                       {item.year}
                     </span>
                   </div>
@@ -92,7 +75,7 @@ export function EditorialTimeline() {
                   {/* Marque Chip */}
                   <div className="my-3 md:my-0 md:col-span-3">
                     {item.mark ? (
-                      <div className="flex h-14 w-28 items-center justify-center border border-[#CBD5E1] bg-white p-2 shadow-xs group-hover:border-[#2563EB]/40 transition-colors">
+                      <div className="flex h-14 w-28 items-center justify-center border border-white/20 bg-white p-2 shadow-sm">
                         <Image
                           src={item.mark}
                           alt={item.title}
@@ -102,27 +85,27 @@ export function EditorialTimeline() {
                         />
                       </div>
                     ) : (
-                      <span className="font-mono text-xs text-[#94A3B8]">—</span>
+                      <span className="font-mono text-xs text-[#64748B]">—</span>
                     )}
                   </div>
 
                   {/* Title & Note */}
                   <div className="md:col-span-5">
-                    <h3 className="font-sans text-xl font-bold uppercase text-[#0F172A]">
+                    <h3 className="font-serif text-xl font-bold uppercase text-white">
                       {item.title}
                     </h3>
-                    <p className="mt-1 text-sm text-[#475569] leading-relaxed">
+                    <p className="mt-1 text-sm text-[#CBD5E1] leading-relaxed font-sans">
                       {item.note}
                     </p>
                   </div>
 
                   {/* Offset badge */}
-                  <div className="mt-2 text-right font-mono text-xs font-bold text-[#2563EB] md:mt-0 md:col-span-2">
-                    <span className="rounded-xs bg-[#EFF6FF] px-2.5 py-1 border border-[#BFDBFE]">
+                  <div className="mt-2 text-right font-mono text-xs font-bold text-[#38BDF8] md:mt-0 md:col-span-2">
+                    <span className="rounded-xs bg-white/10 px-2.5 py-1 border border-white/20">
                       +{item.year - 1968} YRS
                     </span>
                   </div>
-                </motion.div>
+                </div>
               </div>
             )
           })}

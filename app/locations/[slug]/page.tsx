@@ -179,12 +179,14 @@ export default async function LocationPage({ params }: Props) {
                 <div className="text-body">
                   <a
                     href={`tel:${loc.phoneE164}`}
+                    data-track-location={`branch-${loc.slug}`}
                     className="flex min-h-11 items-center font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
                   >
                     {loc.phone}
                   </a>
                   <a
                     href={`mailto:${loc.email}`}
+                    data-track-location={`branch-${loc.slug}`}
                     className="flex min-h-11 items-center text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
                   >
                     {loc.email}

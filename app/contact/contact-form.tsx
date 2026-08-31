@@ -8,7 +8,7 @@ import { Field, Input, Textarea, Checkbox } from "@/components/ui/field"
 import { Alert, Spinner } from "@/components/ui/feedback"
 import { submitLead } from "@/lib/leads/actions"
 import { pushEvent } from "@/lib/analytics/gtm"
-import { whatsappUrl } from "@/lib/locations"
+import { whatsappUrl, PRIMARY_LOCATION } from "@/lib/locations"
 
 const EMPTY = { name: "", email: "", phone: "", message: "", consent: false, companyWebsite: "" }
 
@@ -80,7 +80,7 @@ export function ContactForm() {
         error_message: "network_exception",
         error_type: "exception",
       })
-      setError("Something went wrong. Please call us on +91 94191 00000.")
+      setError(`Something went wrong. Please call us on ${PRIMARY_LOCATION.phone}.`)
     } finally {
       setSubmitting(false)
     }
@@ -94,11 +94,12 @@ export function ContactForm() {
           Thanks for getting in touch. Our team will call you back within one working day.
           For anything urgent, call us on{" "}
           <a
-            href="tel:+919419100000"
+            href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+            data-track-location="contact-form"
             className="text-accent-text-light underline-offset-4 hover:underline"
             data-num
           >
-            +91 94191 00000
+            {PRIMARY_LOCATION.phone}
           </a>.
         </p>
 

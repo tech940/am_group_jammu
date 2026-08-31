@@ -93,7 +93,7 @@ function ImageArea({
           </span>
         )}
         {vehicle.discountPercent !== null && vehicle.discountPercent > 0 && (
-          <span className="inline-flex items-center rounded-sm bg-accent px-2 py-0.5 text-meta uppercase text-ground" data-num>
+          <span className="inline-flex items-center rounded-sm bg-accent px-2 py-0.5 text-meta uppercase text-on-accent" data-num>
             {vehicle.discountPercent}% off
           </span>
         )}
@@ -164,7 +164,7 @@ export function VehicleCard({
       <motion.div
         initial={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
-        className="group bg-surface border border-line overflow-hidden transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col sm:flex-row"
+        className="group bg-surface border border-line rounded-md overflow-hidden transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col sm:flex-row"
       >
         <ImageArea
           vehicle={vehicle}
@@ -226,7 +226,7 @@ export function VehicleCard({
     <motion.div
       initial={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
-      className="group bg-surface overflow-hidden border border-line transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col"
+      className="group bg-surface overflow-hidden rounded-md border border-line transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col"
     >
       <ImageArea
         vehicle={vehicle}

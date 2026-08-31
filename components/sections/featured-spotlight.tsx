@@ -41,7 +41,7 @@ export function FeaturedSpotlight({
 
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div>
-            <span className="inline-flex items-center bg-accent text-ground px-3 py-1 rounded-sm text-meta uppercase mb-2">
+            <span className="inline-flex items-center bg-accent text-on-accent px-3 py-1 rounded-sm text-meta uppercase mb-2">
               Featured Stock
             </span>
             <h2 className="font-display text-h2 text-ink">
@@ -95,7 +95,7 @@ export function FeaturedSpotlight({
                     </span>
                   )}
                   {activeVehicle.discountPercent !== null && activeVehicle.discountPercent > 0 && (
-                    <span data-num className="bg-accent text-ground text-meta uppercase px-2.5 py-1 rounded-sm">
+                    <span data-num className="bg-accent text-on-accent text-meta uppercase px-2.5 py-1 rounded-sm">
                       {activeVehicle.discountPercent}% off
                     </span>
                   )}

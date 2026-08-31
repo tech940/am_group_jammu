@@ -62,9 +62,13 @@ function LinkColumn({
   if (links.length === 0) return null
   return (
     <nav aria-label={title}>
-      <h3 className="border-b border-line-on-deep pb-2 text-meta uppercase text-on-deep-2">
+      {/* h2, not h3. The footer is a top-level landmark and its column titles
+          are peers of the page's own section headings — as h3 they skipped a
+          level on any page that has no h2 of its own (/gallery did exactly
+          that, h1 -> h3). */}
+      <h2 className="border-b border-line-on-deep pb-2 text-meta uppercase text-on-deep-2">
         {title}
-      </h3>
+      </h2>
       <ul className="mt-1">
         {links.map((l) => (
           <li key={l.href}>
@@ -95,42 +99,11 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
   return (
     // data-ground switches the global focus outline to paper — the accent
     // outline muddies against ink.
-    // data-world="story" on the homepage: the footer is shared with 25 other
-    // routes, so the homepage's red ban is applied by scope rather than by
-    // editing the global accent.
     <footer
       data-ground="deep"
-      data-world={pathname === "/" ? "story" : undefined}
-      className="bg-ink text-on-deep"
+      className="bg-deep-2 text-on-deep"
     >
-      <div className="mx-auto max-w-[1400px] px-5 pt-16 md:px-10 md:pt-20">
-        {withStockDirectory ? (
-          <>
-            <h2 className="border-b border-line-on-deep pb-4 text-meta uppercase text-on-deep-2">
-              Browse the group — every entry backed by live stock
-            </h2>
-
-            {/* Every group, untruncated. An earlier version hand-picked five
-                columns and sliced them, which silently dropped "by Fuel",
-                "by Transmission" and "by Year" — statically generated landing
-                pages (/used-cars/diesel-cars-in-jammu and friends) that would
-                then have had no inbound link at all. Render what
-                lib/seo/links.ts produces; it already drops empty groups. */}
-            <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              <LinkColumn title="The group" links={SITE_INDEX} />
-              {seoLinks.groups.map((group) => (
-                <LinkColumn key={group.title} title={group.title} links={group.links} />
-              ))}
-            </div>
-          </>
-        ) : (
-          // Off the stock routes the footer is a site index, not a car
-          // directory. Same columns component, one group, no stock heading.
-          <div className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-3">
-            <LinkColumn title="The group" links={SITE_INDEX} />
-          </div>
-        )}
-      </div>
+    
 
       {/* NAP */}
       <div className="mx-auto mt-14 max-w-[1400px] px-5 md:px-10">
@@ -160,7 +133,7 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
           </div>
 
           <div className="self-end">
-            <h3 className="text-meta uppercase text-on-deep-2">Showrooms</h3>
+            <h2 className="text-meta uppercase text-on-deep-2">Showrooms</h2>
             <ul className="mt-1">
               {LOCATIONS.map((l) => (
                 <li key={l.slug}>
@@ -185,6 +158,7 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
             </a>
             <a
               href={`mailto:${flagship.email}`}
+              data-track-location="footer"
               className="flex min-h-11 items-center text-small text-on-deep-2 transition-colors duration-(--duration-1) hover:text-on-deep"
             >
               {flagship.email}

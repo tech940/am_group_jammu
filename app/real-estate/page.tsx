@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import RealEstateClient from "./real-estate-client"
+import { RealEstatePage } from "./real-estate-page"
 
 export const metadata: Metadata = {
   title: "Real Estate Division | Commercial & Residential Projects in J&K",
@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <RealEstateClient />
+  return <RealEstatePage />
 }

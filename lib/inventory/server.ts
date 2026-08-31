@@ -47,7 +47,8 @@ export async function getInventory(): Promise<InventorySnapshot> {
       degraded: false,
     }
   } catch (err) {
-    console.error('[inventory] upstream fetch failed; serving empty snapshot', err)
+    const reason = err instanceof Error ? err.message : String(err)
+    console.warn(`[inventory] upstream fetch unavailable (${reason}); serving empty snapshot`)
     return {
       vehicles: [],
       facets: EMPTY_FACETS,

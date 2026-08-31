@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { PRIMARY_LOCATION } from "@/lib/locations"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { FeaturedInventory } from "@/components/sections/inventory"
@@ -109,7 +110,7 @@ export default async function UsedCarsLandingPage({ params }: Props) {
               Since 1968
             </span>
             <Button asChild variant="primary">
-              <a href="tel:+919419100000">+91 94191 00000</a>
+              <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="landing-faq">{PRIMARY_LOCATION.phone}</a>
             </Button>
           </div>
         </div>
@@ -119,7 +120,7 @@ export default async function UsedCarsLandingPage({ params }: Props) {
         vehicles={landing.vehicles}
         title={landing.crumb}
         subtitle={`${landing.vehicles.length} ${landing.vehicles.length === 1 ? "car" : "cars"} in stock at AM Group ${landing.cityName}`}
-        emptyMessage="Our live inventory is temporarily unavailable. Please call +91 94191 00000."
+        emptyMessage={`Our live inventory is temporarily unavailable. Please call ${PRIMARY_LOCATION.phone}.`}
       />
 
       {/* Long-form copy */}
@@ -142,10 +143,11 @@ export default async function UsedCarsLandingPage({ params }: Props) {
             </Link>
             , or call us on{" "}
             <a
-              href="tel:+919419100000"
+              href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+              data-track-location="landing-cta"
               className="font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
             >
-              +91 94191 00000
+              {PRIMARY_LOCATION.phone}
             </a>{" "}
             and we will tell you what has just arrived.
           </p>

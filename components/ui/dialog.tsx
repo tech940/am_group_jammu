@@ -162,7 +162,7 @@ export function Dialog({
             animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: 4 }}
             transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-            className={`relative flex max-h-[90svh] w-full flex-col rounded-t-md bg-surface shadow-overlay outline-none sm:rounded-md ${SIZES[size]}`}
+            className={`relative flex max-h-[90svh] w-full flex-col rounded-t-lg bg-surface shadow-overlay outline-none sm:rounded-lg ${SIZES[size]}`}
           >
             <header className="flex items-start justify-between gap-4 border-b border-line px-5 py-4 sm:px-6">
               <div className="min-w-0">
@@ -252,7 +252,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onConfirm}
             disabled={pending}
-            className="inline-flex h-11 items-center rounded-sm bg-danger px-5 text-button text-ground transition-colors duration-(--duration-1) hover:bg-accent-hover disabled:opacity-60"
+            className="inline-flex h-11 items-center rounded-sm bg-danger px-5 text-button text-on-deep transition-colors duration-(--duration-1) hover:bg-danger-hover disabled:opacity-60"
           >
             {pending ? "Deleting…" : confirmLabel}
           </button>

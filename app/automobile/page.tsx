@@ -1,17 +1,17 @@
 import type { Metadata } from "next"
-import AutomobileClient from "./automobile-client"
+import { AutomobilePage } from "./automobile-page"
 import { getHomeInventory } from "@/lib/inventory/server"
+import { SCALE } from "@/components/home/content"
 
 export const metadata: Metadata = {
   title: "Automobile Division | Authorised Car Dealerships in J&K",
-  description:
-    "AM Group's automobile division — authorised new car showrooms, certified pre-owned outlets, and full-service workshops across Jammu & Kashmir.",
+  description: `AM Group's automobile division — seven current vehicle franchises, authorised new-car showrooms, certified pre-owned stock and full-service workshops across ${SCALE.cities.join(", ")}.`,
   alternates: {
     canonical: "/automobile",
   },
 }
 
 export default async function Page() {
-  const { byBodyType } = await getHomeInventory()
-  return <AutomobileClient byBodyType={byBodyType} />
+  const { latest, total, degraded } = await getHomeInventory()
+  return <AutomobilePage vehicles={latest} total={total} degraded={degraded} />
 }

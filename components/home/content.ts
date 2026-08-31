@@ -25,17 +25,29 @@ export interface Milestone {
    * a trademark is not ours to restyle. They sit on a light chip instead.
    */
   mark?: string
+  /**
+   * What kind of stop this is on the journey, for the pictogram shown beside
+   * the year — a fuel pump, a car, a motorcycle. "multi" marks 2024, where
+   * three franchises (two car, one two-wheeler) arrived in one year and no
+   * single vehicle is honest; it renders as a route-flag waypoint instead.
+   */
+  kind: "fuel" | "car" | "bike" | "multi"
+  /**
+   * A short editorial stage name for the journey rendering ("The beginning",
+   * "Into cars"). Framing, not fact — the factual claim stays in `note`.
+   */
+  stage: string
 }
 
 export const TIMELINE: Milestone[] = [
-  { year: 1968, title: "Hindustan Petroleum", note: "The group begins with HPCL gas stations and kerosene distribution in Jammu." , mark: "/marques/hp.png" },
-  { year: 1977, title: "Indian Oil", note: "IOCL dealership extends the petroleum business across the region." , mark: "/marques/iocl.png" },
-  { year: 2004, title: "Chevrolet", note: "First passenger-car franchise; GM awards follow from 2006." , mark: "/marques/chevrolet.png" },
-  { year: 2008, title: "Hyundai", note: "AM Hyundai opens — the group's largest car business to this day." , mark: "/marques/hyundai.png" },
-  { year: 2010, title: "Honda 2-Wheelers", note: "Diamond Honda brings the group into two-wheelers." , mark: "/marques/honda.png" },
-  { year: 2012, title: "KTM", note: "The only KTM showroom in Jammu." , mark: "/marques/ktm.png" },
-  { year: 2017, title: "Tata Motors", note: "AM Tata adds India's home-grown passenger range." , mark: "/marques/tata.png" },
-  { year: 2024, title: "Bajaj · Kia · MG", note: "Three franchises in one year — the group's broadest expansion since 1968." , mark: "/marques/bajaj-kia-mg.png" },
+  { year: 1968, title: "Hindustan Petroleum", kind: "fuel", stage: "The beginning",   note: "The group begins with HPCL gas stations and kerosene distribution in Jammu." , mark: "/marques/hp.png" },
+  { year: 1977, title: "Indian Oil", kind: "fuel", stage: "A second appointment",   note: "IOCL dealership extends the petroleum business across the region." , mark: "/marques/iocl.png" },
+  { year: 2004, title: "Chevrolet", kind: "car", stage: "Into cars",   note: "First passenger-car franchise; GM awards follow from 2006." , mark: "/marques/chevrolet.png" },
+  { year: 2008, title: "Hyundai", kind: "car", stage: "The breakthrough",   note: "AM Hyundai opens — the group's largest car business to this day." , mark: "/marques/hyundai.png" },
+  { year: 2010, title: "Honda 2-Wheelers", kind: "bike", stage: "Onto two wheels",   note: "Diamond Honda brings the group into two-wheelers." , mark: "/marques/honda.png" },
+  { year: 2012, title: "KTM", kind: "bike", stage: "The only one in Jammu",   note: "The only KTM showroom in Jammu." , mark: "/marques/ktm.png" },
+  { year: 2017, title: "Tata Motors", kind: "car", stage: "The home-grown range",   note: "AM Tata adds India's home-grown passenger range." , mark: "/marques/tata.png" },
+  { year: 2024, title: "Bajaj · Kia · MG", kind: "multi", stage: "Three at once",   note: "Three franchises in one year — the group's broadest expansion since 1968." , mark: "/marques/bajaj-kia-mg.png" },
 ]
 
 export const FOUNDED = 1968
@@ -83,8 +95,12 @@ export const DIVISIONS: Division[] = [
       "Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock.",
     href: "/automobile",
     image: SUPABASE_MEDIA.divisions.automobile,
-    imageAlt: "AM Hyundai & Kia dealership campus in Jammu with state-of-the-art service bays",
-    figure: "AM Hyundai & Kia, Jammu",
+    // The photograph behind this key is the AM Tata forecourt, not the
+    // Hyundai/Kia campus the caption used to name. A caption that does not
+    // match its photograph is exactly the kind of unchecked claim the rest of
+    // this file exists to prevent.
+    imageAlt: "The AM Tata Motors showroom in Jammu with new cars lined up on the forecourt",
+    figure: "AM Tata, Jammu",
   },
   {
     key: "petroleum",
@@ -133,18 +149,40 @@ export interface Franchise {
   entity: string
   image: string
   imageAlt: string
+  /**
+   * The franchise page's URL path — the EXACT slug the old WordPress site
+   * ranked under (/hyundai, /am-kia, /ktm-jammu, ...), so the page takes over
+   * the legacy URL directly instead of living behind a redirect. null for
+   * Chevrolet: the appointment ended in 2017 and a heritage marque gets a row
+   * in the register, not a landing page.
+   */
+  slug: string | null
+  /** One honest paragraph for the franchise page. Facts only. */
+  blurb: string
 }
 
 export const FRANCHISES: Franchise[] = [
-  { name: "Hyundai", since: 2008, category: "Passenger cars", entity: "AM Hyundai", image: SUPABASE_MEDIA.branches["jammu-hyundai"].exterior, imageAlt: "AM Hyundai flagship showroom" },
-  { name: "Tata Motors", since: 2017, category: "Passenger cars", entity: "AM Tata", image: SUPABASE_MEDIA.divisions.automobile, imageAlt: "AM Tata Motors dealership, Jammu" },
-  { name: "Kia", since: 2024, category: "Passenger cars", entity: "AM Kia", image: SUPABASE_MEDIA.branches["jammu-kia"].exterior, imageAlt: "AM Kia showroom interior with Carens and Seltos" },
-  { name: "MG", since: 2024, category: "Passenger cars", entity: "AMG Autocraft", image: SUPABASE_MEDIA.branches["luxury-showrooms"].mg, imageAlt: "MG Morris Garages dealership building, Jammu" },
-  { name: "Honda", since: 2010, category: "Two-wheelers", entity: "Diamond Honda", image: SUPABASE_MEDIA.branches["two-wheelers"].honda, imageAlt: "Diamond Honda two-wheeler dealership" },
-  { name: "KTM", since: 2012, category: "Two-wheelers", entity: "KTM Jammu", image: SUPABASE_MEDIA.branches["two-wheelers"].ktm, imageAlt: "KTM Jammu showroom" },
-  { name: "Bajaj", since: 2024, category: "Two-wheelers", entity: "AM Bajaj", image: SUPABASE_MEDIA.branches["two-wheelers"].bajaj, imageAlt: "AM Bajaj showroom" },
-  { name: "Chevrolet", since: 2004, category: "Heritage", entity: "2004 – 2017 · service honoured", image: SUPABASE_MEDIA.branches["srinagar-hyundai"].exterior, imageAlt: "AM Group dealership" },
+  { name: "Hyundai", since: 2008, slug: "hyundai", blurb: "AM Hyundai opened in 2008 and remains the group's largest car business, with showrooms in Jammu and Srinagar and authorised service behind both.", category: "Passenger cars", entity: "AM Hyundai", image: SUPABASE_MEDIA.branches["jammu-hyundai"].exterior, imageAlt: "AM Hyundai flagship showroom" },
+  { name: "Tata Motors", since: 2017, slug: "am-tata", blurb: "AM Tata brought India's home-grown passenger range to the group in 2017 — sales, authorised service and genuine parts under one appointment.", category: "Passenger cars", entity: "AM Tata", image: SUPABASE_MEDIA.divisions.automobile, imageAlt: "AM Tata Motors dealership, Jammu" },
+  { name: "Kia", since: 2024, slug: "am-kia", blurb: "AM Kia is one of the three franchises appointed in 2024, the group's broadest single year of expansion since 1968.", category: "Passenger cars", entity: "AM Kia", image: SUPABASE_MEDIA.branches["jammu-kia"].exterior, imageAlt: "AM Kia showroom interior with Carens and Seltos" },
+  { name: "MG", since: 2024, slug: "amg-autocraft-jammu", blurb: "AMG Autocraft holds the MG Motor franchise for Jammu, appointed in 2024 alongside Kia and Bajaj.", category: "Passenger cars", entity: "AMG Autocraft", image: SUPABASE_MEDIA.branches["luxury-showrooms"].mg, imageAlt: "MG Morris Garages dealership building, Jammu" },
+  { name: "Honda", since: 2010, slug: "honda-two-wheeler", blurb: "Diamond Honda brought the group into two-wheelers in 2010, with sales and authorised service for Honda's motorcycle and scooter range.", category: "Two-wheelers", entity: "Diamond Honda", image: SUPABASE_MEDIA.branches["two-wheelers"].honda, imageAlt: "Diamond Honda two-wheeler dealership" },
+  { name: "KTM", since: 2012, slug: "ktm-jammu", blurb: "KTM Jammu, appointed 2012, is the only KTM showroom in Jammu — sales, authorised service and genuine parts for the full KTM range.", category: "Two-wheelers", entity: "KTM Jammu", image: SUPABASE_MEDIA.branches["two-wheelers"].ktm, imageAlt: "KTM Jammu showroom" },
+  { name: "Bajaj", since: 2024, slug: "am-bajaj-jammu", blurb: "AM Bajaj was appointed in 2024, one of three franchises added that year, selling and servicing Bajaj's motorcycle range.", category: "Two-wheelers", entity: "AM Bajaj", image: SUPABASE_MEDIA.branches["two-wheelers"].bajaj, imageAlt: "AM Bajaj showroom" },
+  { name: "Chevrolet", since: 2004, slug: null, blurb: "Held 2004–2017; General Motors left India and the franchise ended, but service on Chevrolet cars is still honoured.", category: "Heritage", entity: "2004 – 2017 · service honoured", image: SUPABASE_MEDIA.branches["srinagar-hyundai"].exterior, imageAlt: "AM Group dealership" },
 ]
+
+/**
+ * Round figures as the company itself publishes them — the counters on its own
+ * homepage ("Why us"). They are marketing round numbers, not audited counts,
+ * and they render with that caveat in the note line rather than being dressed
+ * up as measurements. The old site also said "50+ years", which is simply
+ * stale; YEARS_TRADING computes the real figure.
+ */
+export const CLAIMS = {
+  vehiclesPerYear: { value: 10, suffix: "K+", label: "Vehicles sold a year" },
+  customers: { value: 5, suffix: "L+", label: "Customers served" },
+} as const
 
 /* ------------------------------------------------------------------ */
 /* Awards — from the company's own Awards & Recognition tables         */

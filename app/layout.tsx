@@ -14,7 +14,7 @@ import { LinkTracker } from "@/components/analytics/link-tracker";
 import { MobileActionBar } from "@/components/layout/mobile-action-bar";
 
 export const viewport: Viewport = {
-  themeColor: "#133a63",
+  themeColor: "#1b3a32",
   width: "device-width",
   initialScale: 1,
 };

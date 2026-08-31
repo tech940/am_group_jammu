@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import EnergyClient from "./hp-indian-oil-client"
+import { PetroleumPage } from "./petroleum-page"
 
 export const metadata: Metadata = {
   title: "HP & Indian Oil Fuel Stations | Energy Division",
@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <EnergyClient />
+  return <PetroleumPage />
 }

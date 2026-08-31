@@ -1,0 +1,229 @@
+- generic [active] [ref=f5e1]:
+  - generic [ref=f5e2]:
+    - banner [ref=f5e3]:
+      - generic [ref=f5e4]:
+        - link "AM Group — home" [ref=f5e5] [cursor=pointer]:
+          - /url: /
+          - img "AM Group" [ref=f5e6]
+          - generic [ref=f5e7]: Est. 1968Jammu & Kashmir
+        - navigation "Primary" [ref=f5e8]:
+          - link "About" [ref=f5e9] [cursor=pointer]:
+            - /url: /about
+          - button "Businesses" [ref=f5e11]
+          - link "Used Cars" [ref=f5e12] [cursor=pointer]:
+            - /url: /inventory
+          - link "Locations" [ref=f5e13] [cursor=pointer]:
+            - /url: /locations
+          - link "News" [ref=f5e14] [cursor=pointer]:
+            - /url: /blog
+          - link "Contact" [ref=f5e15] [cursor=pointer]:
+            - /url: /contact
+          - link "+91 94191 00000" [ref=f5e16] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - button "Book test drive" [ref=f5e19]
+    - main [ref=f5e21]:
+      - navigation "Breadcrumb" [ref=f5e22]:
+        - link "Home" [ref=f5e23] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f5e24]: /
+        - generic [ref=f5e25]: Contact
+      - region [ref=f5e26]:
+        - generic [ref=f5e29]:
+          - generic [ref=f5e30]:
+            - paragraph [ref=f5e31]: Get in touch
+            - heading "Someone answers" [level=1] [ref=f5e33]: Someoneanswers
+            - paragraph [ref=f5e34]: Phone and WhatsApp reach the Jammu site directly during opening hours. The form goes to the same desk and is answered within one working day.
+            - generic [ref=f5e35]:
+              - link "Call +91 94191 00000" [ref=f5e36] [cursor=pointer]:
+                - /url: tel:+919419100000
+              - link "WhatsApp" [ref=f5e37] [cursor=pointer]:
+                - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I%20have%20a%20question.
+          - generic [ref=f5e38]:
+            - generic [ref=f5e39]:
+              - term [ref=f5e40]: Branches
+              - definition [ref=f5e41]: "2"
+              - definition [ref=f5e42]: Jammu · Srinagar
+            - generic [ref=f5e43]:
+              - term [ref=f5e44]: Open
+              - definition [ref=f5e45]: Mon–Sat
+              - definition [ref=f5e46]: 9:30 am – 6:30 pm
+            - generic [ref=f5e47]:
+              - term [ref=f5e48]: Corporate office
+              - definition [ref=f5e49]: "1"
+              - definition [ref=f5e50]: Gurugram
+            - generic [ref=f5e51]:
+              - term [ref=f5e52]: Reply target
+              - definition [ref=f5e53]: "1"
+              - definition [ref=f5e54]: working day
+      - region [ref=f5e55]:
+        - generic [ref=f5e56]:
+          - generic [ref=f5e57]:
+            - generic [ref=f5e58]:
+              - paragraph [ref=f5e59]: Where we are
+              - heading "Two branches, one corporate office" [level=2] [ref=f5e61]
+            - paragraph [ref=f5e62]: Both branches take walk-ins during opening hours. All certified pre-owned stock is held in Jammu.
+          - generic [ref=f5e63]:
+            - generic [ref=f5e64]:
+              - heading "Jammu" [level=3] [ref=f5e65]
+              - generic [ref=f5e66]: AM Business Park, N-H 1 Bye-Pass RoadJammu, Jammu and Kashmir 180012Opposite Jammu Railway Station
+              - generic [ref=f5e67]:
+                - generic [ref=f5e68]:
+                  - term [ref=f5e69]: Hours
+                  - definition [ref=f5e70]: Mon–Sat, 9:30 am – 6:30 pm
+                - generic [ref=f5e71]:
+                  - term [ref=f5e72]: Phone
+                  - definition [ref=f5e73]:
+                    - link "+91 94191 00000" [ref=f5e74] [cursor=pointer]:
+                      - /url: tel:+919419100000
+                - generic [ref=f5e75]:
+                  - term [ref=f5e76]: Email
+                  - definition [ref=f5e77]:
+                    - link "info@amgroupind.com" [ref=f5e78] [cursor=pointer]:
+                      - /url: mailto:info@amgroupind.com
+              - paragraph [ref=f5e79]: Our flagship site on the N-H 1 Bye-Pass Road, opposite the railway station. All certified pre-owned stock is held here and can be inspected without an appointment.
+              - generic [ref=f5e80]:
+                - link "Call Jammu" [ref=f5e81] [cursor=pointer]:
+                  - /url: tel:+919419100000
+                - link "WhatsApp" [ref=f5e82] [cursor=pointer]:
+                  - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20contact%20your%20Jammu%20office.
+                - link "Directions" [ref=f5e83] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=AM+Business+Park+NH+1+Bye+Pass+Road+Jammu+180012
+            - generic [ref=f5e84]:
+              - heading "Srinagar" [level=3] [ref=f5e85]
+              - generic [ref=f5e86]: AM Tower, Hyderpora Bye-PassSrinagar, Jammu and Kashmir 190014Hyderpora Bye-Pass, near the airport road
+              - generic [ref=f5e87]:
+                - generic [ref=f5e88]:
+                  - term [ref=f5e89]: Hours
+                  - definition [ref=f5e90]: Mon–Sat, 9:30 am – 6:30 pm
+                - generic [ref=f5e91]:
+                  - term [ref=f5e92]: Phone
+                  - definition [ref=f5e93]:
+                    - link "+91 94191 00000" [ref=f5e94] [cursor=pointer]:
+                      - /url: tel:+919419100000
+                - generic [ref=f5e95]:
+                  - term [ref=f5e96]: Email
+                  - definition [ref=f5e97]:
+                    - link "info@amgroupind.com" [ref=f5e98] [cursor=pointer]:
+                      - /url: mailto:info@amgroupind.com
+              - paragraph [ref=f5e99]: Our Kashmir Valley office at AM Tower on the Hyderpora Bye-Pass. Cars from the Jammu stock can be brought here for inspection — call ahead so we have the one you want on site.
+              - generic [ref=f5e100]:
+                - link "Call Srinagar" [ref=f5e101] [cursor=pointer]:
+                  - /url: tel:+919419100000
+                - link "WhatsApp" [ref=f5e102] [cursor=pointer]:
+                  - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20contact%20your%20Srinagar%20office.
+                - link "Directions" [ref=f5e103] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=AM+Tower+Hyderpora+Bye+Pass+Srinagar+190014
+          - generic [ref=f5e104]:
+            - paragraph [ref=f5e105]: Corporate office
+            - heading "Gurugram" [level=3] [ref=f5e106]
+            - generic [ref=f5e107]: B-2/8 Amaltas Marg, DLF Phase 1, Sector 26A, Gurugram, Haryana 122002
+            - paragraph [ref=f5e108]: Head-office correspondence only — no showroom, no service, and no walk-in stock.
+      - region [ref=f5e109]:
+        - generic [ref=f5e110]:
+          - generic [ref=f5e111]:
+            - generic [ref=f5e112]:
+              - paragraph [ref=f5e113]: Send a message
+              - heading "Write instead" [level=2] [ref=f5e115]
+            - paragraph [ref=f5e116]: If a call is not convenient, this reaches the same desk. Required fields are marked; everything else is optional.
+          - generic [ref=f5e117]:
+            - generic [ref=f5e118]:
+              - paragraph [ref=f5e119]: Tell us what you are after — a specific car, a service booking, a part, a property enquiry — and which branch is easiest for you to reach.
+              - paragraph [ref=f5e120]: Answered within one working day
+            - generic [ref=f5e121]:
+              - generic [ref=f5e122]:
+                - paragraph [ref=f5e123]: Prefer to chat? Message us on WhatsApp and we will reply during showroom hours.
+                - link "WhatsApp us" [ref=f5e124] [cursor=pointer]:
+                  - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I%20have%20a%20question%20about%20your%20used%20cars%20in%20Jammu.
+              - generic [ref=f5e127]:
+                - generic [ref=f5e128]:
+                  - generic [ref=f5e129]:
+                    - text: Full Name*
+                    - generic [ref=f5e130]: (required)
+                  - textbox "Full Name (required)" [ref=f5e131]:
+                    - /placeholder: e.g. Rahul Sharma
+                - generic [ref=f5e132]:
+                  - generic [ref=f5e133]: Email Address
+                  - textbox "Email Address" [ref=f5e134]:
+                    - /placeholder: rahul@example.com
+              - generic [ref=f5e135]:
+                - generic [ref=f5e136]:
+                  - text: Phone Number*
+                  - generic [ref=f5e137]: (required)
+                - textbox "Phone Number (required)" [ref=f5e138]:
+                  - /placeholder: +91 XXXXX XXXXX
+              - generic [ref=f5e139]:
+                - generic [ref=f5e140]: Message
+                - textbox "Message" [ref=f5e141]:
+                  - /placeholder: Tell us what you're thinking...
+              - generic [ref=f5e142]:
+                - text: Company website
+                - textbox [ref=f5e143]
+              - generic [ref=f5e144]:
+                - checkbox "I agree to be contacted by AM Group via Call, SMS, WhatsApp, RCS, and Email regarding my inquiry, offers, and service updates. I understand that I can opt out at any time." [ref=f5e145] [cursor=pointer]
+                - generic [ref=f5e146] [cursor=pointer]: I agree to be contacted by AM Group via Call, SMS, WhatsApp, RCS, and Email regarding my inquiry, offers, and service updates. I understand that I can opt out at any time.
+              - button "Send Message" [ref=f5e147] [cursor=pointer]
+    - contentinfo [ref=f5e148]:
+      - navigation "The group" [ref=f5e151]:
+        - heading "The group" [level=3] [ref=f5e152]
+        - list [ref=f5e153]:
+          - listitem [ref=f5e154]:
+            - link "About the group" [ref=f5e155] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f5e156]:
+            - link "Automobile division" [ref=f5e157] [cursor=pointer]:
+              - /url: /automobile
+          - listitem [ref=f5e158]:
+            - link "HP & Indian Oil" [ref=f5e159] [cursor=pointer]:
+              - /url: /hp-indian-oil
+          - listitem [ref=f5e160]:
+            - link "Real estate" [ref=f5e161] [cursor=pointer]:
+              - /url: /real-estate
+          - listitem [ref=f5e162]:
+            - link "S Mega Mart" [ref=f5e163] [cursor=pointer]:
+              - /url: /s-mega-mart
+          - listitem [ref=f5e164]:
+            - link "All used cars" [ref=f5e165] [cursor=pointer]:
+              - /url: /inventory
+          - listitem [ref=f5e166]:
+            - link "Showrooms & directions" [ref=f5e167] [cursor=pointer]:
+              - /url: /locations
+          - listitem [ref=f5e168]:
+            - link "News & updates" [ref=f5e169] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=f5e170]:
+            - link "Contact" [ref=f5e171] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=f5e173]:
+        - generic [ref=f5e174]:
+          - link "AM Group — home" [ref=f5e175] [cursor=pointer]:
+            - /url: /
+            - img "AM Group" [ref=f5e176]
+          - paragraph [ref=f5e177]: Est. 1968 · Jammu & Kashmir
+          - generic [ref=f5e178]:
+            - strong [ref=f5e179]: AM Group Jammu — AM Business Park
+            - text: AM Business Park, N-H 1 Bye-Pass Road, Jammu, Jammu and Kashmir 180012Open Mon–Sat, 9:30 am – 6:30 pm.
+        - generic [ref=f5e180]:
+          - heading "Showrooms" [level=3] [ref=f5e181]
+          - list [ref=f5e182]:
+            - listitem [ref=f5e183]:
+              - link "Jammu" [ref=f5e184] [cursor=pointer]:
+                - /url: /locations/jammu
+            - listitem [ref=f5e185]:
+              - link "Srinagar" [ref=f5e186] [cursor=pointer]:
+                - /url: /locations/srinagar
+        - generic [ref=f5e187]:
+          - link "+91 94191 00000" [ref=f5e188] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - link "info@amgroupind.com" [ref=f5e191] [cursor=pointer]:
+            - /url: mailto:info@amgroupind.com
+      - generic [ref=f5e193]:
+        - paragraph [ref=f5e194]: © 2026 AM Group Jammu — all rights reserved
+        - generic [ref=f5e195]:
+          - link "Privacy policy" [ref=f5e196] [cursor=pointer]:
+            - /url: /privacy-policy
+          - generic [ref=f5e197]: "|"
+          - link "Terms" [ref=f5e198] [cursor=pointer]:
+            - /url: /terms
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=f5e204] [cursor=pointer]

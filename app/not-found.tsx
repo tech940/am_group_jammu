@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { PRIMARY_LOCATION } from "@/lib/locations"
 import Image from "next/image"
 import { getInventory } from "@/lib/inventory/server"
 import { Button } from "@/components/ui/button"
@@ -196,8 +197,9 @@ export default async function NotFound() {
             </p>
             <div className="flex justify-center">
               <Button asChild variant="onDeep" size="lg">
-                <a href="tel:+919419100000" data-num>
-                  +91 94191 00000
+                <a href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+            data-track-location="404" data-num>
+                  {PRIMARY_LOCATION.phone}
                 </a>
               </Button>
             </div>

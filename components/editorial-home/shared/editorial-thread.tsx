@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { motion, useScroll, useSpring, useTransform } from "framer-motion"
+import { motion, useScroll, useTransform } from "framer-motion"
+import { useProgress } from "./motion"
 
 interface EditorialThreadProps {
   founded: number
@@ -10,7 +11,9 @@ interface EditorialThreadProps {
 
 export function EditorialThread({ founded, currentYear }: EditorialThreadProps) {
   const { scrollYProgress } = useScroll()
-  const progress = useSpring(scrollYProgress, { stiffness: 100, damping: 25 })
+  // The thread is the page's position cue, so it stays live under reduced
+  // motion — only the spring's inertia is dropped, leaving it tracking 1:1.
+  const progress = useProgress(scrollYProgress)
   const scaleY = useTransform(progress, [0, 1], [0, 1])
 
   const [year, setYear] = React.useState(founded)
@@ -29,10 +32,10 @@ export function EditorialThread({ founded, currentYear }: EditorialThreadProps) 
     >
       {/* Top catalog code */}
       <div className="flex flex-col gap-1">
-        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-white/80">
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-white/80">
           AM GROUP
         </span>
-        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">
           ARCHIVE
         </span>
       </div>
@@ -56,10 +59,10 @@ export function EditorialThread({ founded, currentYear }: EditorialThreadProps) 
 
       {/* Bottom coordinate indicator */}
       <div className="flex flex-col gap-1">
-        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">
           COORDINATES
         </span>
-        <span className="font-mono text-[10px] tracking-wider text-white/80">
+        <span className="font-mono text-[11px] tracking-wider text-white/80">
           32°43&apos;N
         </span>
       </div>

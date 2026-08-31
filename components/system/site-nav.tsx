@@ -146,17 +146,14 @@ export function SiteNav() {
     <>
       {/* data-ground switches the global focus outline to paper — the accent
           outline muddies against ink. */}
-      {/* data-world="story" on the homepage only.
-          The header lives in the root layout, above the page's own story
-          wrapper, so without this the shared accent (#c13a2a red) leaks onto a
-          page where red is banned — the "Book test drive" fill was the one red
-          element left on it. Scoping here repaints the header to champagne on
-          "/" and leaves the other 25 routes untouched. */}
+      {/* The homepage no longer runs its own "story" colour world — it is
+          built on the shared token set like every other route — so there is no
+          data-world stamp here any more. The header simply stays transparent
+          over the homepage's deep hero until the reader scrolls. */}
       <header
         data-ground="deep"
-        data-world={overDarkHero ? "story" : undefined}
-        className={`fixed inset-x-0 top-0 z-50 border-b transition-colors duration-300 ${
-          filled ? "border-line-on-deep bg-ink" : "border-transparent bg-transparent"
+        className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
+          filled ? "border-b border-line-on-deep bg-deep-2" : "glass-bar border-b border-line-on-deep"
         }`}
         onMouseLeave={() => setMenu(null)}
       >
@@ -207,13 +204,13 @@ export function SiteNav() {
                     {e.label}
                   </button>
                   {expanded && (
-                    <div className="absolute left-1/2 top-full w-72 -translate-x-1/2 border border-line-on-deep bg-ink shadow-overlay">
+                    <div className="absolute left-1/2 top-full w-72 -translate-x-1/2 rounded-b-md border border-line-on-deep bg-deep-2 shadow-overlay">
                       {e.children.map((c) => (
                         <Link
                           key={c.href}
                           href={c.href}
                           onClick={closeAll}
-                          className="block border-b border-line-on-deep px-4 py-3 last:border-b-0 hover:bg-deep-2"
+                          className="block border-b border-line-on-deep px-4 py-3 last:border-b-0 hover:bg-deep"
                         >
                           <span className="block font-display text-lg font-semibold uppercase leading-none text-on-deep">
                             {c.label}
@@ -240,7 +237,7 @@ export function SiteNav() {
             <button
               type="button"
               onClick={bookTestDrive}
-              className="inline-flex h-11 items-center rounded-sm bg-accent px-5 text-button text-on-accent transition-colors duration-(--duration-1) hover:bg-accent-hover"
+              className="inline-flex h-11 items-center rounded-sm bg-accent-bright px-5 text-button text-on-accent-bright transition-colors duration-(--duration-1) hover:bg-accent-bright-hover"
             >
               Book test drive
             </button>
@@ -269,8 +266,7 @@ export function SiteNav() {
           ref={sheetRef}
           tabIndex={-1}
           data-ground="deep"
-          data-world={overDarkHero ? "story" : undefined}
-          className="fixed inset-0 z-40 bg-ink lg:hidden"
+          className="fixed inset-0 z-40 bg-deep-2 lg:hidden"
         >
           <div className="flex h-full flex-col px-5 pb-10 pt-24">
             <nav aria-label="Site" className="flex-1 overflow-y-auto">
@@ -311,7 +307,7 @@ export function SiteNav() {
               <button
                 type="button"
                 onClick={bookTestDrive}
-                className="inline-flex h-12 items-center justify-center rounded-sm bg-accent px-6 text-button text-on-accent transition-colors duration-(--duration-1) hover:bg-accent-hover"
+                className="inline-flex h-12 items-center justify-center rounded-sm bg-accent-bright px-6 text-button text-on-accent-bright transition-colors duration-(--duration-1) hover:bg-accent-bright-hover"
               >
                 Book test drive
               </button>

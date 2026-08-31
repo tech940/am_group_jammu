@@ -91,6 +91,7 @@ export function LegalDocument({
                 <br />
                 <a
                   href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                  data-track-location="legal"
                   data-num
                   className="transition-colors duration-(--duration-1) hover:text-accent-text-light"
                 >
@@ -99,6 +100,7 @@ export function LegalDocument({
                 {" · "}
                 <a
                   href={`mailto:${PRIMARY_LOCATION.email}`}
+                  data-track-location="legal"
                   className="transition-colors duration-(--duration-1) hover:text-accent-text-light"
                 >
                   {PRIMARY_LOCATION.email}

@@ -2,7 +2,11 @@ import { VehicleSEO } from "@/types/seo"
 import { LOCATIONS, PRIMARY_LOCATION, type Location } from "@/lib/locations"
 
 const SITE = "https://amgroupind.com"
-const LOGO = "https://amgroupind.com/wp-content/uploads/2023/06/logo-1.png"
+// Served by this app, not hot-linked from the WordPress site being
+// decommissioned. Every wp-content URL in the schema becomes a 404 at DNS
+// cutover, and a LocalBusiness logo that does not resolve costs the rich result.
+// Absolute because schema.org consumers do not resolve relative paths.
+const LOGO = "https://amgroupind.com/logo-am-group.png"
 
 /** Stable @id per branch so the Organization can reference them. */
 export function locationId(location: Location): string {

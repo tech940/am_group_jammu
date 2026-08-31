@@ -24,13 +24,22 @@ const buttonVariants = cva(
       variant: {
         // Accent fill. The one loud control on a screen; if two are competing,
         // one of them is the wrong variant.
-        primary: "bg-accent text-ground hover:bg-accent-hover",
+        primary: "bg-accent text-on-accent hover:bg-accent-hover",
         // Default action on a light ground.
         secondary: "border border-line-strong bg-surface text-ink hover:bg-ground-2",
-        // On dark grounds.
+        // The loud control on a DARK ground. `primary`'s deep blue measures
+        // 2.7:1 there and would read as a hole in the page; the pale end of the
+        // accent is the one that carries a fill on graphite.
+        bright:
+          "bg-accent-bright text-on-accent-bright hover:bg-accent-bright-hover",
+        // The quiet control on a dark ground: a frosted pane with a lit edge.
+        // `.glass` carries its own no-blur and reduced-transparency fallbacks.
+        glass:
+          "glass rounded-sm text-on-deep hover:border-[var(--glass-edge-strong)]",
+        // Outline on dark grounds.
         onDeep: "border border-line-on-deep text-on-deep hover:bg-ground hover:text-ink",
         ghost: "text-ink hover:bg-ground-2",
-        danger: "bg-danger text-ground hover:bg-accent-hover",
+        danger: "bg-danger text-on-deep hover:bg-danger-hover",
         link: "text-accent-text-light underline-offset-4 hover:underline px-0",
       },
       size: {

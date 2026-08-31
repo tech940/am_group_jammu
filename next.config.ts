@@ -90,20 +90,11 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
    * Replace each with a 301 to its proper page as that page is built.
    * ---------------------------------------------------------------------- */
 
-  // New-vehicle dealerships. /automobile is the group's vehicle division hub —
-  // thin today (it names none of these brands), which is why this is not a 301.
-  { source: '/hyundai', destination: '/automobile', temporary: true },
-  { source: '/am-kia', destination: '/automobile', temporary: true },
-  { source: '/am-tata', destination: '/automobile', temporary: true },
-  // Reads like a bodyshop; is actually the MG Motor dealership.
-  { source: '/amg-autocraft-jammu', destination: '/automobile', temporary: true },
-
-  // Two-wheeler showrooms. /ktm-jammu is the strongest of the three — the only
-  // KTM showroom in Jammu, so it owns a near-uncontested query. Highest-value
-  // page on this list to build properly.
-  { source: '/ktm-jammu', destination: '/automobile', temporary: true },
-  { source: '/honda-two-wheeler', destination: '/automobile', temporary: true },
-  { source: '/am-bajaj-jammu', destination: '/automobile', temporary: true },
+  // The seven franchise showroom URLs are GONE from this list on purpose:
+  // app/[brand] now serves real pages at those exact slugs (/hyundai,
+  // /am-kia, /am-tata, /amg-autocraft-jammu, /ktm-jammu, /honda-two-wheeler,
+  // /am-bajaj-jammu). Redirects run before routing, so an entry here would
+  // shadow the page it was holding the URL for.
 
   // B2B genuine-parts distribution — a different customer entirely, so the
   // vehicle hub would be as wrong as the used-car pages.

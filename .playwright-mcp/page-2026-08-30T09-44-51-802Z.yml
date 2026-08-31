@@ -1,0 +1,322 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - banner [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - link "AM Group — home" [ref=f1e5] [cursor=pointer]:
+          - /url: /
+          - img "AM Group" [ref=f1e6]
+          - generic [ref=f1e7]: Est. 1968Jammu & Kashmir
+        - button "Menu" [ref=f1e8]
+    - main [ref=f1e10]:
+      - navigation "Breadcrumb" [ref=f1e11]:
+        - link "Home" [ref=f1e12] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f1e13]: /
+        - generic [ref=f1e14]: About
+      - region [ref=f1e15]:
+        - generic [ref=f1e18]:
+          - generic [ref=f1e19]:
+            - paragraph [ref=f1e20]: Jammu & Kashmir · since 1968
+            - heading "The house that fuel built" [level=1] [ref=f1e22]: The house thatfuel built
+            - paragraph [ref=f1e23]: "AM Group began with a Hindustan Petroleum forecourt in Jammu in 1968 and an Indian Oil appointment nine years later. The cars came in 2004. Everything since has been built on the same two things: appointments we can date, and numbers we publish."
+          - paragraph [ref=f1e24]: AM Hyundai, Jammu — appointed 2008, the group's largest car business.
+          - generic [ref=f1e25]:
+            - generic [ref=f1e26]:
+              - term [ref=f1e27]: Trading since
+              - definition [ref=f1e28]: "1968"
+              - definition [ref=f1e29]: 58 years
+            - generic [ref=f1e30]:
+              - term [ref=f1e31]: Dealership outlets
+              - definition [ref=f1e32]: "26"
+              - definition [ref=f1e33]: Jammu · Srinagar · Udhampur · Kathua
+            - generic [ref=f1e34]:
+              - term [ref=f1e35]: Vehicle franchises
+              - definition [ref=f1e36]: "7"
+              - definition [ref=f1e37]: plus Chevrolet, held 2004–2017
+            - generic [ref=f1e38]:
+              - term [ref=f1e39]: Manufacturer awards
+              - definition [ref=f1e40]: "17"
+              - definition [ref=f1e41]: each dated and placed
+      - region [ref=f1e42]:
+        - generic [ref=f1e43]:
+          - generic [ref=f1e44]:
+            - generic [ref=f1e45]:
+              - paragraph [ref=f1e46]: The group
+              - heading "One company, four businesses" [level=2] [ref=f1e48]
+            - paragraph [ref=f1e49]: Written from the company's own published record. Where a year has not been published, it is marked as an estimate rather than presented as fact.
+          - generic [ref=f1e50]:
+            - generic [ref=f1e51]:
+              - paragraph [ref=f1e52]: AM Group runs 26dealership outlets across the union territory of Jammu & Kashmir, covering both passenger vehicles and two-wheelers. Alongside them the group operates petroleum retail, commercial and residential development, and — since 2025 — organised retail.
+              - paragraph [ref=f1e53]: It started in 1968with a dealership for Hindustan Petroleum Corporation gas stations and kerosene oil. Indian Oil followed in 1977. The first passenger-car franchise, Chevrolet, arrived in 2004; AM Hyundai opened in 2008 and remains the group's largest car business to this day.
+              - paragraph [ref=f1e54]: "2024 was the broadest single year of expansion since the company was founded: Bajaj, Kia and MG all appointed inside twelve months. The full sequence is below, with the year of every appointment."
+            - figure "Central workshop, Jammu — authorised service across the group's franchises." [ref=f1e55]:
+              - img "Technicians working in the AM Group central service workshop in Jammu" [ref=f1e57]
+      - region [ref=f1e59]:
+        - generic [ref=f1e60]:
+          - generic [ref=f1e61]:
+            - generic [ref=f1e62]:
+              - paragraph [ref=f1e63]: Timeline of appointments
+              - heading "8 appointments, 1968 to 2024" [level=2] [ref=f1e65]
+            - paragraph [ref=f1e66]: Every marque the group has been appointed to represent, in the order it happened. The artwork is each manufacturer's own and is never recoloured.
+          - list [ref=f1e67]:
+            - listitem [ref=f1e68]:
+              - generic [ref=f1e69]: "1968"
+              - generic [ref=f1e71]:
+                - generic [ref=f1e72]: Hindustan Petroleum
+                - generic [ref=f1e73]: The group begins with HPCL gas stations and kerosene distribution in Jammu.
+            - listitem [ref=f1e74]:
+              - generic [ref=f1e75]: "1977"
+              - generic [ref=f1e77]:
+                - generic [ref=f1e78]: Indian Oil
+                - generic [ref=f1e79]: IOCL dealership extends the petroleum business across the region.
+            - listitem [ref=f1e80]:
+              - generic [ref=f1e81]: "2004"
+              - generic [ref=f1e83]:
+                - generic [ref=f1e84]: Chevrolet
+                - generic [ref=f1e85]: First passenger-car franchise; GM awards follow from 2006.
+            - listitem [ref=f1e86]:
+              - generic [ref=f1e87]: "2008"
+              - generic [ref=f1e89]:
+                - generic [ref=f1e90]: Hyundai
+                - generic [ref=f1e91]: AM Hyundai opens — the group's largest car business to this day.
+            - listitem [ref=f1e92]:
+              - generic [ref=f1e93]: "2010"
+              - generic [ref=f1e95]:
+                - generic [ref=f1e96]: Honda 2-Wheelers
+                - generic [ref=f1e97]: Diamond Honda brings the group into two-wheelers.
+            - listitem [ref=f1e98]:
+              - generic [ref=f1e99]: "2012"
+              - generic [ref=f1e101]:
+                - generic [ref=f1e102]: KTM
+                - generic [ref=f1e103]: The only KTM showroom in Jammu.
+            - listitem [ref=f1e104]:
+              - generic [ref=f1e105]: "2017"
+              - generic [ref=f1e107]:
+                - generic [ref=f1e108]: Tata Motors
+                - generic [ref=f1e109]: AM Tata adds India's home-grown passenger range.
+            - listitem [ref=f1e110]:
+              - generic [ref=f1e111]: "2024"
+              - generic [ref=f1e113]:
+                - generic [ref=f1e114]: Bajaj · Kia · MG
+                - generic [ref=f1e115]: Three franchises in one year — the group's broadest expansion since 1968.
+      - region [ref=f1e116]:
+        - generic [ref=f1e117]:
+          - generic [ref=f1e118]:
+            - generic [ref=f1e119]:
+              - paragraph [ref=f1e120]: Our businesses
+              - heading "Four divisions" [level=2] [ref=f1e122]
+            - paragraph [ref=f1e123]: Each is a separate operating business with its own sites and staff. Follow any of them for the detail.
+          - list [ref=f1e124]:
+            - listitem [ref=f1e125]:
+              - link "Automobile Since 2004 Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock." [ref=f1e126] [cursor=pointer]:
+                - /url: /automobile
+                - generic [ref=f1e128]:
+                  - generic [ref=f1e129]:
+                    - generic [ref=f1e130]: Automobile
+                    - generic [ref=f1e131]: Since 2004
+                  - generic [ref=f1e132]: Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock.
+            - listitem [ref=f1e133]:
+              - 'link "Petroleum Since 1968 Where the group began: Hindustan Petroleum and Indian Oil stations serving the region''s fuel demand since 1968." [ref=f1e134] [cursor=pointer]':
+                - /url: /hp-indian-oil
+                - generic [ref=f1e136]:
+                  - generic [ref=f1e137]:
+                    - generic [ref=f1e138]: Petroleum
+                    - generic [ref=f1e139]: Since 1968
+                  - generic [ref=f1e140]: "Where the group began: Hindustan Petroleum and Indian Oil stations serving the region's fuel demand since 1968."
+            - listitem [ref=f1e141]:
+              - link "Real Estate Since c. 2000 Commercial and residential development, including AM Business Park on the N-H 1 Bye-Pass — the group's own flagship address." [ref=f1e142] [cursor=pointer]:
+                - /url: /real-estate
+                - generic [ref=f1e144]:
+                  - generic [ref=f1e145]:
+                    - generic [ref=f1e146]: Real Estate
+                    - generic [ref=f1e147]: Since c. 2000
+                  - generic [ref=f1e148]: Commercial and residential development, including AM Business Park on the N-H 1 Bye-Pass — the group's own flagship address.
+            - listitem [ref=f1e149]:
+              - link "Retail Since 2025 S Mega Mart brings organised retail to the valley — the group's newest business and its first outside automotive and energy." [ref=f1e150] [cursor=pointer]:
+                - /url: /s-mega-mart
+                - generic [ref=f1e152]:
+                  - generic [ref=f1e153]:
+                    - generic [ref=f1e154]: Retail
+                    - generic [ref=f1e155]: Since 2025
+                  - generic [ref=f1e156]: S Mega Mart brings organised retail to the valley — the group's newest business and its first outside automotive and energy.
+      - region [ref=f1e157]:
+        - generic [ref=f1e158]:
+          - generic [ref=f1e159]:
+            - generic [ref=f1e160]:
+              - paragraph [ref=f1e161]: Awards & recognition
+              - heading "Dated, placed, checkable" [level=2] [ref=f1e163]
+            - paragraph [ref=f1e164]: The complete register as the manufacturers awarded it — every entry with the year and the city it was given in. Nothing here is summarised as a badge count.
+          - generic [ref=f1e165]:
+            - generic [ref=f1e166]:
+              - heading "Hyundai · 10 awards" [level=3] [ref=f1e167]
+              - list [ref=f1e168]:
+                - listitem [ref=f1e169]:
+                  - generic [ref=f1e170]:
+                    - generic [ref=f1e171]: National Best Seller Award (H1)
+                    - generic [ref=f1e172]: Los Angeles, USA
+                  - generic [ref=f1e173]: "2009"
+                - listitem [ref=f1e174]:
+                  - generic [ref=f1e175]:
+                    - generic [ref=f1e176]: Best Dealership (North Region)
+                    - generic [ref=f1e177]: Head Office
+                  - generic [ref=f1e178]: "2009"
+                - listitem [ref=f1e179]:
+                  - generic [ref=f1e180]:
+                    - generic [ref=f1e181]: National Best Seller Award (Volume)
+                    - generic [ref=f1e182]: Ho Chi Minh City, Vietnam
+                  - generic [ref=f1e183]: "2009"
+                - listitem [ref=f1e184]:
+                  - generic [ref=f1e185]:
+                    - generic [ref=f1e186]: National Best Seller Award (Retails)
+                    - generic [ref=f1e187]: Ho Chi Minh City, Vietnam
+                  - generic [ref=f1e188]: "2010"
+                - listitem [ref=f1e189]:
+                  - generic [ref=f1e190]:
+                    - generic [ref=f1e191]: National Best Seller Award
+                    - generic [ref=f1e192]: Auckland, New Zealand
+                  - generic [ref=f1e193]: "2010"
+                - listitem [ref=f1e194]:
+                  - generic [ref=f1e195]:
+                    - generic [ref=f1e196]: National Best Seller Award
+                    - generic [ref=f1e197]: Paris, France
+                  - generic [ref=f1e198]: "2011"
+                - listitem [ref=f1e199]:
+                  - generic [ref=f1e200]:
+                    - generic [ref=f1e201]: National Best Seller Award
+                    - generic [ref=f1e202]: New York, USA
+                  - generic [ref=f1e203]: "2012"
+                - listitem [ref=f1e204]:
+                  - generic [ref=f1e205]:
+                    - generic [ref=f1e206]: Best Premium Car Seller Award
+                    - generic [ref=f1e207]: Head Office
+                  - generic [ref=f1e208]: "2015"
+                - listitem [ref=f1e209]:
+                  - generic [ref=f1e210]:
+                    - generic [ref=f1e211]: Best Model Performance Award — i20
+                    - generic [ref=f1e212]: Lisbon, Portugal
+                  - generic [ref=f1e213]: "2018"
+                - listitem [ref=f1e214]:
+                  - generic [ref=f1e215]:
+                    - generic [ref=f1e216]: Best Model Performance Award — i20
+                    - generic [ref=f1e217]: Rio de Janeiro, Brazil
+                  - generic [ref=f1e218]: "2019"
+            - generic [ref=f1e219]:
+              - heading "Chevrolet · 7 awards" [level=3] [ref=f1e220]
+              - list [ref=f1e221]:
+                - listitem [ref=f1e222]:
+                  - generic [ref=f1e223]:
+                    - generic [ref=f1e224]: Highest Customer Satisfaction Award
+                    - generic [ref=f1e225]: G.M. Office
+                  - generic [ref=f1e226]: "2006"
+                - listitem [ref=f1e227]:
+                  - generic [ref=f1e228]:
+                    - generic [ref=f1e229]: Parts Target Achievement Award
+                    - generic [ref=f1e230]: G.M. Office
+                  - generic [ref=f1e231]: "2006"
+                - listitem [ref=f1e232]:
+                  - generic [ref=f1e233]:
+                    - generic [ref=f1e234]: Spark Fastest 50 Contest Award
+                    - generic [ref=f1e235]: G.M. Office
+                  - generic [ref=f1e236]: "2007"
+                - listitem [ref=f1e237]:
+                  - generic [ref=f1e238]:
+                    - generic [ref=f1e239]: Overall Customer Satisfaction Award
+                    - generic [ref=f1e240]: Gurgaon
+                  - generic [ref=f1e241]: "2007"
+                - listitem [ref=f1e242]:
+                  - generic [ref=f1e243]:
+                    - generic [ref=f1e244]: Best Accessory Sale Award
+                    - generic [ref=f1e245]: Nainital
+                  - generic [ref=f1e246]: "2009"
+                - listitem [ref=f1e247]:
+                  - generic [ref=f1e248]:
+                    - generic [ref=f1e249]: 1st Rank Overall Performance
+                    - generic [ref=f1e250]: Zone Level
+                  - generic [ref=f1e251]: "2010"
+                - listitem [ref=f1e252]:
+                  - generic [ref=f1e253]:
+                    - generic [ref=f1e254]: 5,000 Vehicle Sales Achievement
+                    - generic [ref=f1e255]: Zone Level
+                  - generic [ref=f1e256]: "2011"
+              - paragraph [ref=f1e257]: AM Group held the Chevrolet franchise from 2004 until General Motors left India in 2017, and still honours service on those cars. It is not a current appointment.
+              - link "The automobile division" [ref=f1e258] [cursor=pointer]:
+                - /url: /automobile
+      - region [ref=f1e261]:
+        - generic [ref=f1e266]:
+          - generic [ref=f1e267]:
+            - paragraph [ref=f1e268]: Talk to us
+            - heading "Come and see the place" [level=2] [ref=f1e270]
+            - paragraph [ref=f1e271]: 58 years of it is on the N-H 1 Bye-Pass in Jammu. Mon–Sat, 9:30 am to 6:30 pm.
+          - generic [ref=f1e272]:
+            - link "Call +91 94191 00000" [ref=f1e273] [cursor=pointer]:
+              - /url: tel:+919419100000
+            - link "WhatsApp" [ref=f1e274] [cursor=pointer]:
+              - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20speak%20to%20someone%20about%20a%20car.%20Are%20you%20free%20now%3F
+            - button "Send an enquiry" [ref=f1e275] [cursor=pointer]
+            - link "Find us" [ref=f1e276] [cursor=pointer]:
+              - /url: /locations
+    - contentinfo [ref=f1e277]:
+      - navigation "The group" [ref=f1e280]:
+        - heading "The group" [level=3] [ref=f1e281]
+        - list [ref=f1e282]:
+          - listitem [ref=f1e283]:
+            - link "About the group" [ref=f1e284] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f1e285]:
+            - link "Automobile division" [ref=f1e286] [cursor=pointer]:
+              - /url: /automobile
+          - listitem [ref=f1e287]:
+            - link "HP & Indian Oil" [ref=f1e288] [cursor=pointer]:
+              - /url: /hp-indian-oil
+          - listitem [ref=f1e289]:
+            - link "Real estate" [ref=f1e290] [cursor=pointer]:
+              - /url: /real-estate
+          - listitem [ref=f1e291]:
+            - link "S Mega Mart" [ref=f1e292] [cursor=pointer]:
+              - /url: /s-mega-mart
+          - listitem [ref=f1e293]:
+            - link "All used cars" [ref=f1e294] [cursor=pointer]:
+              - /url: /inventory
+          - listitem [ref=f1e295]:
+            - link "Showrooms & directions" [ref=f1e296] [cursor=pointer]:
+              - /url: /locations
+          - listitem [ref=f1e297]:
+            - link "News & updates" [ref=f1e298] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=f1e299]:
+            - link "Contact" [ref=f1e300] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=f1e302]:
+        - generic [ref=f1e303]:
+          - link "AM Group — home" [ref=f1e304] [cursor=pointer]:
+            - /url: /
+            - img "AM Group" [ref=f1e305]
+          - paragraph [ref=f1e306]: Est. 1968 · Jammu & Kashmir
+          - generic [ref=f1e307]:
+            - strong [ref=f1e308]: AM Group Jammu — AM Business Park
+            - text: AM Business Park, N-H 1 Bye-Pass Road, Jammu, Jammu and Kashmir 180012Open Mon–Sat, 9:30 am – 6:30 pm.
+        - generic [ref=f1e309]:
+          - heading "Showrooms" [level=3] [ref=f1e310]
+          - list [ref=f1e311]:
+            - listitem [ref=f1e312]:
+              - link "Jammu" [ref=f1e313] [cursor=pointer]:
+                - /url: /locations/jammu
+            - listitem [ref=f1e314]:
+              - link "Srinagar" [ref=f1e315] [cursor=pointer]:
+                - /url: /locations/srinagar
+        - generic [ref=f1e316]:
+          - link "+91 94191 00000" [ref=f1e317] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - link "info@amgroupind.com" [ref=f1e320] [cursor=pointer]:
+            - /url: mailto:info@amgroupind.com
+      - generic [ref=f1e322]:
+        - paragraph [ref=f1e323]: © 2026 AM Group Jammu — all rights reserved
+        - generic [ref=f1e324]:
+          - link "Privacy policy" [ref=f1e325] [cursor=pointer]:
+            - /url: /privacy-policy
+          - generic [ref=f1e326]: "|"
+          - link "Terms" [ref=f1e327] [cursor=pointer]:
+            - /url: /terms
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=f1e333] [cursor=pointer]

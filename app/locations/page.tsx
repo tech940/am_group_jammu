@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { LOCATIONS, formatAddress, formatHours } from "@/lib/locations"
+import { LOCATIONS, PRIMARY_LOCATION, formatAddress, formatHours } from "@/lib/locations"
 import { getInventory } from "@/lib/inventory/server"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
@@ -28,7 +28,7 @@ export default async function LocationsPage() {
       question: "Do I need an appointment to visit?",
       answer:
         "No. You are welcome to walk into the Jammu showroom during opening hours and inspect any car in stock. " +
-        "For Srinagar we recommend calling ahead on +91 94191 00000 so we can have the specific car you want on site.",
+        `For Srinagar we recommend calling ahead on ${PRIMARY_LOCATION.phone} so we can have the specific car you want on site.`,
     },
     {
       question: "Can I see a car from the Jammu stock in Srinagar?",
@@ -74,10 +74,11 @@ export default async function LocationsPage() {
             <p className="text-body text-ink-2">
               Walk in during opening hours, or call{" "}
               <a
-                href="tel:+919419100000"
-                className="font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                data-track-location="locations-hub-hero"
+                className="font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent"
               >
-                +91 94191 00000
+                {PRIMARY_LOCATION.phone}
               </a>{" "}
               and we will tell you exactly what is on the forecourt today.
             </p>
@@ -121,7 +122,8 @@ export default async function LocationsPage() {
                     <dd>
                       <a
                         href={`tel:${loc.phoneE164}`}
-                        className="inline-flex min-h-11 items-center font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                        data-track-location={`locations-hub-${loc.slug}`}
+                        className="inline-flex min-h-11 items-center font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent"
                       >
                         {loc.phone}
                       </a>
@@ -132,7 +134,8 @@ export default async function LocationsPage() {
                     <dd>
                       <a
                         href={`mailto:${loc.email}`}
-                        className="inline-flex min-h-11 items-center text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                        data-track-location={`locations-hub-${loc.slug}`}
+                        className="inline-flex min-h-11 items-center text-ink transition-colors duration-(--duration-1) hover:text-accent"
                       >
                         {loc.email}
                       </a>

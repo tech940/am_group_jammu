@@ -1,6 +1,7 @@
 "use client"
 
-import { motion, useReducedMotion } from "framer-motion"
+import { motion } from "framer-motion"
+import { useReducedMotionSafe } from "@/components/system/use-reduced-motion"
 import type { ReactNode } from "react"
 
 /**
@@ -179,7 +180,7 @@ export function DimensionLine({
   tone?: "ink" | "print" | "redline"
   className?: string
 }) {
-  const reduce = useReducedMotion()
+  const reduce = useReducedMotionSafe()
   const color =
     tone === "print" ? "text-print-dim" : tone === "redline" ? "text-redline" : "text-steel"
   const lineColor =
@@ -361,7 +362,7 @@ export function Settle({
   delay?: number
   className?: string
 }) {
-  const reduce = useReducedMotion()
+  const reduce = useReducedMotionSafe()
   return (
     <motion.div
       className={className}
@@ -445,6 +446,60 @@ export function AlertGlyph({ className = "" }: { className?: string }) {
     <Glyph className={className}>
       <path d="M10 2.5 18.5 17.5H1.5L10 2.5Z" strokeLinejoin="miter" />
       <path d="M10 8v3.5M10 14.25v.5" />
+    </Glyph>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Journey pictograms — what kind of stop this is on the route.        */
+/*                                                                     */
+/* These pass the delete-first test because they carry category, not   */
+/* decoration: on the journey road each stop shows only a year, and    */
+/* "1977" says nothing about WHAT arrived in 1977 — the pump does.     */
+/* Same construction as everything above: 20x20, 1.5px, square caps.   */
+/* ------------------------------------------------------------------ */
+
+export function FuelPumpGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      {/* Pump body, display window, base, and the hose over the side. */}
+      <path d="M4 17.25 V3.5 h8.5 v13.75 M2.5 17.25 h11.5" strokeLinejoin="miter" />
+      <path d="M6.25 6 h4 v3.25 h-4 Z" strokeLinejoin="miter" />
+      <path d="M12.5 8 h2.25 a1.5 1.5 0 0 1 1.5 1.5 v4.75 a1.15 1.15 0 0 0 2.3 0 V9" />
+    </Glyph>
+  )
+}
+
+export function CarGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path
+        d="M2.5 13.5 v-2 l2.75-1 2.25-3 h5 l2.25 3 2.75 1 v2 h-1.75 M8.75 13.5 h2.5 M4.5 13.5 h-2"
+        strokeLinejoin="miter"
+      />
+      <circle cx="6.5" cy="13.75" r="1.9" />
+      <circle cx="13.5" cy="13.75" r="1.9" />
+    </Glyph>
+  )
+}
+
+export function BikeGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <circle cx="5" cy="14" r="2.6" />
+      <circle cx="15" cy="14" r="2.6" />
+      {/* Frame, seat, and bars. */}
+      <path d="M5 14 L8.5 8.25 h3.25 L15 14 M8.5 8.25 6.75 6.5 h-2 M11.75 8.25 13.5 6 h1.75" />
+    </Glyph>
+  )
+}
+
+/** A waypoint flag — for the stop where no single vehicle is honest. */
+export function FlagGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path d="M5.5 17.5 V2.75" />
+      <path d="M5.5 3.5 h9 l-2.5 3.25 2.5 3.25 h-9" strokeLinejoin="miter" />
     </Glyph>
   )
 }

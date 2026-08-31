@@ -62,7 +62,7 @@ const NONCE_TTL_MS = 6 * 60 * 60 * 1000
 const DEFAULTS = {
   perPage: 50,
   maxPages: 20,
-  timeoutMs: 15_000,
+  timeoutMs: 8_000,
   politeDelayMs: 400,
 } as const
 

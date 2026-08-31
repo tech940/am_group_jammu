@@ -17,7 +17,7 @@ import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
 import type { VehicleNeighbour } from "@/lib/inventory/server"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { pushEvent, vehicleParams } from "@/lib/analytics/gtm"
-import { whatsappUrl } from "@/lib/locations"
+import { whatsappUrl, PRIMARY_LOCATION } from "@/lib/locations"
 
 export default function VehicleClient({
   vehicle,
@@ -296,7 +296,7 @@ export default function VehicleClient({
                   <div className="mt-2 flex items-center justify-center gap-3">
                     <span className="text-small text-ink-3 line-through" data-num>{vehicle.originalPriceLabel}</span>
                     {vehicle.discountPercent !== null && (
-                      <span className="px-2 py-0.5 rounded-sm bg-accent text-ground text-meta uppercase" data-num>
+                      <span className="px-2 py-0.5 rounded-sm bg-accent text-on-accent text-meta uppercase" data-num>
                         {vehicle.discountPercent}% off
                       </span>
                     )}
@@ -348,8 +348,8 @@ export default function VehicleClient({
             <div className="bg-surface p-6 border border-line">
               <h2 className="font-display text-h3 text-ink mb-4">Quick Contact</h2>
               <div className="flex flex-col">
-                <a href="tel:+919419100000" data-track-location="vdp-quick-contact" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)" data-num>
-                  +91 94191 00000
+                <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="vdp-quick-contact" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)" data-num>
+                  {PRIMARY_LOCATION.phone}
                 </a>
                 <a href="mailto:info@amgroupind.com" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)">
                   info@amgroupind.com
@@ -426,7 +426,7 @@ export default function VehicleClient({
       <FaqSection
         items={faqs}
         title={`${heading} — Questions & Answers`}
-        intro="Common questions about this specific car. Call +91 94191 00000 if anything is not covered here."
+        intro={`Common questions about this specific car. Call ${PRIMARY_LOCATION.phone} if anything is not covered here.`}
       />
 
       <FrequentSearches searches={frequentSearches} />

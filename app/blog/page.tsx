@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import BlogClient from "./blog-client"
+import { NewsPage } from "./news-page"
 
 export const metadata: Metadata = {
   title: "News & Updates | AM Group Media Center",
@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 }
 
 export default function Page() {
-  return <BlogClient />
+  return <NewsPage />
 }

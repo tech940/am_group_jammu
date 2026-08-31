@@ -1,15 +1,18 @@
 import type { Metadata } from "next"
-import SMegaMartClient from "./s-mega-mart-client"
+import { RetailPage } from "./retail-page"
 
 export const metadata: Metadata = {
-  title: "S Mega Mart | Retail Shopping in Jammu",
+  // Srinagar, not Jammu. content.ts has always said the store is in the Kashmir
+  // Valley; the title and description said Jammu, which is a different city
+  // 260km away and the wrong one to rank for.
+  title: "S Mega Mart | Organised Retail in Srinagar",
   description:
-    "S Mega Mart by AM Group — a modern retail shopping destination in Jammu offering groceries, lifestyle products, and daily essentials under one roof.",
+    "S Mega Mart by AM Group — organised retail in Srinagar, Kashmir. The group's newest division and its first business outside automotive and energy.",
   alternates: {
     canonical: "/s-mega-mart",
   },
 }
 
 export default function Page() {
-  return <SMegaMartClient />
+  return <RetailPage />
 }

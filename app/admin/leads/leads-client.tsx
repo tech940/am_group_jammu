@@ -32,7 +32,7 @@ const CHIP =
   "text-button uppercase transition-colors duration-(--duration-1)"
 const CHIP_ON = "border-deep bg-deep text-on-deep hover:bg-deep-2"
 const CHIP_OFF = "border-line bg-surface text-ink-2 hover:border-line-strong hover:text-ink"
-const CHIP_DUE_ON = "border-accent bg-accent text-ground hover:bg-accent-hover"
+const CHIP_DUE_ON = "border-accent bg-accent text-on-accent hover:bg-accent-hover"
 const CHIP_DUE_OFF = "border-line bg-surface text-accent-text-light hover:border-line-strong"
 
 function timeAgo(iso: string): string {

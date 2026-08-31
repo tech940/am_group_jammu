@@ -1,4 +1,5 @@
 import { Metadata } from "next"
+import { PRIMARY_LOCATION } from "@/lib/locations"
 import { notFound } from "next/navigation"
 import { FeaturedInventory } from "@/components/sections/inventory"
 import { getInventory } from "@/lib/inventory/server"
@@ -90,7 +91,7 @@ export default async function BrandPage({ params }: Props) {
       question: `Can I test drive a used ${brandName} before buying?`,
       answer:
         `Yes — test drives are arranged at our Jammu and Srinagar locations at no charge. ` +
-        `Call +91 94191 00000 or submit an enquiry on any ${brandName} listing to book one.`,
+        `Call ${PRIMARY_LOCATION.phone} or submit an enquiry on any ${brandName} listing to book one.`,
     },
   ]
 

@@ -70,6 +70,29 @@ export function getSupabaseMediaUrl(path: string): string {
  */
 export const AM_KIA_SHOWROOM = mediaPath("m", "kia/service/untitled-09028.jpg")
 
+/**
+ * WHAT THESE KEYS ACTUALLY CONTAIN.
+ *
+ * Several paths are named after the branch the photograph was expected to show
+ * and not after what is in the frame. Verified by eye on 2026-08-30, because
+ * captions on the public pages were asserting the wrong building:
+ *
+ *   branches["jammu-hyundai"].exterior      AM Hyundai, Jammu.        CORRECT
+ *   branches["jammu-hyundai"].banner        A marketing graphic with promotional
+ *                                           type baked in — not a building. Do
+ *                                           not use it behind a page heading.
+ *   branches["srinagar-hyundai"].exterior   A TATA MOTORS building, not a
+ *                                           Srinagar Hyundai showroom.
+ *   branches["central-workshop"].*          Showroom photography, not workshop
+ *                                           interiors.
+ *   divisions.automobile                    The AM Tata forecourt.
+ *   branches["luxury-showrooms"].mg         AMG Autocraft (MG), Jammu. CORRECT
+ *   branches["two-wheelers"].*              Honda / Bajaj / KTM.      CORRECT
+ *
+ * Caption from this list, not from the key name. A caption that disagrees with
+ * its photograph is the same class of defect as an unsourced statistic — it is
+ * the page claiming something it cannot support.
+ */
 export const SUPABASE_MEDIA = {
   heroBg: AM_KIA_SHOWROOM,
   awards: getSupabaseMediaUrl("corporate/awards/trophies.png"),

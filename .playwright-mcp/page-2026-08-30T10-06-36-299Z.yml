@@ -1,0 +1,169 @@
+- generic [active] [ref=f8e1]:
+  - generic [ref=f8e2]:
+    - banner [ref=f8e3]:
+      - generic [ref=f8e4]:
+        - link "AM Group — home" [ref=f8e5] [cursor=pointer]:
+          - /url: /
+          - img "AM Group" [ref=f8e6]
+          - generic [ref=f8e7]: Est. 1968Jammu & Kashmir
+        - navigation "Primary" [ref=f8e8]:
+          - link "About" [ref=f8e9] [cursor=pointer]:
+            - /url: /about
+          - button "Businesses" [ref=f8e11]
+          - link "Used Cars" [ref=f8e12] [cursor=pointer]:
+            - /url: /inventory
+          - link "Locations" [ref=f8e13] [cursor=pointer]:
+            - /url: /locations
+          - link "News" [ref=f8e14] [cursor=pointer]:
+            - /url: /blog
+          - link "Contact" [ref=f8e15] [cursor=pointer]:
+            - /url: /contact
+          - link "+91 94191 00000" [ref=f8e16] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - button "Book test drive" [ref=f8e19]
+    - main [ref=f8e21]:
+      - navigation "Breadcrumb" [ref=f8e22]:
+        - link "Home" [ref=f8e23] [cursor=pointer]:
+          - /url: /
+        - generic [ref=f8e24]: /
+        - generic [ref=f8e25]: Hp Indian Oil
+      - region [ref=f8e26]:
+        - generic [ref=f8e29]:
+          - generic [ref=f8e30]:
+            - paragraph [ref=f8e31]: Petroleum division · since 1968
+            - heading "The business that came first" [level=1] [ref=f8e33]: The businessthat came first
+            - paragraph [ref=f8e34]: Before the showrooms, before the property, there was fuel. AM Group's Hindustan Petroleum appointment in 1968 is the oldest thing the company does, and the reason every other division exists.
+          - paragraph [ref=f8e35]: An AM Group forecourt in Jammu & Kashmir.
+          - generic [ref=f8e36]:
+            - generic [ref=f8e37]:
+              - term [ref=f8e38]: Hindustan Petroleum
+              - definition [ref=f8e39]: "1968"
+              - definition [ref=f8e40]: the founding appointment
+            - generic [ref=f8e41]:
+              - term [ref=f8e42]: Indian Oil
+              - definition [ref=f8e43]: "1977"
+              - definition [ref=f8e44]: nine years later
+            - generic [ref=f8e45]:
+              - term [ref=f8e46]: Years in fuel
+              - definition [ref=f8e47]: "58"
+              - definition [ref=f8e48]: unbroken
+            - generic [ref=f8e49]:
+              - term [ref=f8e50]: Divisions since
+              - definition [ref=f8e51]: "3"
+              - definition [ref=f8e52]: automobile · property · retail
+      - region [ref=f8e53]:
+        - generic [ref=f8e54]:
+          - generic [ref=f8e55]:
+            - generic [ref=f8e56]:
+              - paragraph [ref=f8e57]: Fuel retail
+              - heading "Two oil marketing companies" [level=2] [ref=f8e59]
+            - paragraph [ref=f8e60]: AM Group holds dealer appointments from both Hindustan Petroleum and Indian Oil, and operates forecourts under each.
+          - generic [ref=f8e61]:
+            - generic [ref=f8e62]:
+              - generic [ref=f8e63]:
+                - generic [ref=f8e64]:
+                  - term [ref=f8e65]: Hindustan Petroleum
+                  - definition [ref=f8e66]: The group begins with HPCL gas stations and kerosene distribution in Jammu.
+                - definition [ref=f8e67]: "1968"
+              - generic [ref=f8e68]:
+                - generic [ref=f8e69]:
+                  - term [ref=f8e70]: Indian Oil
+                  - definition [ref=f8e71]: IOCL dealership extends the petroleum business across the region.
+                - definition [ref=f8e72]: "1977"
+            - generic [ref=f8e73]:
+              - paragraph [ref=f8e74]: "The group distributes for both companies and runs their retail outlets across the region. It is the least visible part of AM Group and the longest-running: 58 years without a break, through every change in the businesses built on top of it."
+              - paragraph [ref=f8e75]: Fuel grades, pricing and volume standards at these forecourts are set by Hindustan Petroleum and Indian Oil, not by the dealer. We do not make claims on their behalf.
+              - paragraph [ref=f8e76]: Station addresses and opening hours for the petroleum outlets have not been published by the company yet. When they are, they will appear here and in the locations directory rather than being estimated.
+      - region [ref=f8e77]:
+        - generic [ref=f8e78]:
+          - generic [ref=f8e79]:
+            - generic [ref=f8e80]:
+              - paragraph [ref=f8e81]: The sites
+              - heading "On the forecourt" [level=2] [ref=f8e83]
+            - paragraph [ref=f8e84]: Photography of the group's own stations. Every image here is hosted by this application — nothing is hot-linked from the old site.
+          - generic [ref=f8e85]:
+            - figure "AM Group forecourt — plate 1 of 3." [ref=f8e86]:
+              - img "AM Group fuel station forecourt in Jammu & Kashmir, view 1" [ref=f8e88]
+            - figure "AM Group forecourt — plate 2 of 3." [ref=f8e90]:
+              - img "AM Group fuel station forecourt in Jammu & Kashmir, view 2" [ref=f8e92]
+            - figure "AM Group forecourt — plate 3 of 3." [ref=f8e94]:
+              - img "AM Group fuel station forecourt in Jammu & Kashmir, view 3" [ref=f8e96]
+      - region [ref=f8e98]:
+        - generic [ref=f8e103]:
+          - generic [ref=f8e104]:
+            - paragraph [ref=f8e105]: Talk to us
+            - heading "Ask about the fuel business" [level=2] [ref=f8e107]
+            - paragraph [ref=f8e108]: For dealership, supply or commercial fuel enquiries, the corporate office in Jammu takes them directly.
+          - generic [ref=f8e109]:
+            - link "Call +91 94191 00000" [ref=f8e110] [cursor=pointer]:
+              - /url: tel:+919419100000
+            - link "WhatsApp" [ref=f8e111] [cursor=pointer]:
+              - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20speak%20to%20someone%20about%20a%20car.%20Are%20you%20free%20now%3F
+            - button "Send an enquiry" [ref=f8e112] [cursor=pointer]
+            - link "Find us" [ref=f8e113] [cursor=pointer]:
+              - /url: /locations
+    - contentinfo [ref=f8e114]:
+      - navigation "The group" [ref=f8e117]:
+        - heading "The group" [level=2] [ref=f8e118]
+        - list [ref=f8e119]:
+          - listitem [ref=f8e120]:
+            - link "About the group" [ref=f8e121] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f8e122]:
+            - link "Automobile division" [ref=f8e123] [cursor=pointer]:
+              - /url: /automobile
+          - listitem [ref=f8e124]:
+            - link "HP & Indian Oil" [ref=f8e125] [cursor=pointer]:
+              - /url: /hp-indian-oil
+          - listitem [ref=f8e126]:
+            - link "Real estate" [ref=f8e127] [cursor=pointer]:
+              - /url: /real-estate
+          - listitem [ref=f8e128]:
+            - link "S Mega Mart" [ref=f8e129] [cursor=pointer]:
+              - /url: /s-mega-mart
+          - listitem [ref=f8e130]:
+            - link "All used cars" [ref=f8e131] [cursor=pointer]:
+              - /url: /inventory
+          - listitem [ref=f8e132]:
+            - link "Showrooms & directions" [ref=f8e133] [cursor=pointer]:
+              - /url: /locations
+          - listitem [ref=f8e134]:
+            - link "News & updates" [ref=f8e135] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=f8e136]:
+            - link "Contact" [ref=f8e137] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=f8e139]:
+        - generic [ref=f8e140]:
+          - link "AM Group — home" [ref=f8e141] [cursor=pointer]:
+            - /url: /
+            - img "AM Group" [ref=f8e142]
+          - paragraph [ref=f8e143]: Est. 1968 · Jammu & Kashmir
+          - generic [ref=f8e144]:
+            - strong [ref=f8e145]: AM Group Jammu — AM Business Park
+            - text: AM Business Park, N-H 1 Bye-Pass Road, Jammu, Jammu and Kashmir 180012Open Mon–Sat, 9:30 am – 6:30 pm.
+        - generic [ref=f8e146]:
+          - heading "Showrooms" [level=2] [ref=f8e147]
+          - list [ref=f8e148]:
+            - listitem [ref=f8e149]:
+              - link "Jammu" [ref=f8e150] [cursor=pointer]:
+                - /url: /locations/jammu
+            - listitem [ref=f8e151]:
+              - link "Srinagar" [ref=f8e152] [cursor=pointer]:
+                - /url: /locations/srinagar
+        - generic [ref=f8e153]:
+          - link "+91 94191 00000" [ref=f8e154] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - link "info@amgroupind.com" [ref=f8e157] [cursor=pointer]:
+            - /url: mailto:info@amgroupind.com
+      - generic [ref=f8e159]:
+        - paragraph [ref=f8e160]: © 2026 AM Group Jammu — all rights reserved
+        - generic [ref=f8e161]:
+          - link "Privacy policy" [ref=f8e162] [cursor=pointer]:
+            - /url: /privacy-policy
+          - generic [ref=f8e163]: "|"
+          - link "Terms" [ref=f8e164] [cursor=pointer]:
+            - /url: /terms
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=f8e170] [cursor=pointer]

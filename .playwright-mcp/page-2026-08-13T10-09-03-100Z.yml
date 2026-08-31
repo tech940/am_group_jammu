@@ -1,0 +1,465 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "AM Group — home" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "AM Group" [ref=e6]
+          - generic [ref=e7]: Est. 1968Jammu & Kashmir
+        - button "Menu" [ref=e8]
+    - main [ref=e9]:
+      - main [ref=e10]:
+        - generic [ref=e11]:
+          - region "AM Group — Premium Automotive Editorial Opener" [ref=e12]:
+            - img "The AM Kia flagship showroom store in Jammu" [ref=e15]
+            - generic [ref=e19]:
+              - generic [ref=e20]:
+                - generic [ref=e21]: AM GROUP
+                - generic [ref=e24]: EST. 1968 · JAMMU & KASHMIR
+                - generic [ref=e25]: ARCHIVE 1968–2026
+              - generic [ref=e26]:
+                - paragraph [ref=e27]: AUTOMOTIVE & INDUSTRIAL DOCUMENTARY
+                - heading "It Started With One Move." [level=1] [ref=e28]
+                - paragraph [ref=e29]: Fifty-eight years of energy distribution, passenger vehicles, commercial real estate, and organized retail across Jammu & Kashmir.
+              - generic [ref=e30]:
+                - generic [ref=e31]: "GPS: 32°42'59\"N 74°51'25\"E"
+                - generic [ref=e32]: SCROLL TO UNFOLD STORY
+          - generic [ref=e37]:
+            - generic [ref=e38]:
+              - generic [ref=e39]: CHAPTER 01 / ORIGIN
+              - generic [ref=e40]: THE FOUNDATION
+              - generic [ref=e41]: JAMMU SITE
+            - generic [ref=e42]:
+              - generic [ref=e43]:
+                - text: FOUNDATION YEAR
+                - heading "1968" [level=2] [ref=e44]
+                - generic [ref=e45]:
+                  - paragraph [ref=e46]: "GPS: 32°42'59\"N 74°51'25\"E"
+                  - paragraph [ref=e47]: PETROLEUM & ENERGY DISTRIBUTION
+              - generic [ref=e48]:
+                - img "AM Group HP Petroleum Forecourt" [ref=e50]
+                - generic [ref=e51]:
+                  - generic [ref=e52]: "[FIG. 01] HP PETROLEUM FORECOURT, JAMMU"
+                  - generic [ref=e53]: TRADING SINCE 1968
+                - generic [ref=e54]:
+                  - heading "Before The Showrooms, There Was Fuel." [level=3] [ref=e55]
+                  - paragraph [ref=e56]: The group begins with HPCL gas stations and kerosene distribution in Jammu.
+                  - paragraph [ref=e57]: Nine years later, the group expanded into Indian Oil dealership (Indian Oil). Both fuel businesses remain operational today under standard commercial agreements — serving as the foundational energy core that funded the group's expansion into passenger vehicle showrooms.
+                  - paragraph [ref=e58]:
+                    - generic [ref=e59]: PHOTOGRAPHED 2026
+                    - generic [ref=e60]: AM GROUP HP FORECOURT
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - generic [ref=e64]: CHRONOLOGY 1968–2024
+              - generic [ref=e65]: CHAPTER 02 / GROWTH
+              - generic [ref=e66]: 8 APPOINTMENTS
+            - generic [ref=e67]:
+              - text: CHRONOLOGICAL REGISTER
+              - heading "Eight Appointments in 58 Years" [level=2] [ref=e68]
+              - paragraph [ref=e69]: Petroleum distribution provided the stable capital foundation. Twenty-seven years of fuel distribution funded the landmark entry into passenger vehicle showrooms.
+            - generic [ref=e70]:
+              - generic [ref=e72]:
+                - generic [ref=e73]: "1968"
+                - img "Hindustan Petroleum" [ref=e76]
+                - generic [ref=e77]:
+                  - heading "Hindustan Petroleum" [level=3] [ref=e78]
+                  - paragraph [ref=e79]: The group begins with HPCL gas stations and kerosene distribution in Jammu.
+                - generic [ref=e80]: +0 YRS
+              - generic [ref=e83]:
+                - generic [ref=e84]: "1977"
+                - img "Indian Oil" [ref=e87]
+                - generic [ref=e88]:
+                  - heading "Indian Oil" [level=3] [ref=e89]
+                  - paragraph [ref=e90]: IOCL dealership extends the petroleum business across the region.
+                - generic [ref=e91]: +9 YRS
+              - generic [ref=e93]:
+                - generic [ref=e94]:
+                  - generic [ref=e95]: "INTERVAL: 27 YEARS OF PETROLEUM TRADING"
+                  - generic [ref=e98]: FUEL TRADING FUNDS CAR SHOWROOM MOVE
+                  - generic [ref=e99]: 1977 ➔ 2004
+                - generic [ref=e100]:
+                  - generic [ref=e101]: "2004"
+                  - img "Chevrolet" [ref=e104]
+                  - generic [ref=e105]:
+                    - heading "Chevrolet" [level=3] [ref=e106]
+                    - paragraph [ref=e107]: First passenger-car franchise; GM awards follow from 2006.
+                  - generic [ref=e108]: +36 YRS
+              - generic [ref=e111]:
+                - generic [ref=e112]: "2008"
+                - img "Hyundai" [ref=e115]
+                - generic [ref=e116]:
+                  - heading "Hyundai" [level=3] [ref=e117]
+                  - paragraph [ref=e118]: AM Hyundai opens — the group's largest car business to this day.
+                - generic [ref=e119]: +40 YRS
+              - generic [ref=e122]:
+                - generic [ref=e123]: "2010"
+                - img "Honda 2-Wheelers" [ref=e126]
+                - generic [ref=e127]:
+                  - heading "Honda 2-Wheelers" [level=3] [ref=e128]
+                  - paragraph [ref=e129]: Diamond Honda brings the group into two-wheelers.
+                - generic [ref=e130]: +42 YRS
+              - generic [ref=e133]:
+                - generic [ref=e134]: "2012"
+                - img "KTM" [ref=e137]
+                - generic [ref=e138]:
+                  - heading "KTM" [level=3] [ref=e139]
+                  - paragraph [ref=e140]: The only KTM showroom in Jammu.
+                - generic [ref=e141]: +44 YRS
+              - generic [ref=e144]:
+                - generic [ref=e145]: "2017"
+                - img "Tata Motors" [ref=e148]
+                - generic [ref=e149]:
+                  - heading "Tata Motors" [level=3] [ref=e150]
+                  - paragraph [ref=e151]: AM Tata adds India's home-grown passenger range.
+                - generic [ref=e152]: +49 YRS
+              - generic [ref=e155]:
+                - generic [ref=e156]: "2024"
+                - img "Bajaj · Kia · MG" [ref=e159]
+                - generic [ref=e160]:
+                  - heading "Bajaj · Kia · MG" [level=3] [ref=e161]
+                  - paragraph [ref=e162]: Three franchises in one year — the group's broadest expansion since 1968.
+                - generic [ref=e163]: +56 YRS
+          - generic [ref=e166]:
+            - generic [ref=e167]:
+              - generic [ref=e168]: COMMERCIAL ECOSYSTEM
+              - generic [ref=e169]: CHAPTER 03 / WHAT WE DO
+              - generic [ref=e170]: 4 SECTORS
+            - generic [ref=e171]:
+              - text: COMMERCIAL ECOSYSTEM
+              - heading "Four Sectors Under One House" [level=2] [ref=e172]
+            - generic [ref=e173]:
+              - generic [ref=e175]:
+                - button "01 / AUTOMOBILE SINCE 2004 Automobile Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock." [ref=e176]:
+                  - generic [ref=e177]:
+                    - generic [ref=e178]: 01 / AUTOMOBILE
+                    - generic [ref=e179]: SINCE 2004
+                  - heading "Automobile" [level=3] [ref=e180]
+                  - paragraph [ref=e181]: Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock.
+                - 'button "02 / PETROLEUM SINCE 1968 Petroleum Where the group began: Hindustan Petroleum and Indian Oil stations serving the region''s fuel demand since 1968." [ref=e182]':
+                  - generic [ref=e183]:
+                    - generic [ref=e184]: 02 / PETROLEUM
+                    - generic [ref=e185]: SINCE 1968
+                  - heading "Petroleum" [level=3] [ref=e186]
+                  - paragraph [ref=e187]: "Where the group began: Hindustan Petroleum and Indian Oil stations serving the region's fuel demand since 1968."
+                - button "03 / REAL ESTATE SINCE 2000 Real Estate Commercial and residential development, including AM Business Park on the N-H 1 Bye-Pass — the group's own flagship address." [ref=e188]:
+                  - generic [ref=e189]:
+                    - generic [ref=e190]: 03 / REAL ESTATE
+                    - generic [ref=e191]: SINCE 2000
+                  - heading "Real Estate" [level=3] [ref=e192]
+                  - paragraph [ref=e193]: Commercial and residential development, including AM Business Park on the N-H 1 Bye-Pass — the group's own flagship address.
+                - button "04 / RETAIL SINCE 2025 Retail S Mega Mart brings organised retail to the valley — the group's newest business and its first outside automotive and energy." [ref=e194]:
+                  - generic [ref=e195]:
+                    - generic [ref=e196]: 04 / RETAIL
+                    - generic [ref=e197]: SINCE 2025
+                  - heading "Retail" [level=3] [ref=e198]
+                  - paragraph [ref=e199]: S Mega Mart brings organised retail to the valley — the group's newest business and its first outside automotive and energy.
+              - generic [ref=e200]:
+                - img "AM Hyundai & Kia dealership campus in Jammu with state-of-the-art service bays" [ref=e203]
+                - generic [ref=e205]:
+                  - generic [ref=e206]: "[SITE] AM Hyundai & Kia, Jammu"
+                  - link "EXPLORE AUTOMOBILE →" [ref=e207] [cursor=pointer]:
+                    - /url: /automobile
+                    - generic [ref=e208]: EXPLORE AUTOMOBILE
+                    - generic [ref=e209]: →
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - generic [ref=e213]: FRANCHISE INDEX
+              - generic [ref=e214]: CHAPTER 04 / BRANDS
+              - generic [ref=e215]: 7 ACTIVE / 1 HERITAGE
+            - generic [ref=e216]:
+              - text: OFFICIAL OEM APPOINTMENTS
+              - heading "Seven Current Appointments. One House." [level=2] [ref=e217]
+              - paragraph [ref=e218]: Passenger vehicles and two-wheelers represented under exclusive regional franchises across Jammu & Kashmir.
+            - generic [ref=e219]:
+              - generic [ref=e221]:
+                - generic [ref=e222]: APPOINTED 2008
+                - heading "Hyundai" [level=3] [ref=e225]
+                - generic [ref=e226]: AM Hyundai
+                - generic [ref=e227]: Passenger cars
+              - generic [ref=e230]:
+                - generic [ref=e231]: APPOINTED 2017
+                - heading "Tata Motors" [level=3] [ref=e234]
+                - generic [ref=e235]: AM Tata
+                - generic [ref=e236]: Passenger cars
+              - generic [ref=e239]:
+                - generic [ref=e240]: APPOINTED 2024
+                - heading "Kia" [level=3] [ref=e243]
+                - generic [ref=e244]: AM Kia
+                - generic [ref=e245]: Passenger cars
+              - generic [ref=e248]:
+                - generic [ref=e249]: APPOINTED 2024
+                - heading "MG" [level=3] [ref=e252]
+                - generic [ref=e253]: AMG Autocraft
+                - generic [ref=e254]: Passenger cars
+              - generic [ref=e257]:
+                - generic [ref=e258]: APPOINTED 2010
+                - heading "Honda" [level=3] [ref=e261]
+                - generic [ref=e262]: Diamond Honda
+                - generic [ref=e263]: Two-wheelers
+              - generic [ref=e266]:
+                - generic [ref=e267]: APPOINTED 2012
+                - heading "KTM" [level=3] [ref=e270]
+                - generic [ref=e271]: KTM Jammu
+                - generic [ref=e272]: Two-wheelers
+              - generic [ref=e275]:
+                - generic [ref=e276]: APPOINTED 2024
+                - heading "Bajaj" [level=3] [ref=e279]
+                - generic [ref=e280]: AM Bajaj
+                - generic [ref=e281]: Two-wheelers
+              - generic [ref=e284]:
+                - generic [ref=e285]: APPOINTED 2004
+                - heading "Chevrolet" [level=3] [ref=e288]
+                - generic [ref=e289]: 2004 – 2017 · service honoured
+                - generic [ref=e290]: Heritage
+          - generic [ref=e293]:
+            - generic [ref=e294]:
+              - generic [ref=e295]: ROUTE NH-44 · 270 KM
+              - generic [ref=e298]: CHAPTER 05 / GEOGRAPHY
+              - generic [ref=e299]: 2 PRIMARY HUBS
+            - generic [ref=e300]:
+              - text: REGIONAL FOOTPRINT
+              - heading "Jammu to Srinagar — 270 KM" [level=2] [ref=e301]
+              - paragraph [ref=e302]: Two primary addressable dealership complexes connected along National Highway 44 across Jammu & Kashmir.
+            - generic [ref=e304]:
+              - generic [ref=e305]: JAMMU (FLAGSHIP) · 32°42'59"N
+              - generic [ref=e308]: NATIONAL HIGHWAY 44
+              - generic [ref=e309]: SRINAGAR (HUB) · 34°01'04"N
+            - generic [ref=e314]:
+              - generic [ref=e315]:
+                - img "AM Group Jammu — AM Business Park" [ref=e317]
+                - generic [ref=e319]:
+                  - generic [ref=e320]: STATION 01
+                  - generic [ref=e321]: JAMMU
+                - heading "AM Group Jammu — AM Business Park" [level=3] [ref=e322]
+                - paragraph [ref=e323]: AM Business Park, N-H 1 Bye-Pass Road, Jammu, Jammu and Kashmir 180012 — Opposite Jammu Railway Station
+                - paragraph [ref=e324]: "HOURS: Mon–Sat, 9:30 am – 6:30 pm"
+                - link "GET DIRECTIONS →" [ref=e326] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=AM+Business+Park+NH+1+Bye+Pass+Road+Jammu+180012
+              - generic [ref=e327]:
+                - img "AM Group Srinagar — AM Tower" [ref=e329]
+                - generic [ref=e331]:
+                  - generic [ref=e332]: STATION 02
+                  - generic [ref=e333]: SRINAGAR
+                - heading "AM Group Srinagar — AM Tower" [level=3] [ref=e334]
+                - paragraph [ref=e335]: AM Tower, Hyderpora Bye-Pass, Srinagar, Jammu and Kashmir 190014 — Hyderpora Bye-Pass, near the airport road
+                - paragraph [ref=e336]: "HOURS: Mon–Sat, 9:30 am – 6:30 pm"
+                - link "GET DIRECTIONS →" [ref=e338] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=AM+Tower+Hyderpora+Bye+Pass+Srinagar+190014
+          - generic [ref=e340]:
+            - generic [ref=e341]:
+              - generic [ref=e342]: VERBATIM REVIEWS
+              - generic [ref=e343]: CHAPTER 06 / HUMAN
+              - generic [ref=e344]: STAFF RECOGNITION
+            - generic [ref=e345]:
+              - text: SERVICE RECORDS
+              - heading "Customer Testimonials" [level=2] [ref=e346]
+              - paragraph [ref=e347]: Verbatim Google reviews naming floor advisors on the Jammu showroom floor.
+            - generic [ref=e348]:
+              - generic [ref=e349]:
+                - generic [ref=e350]:
+                  - generic [ref=e351]: RECORD 01 · 3 MONTHS AGO
+                  - blockquote [ref=e352]: “I had an excellent experience working with my sales advisors Rahida and Sheetal. They took the time to understand my preferences, explained all available options clearly, and ensured I felt confident in my purchase decision.”
+                - generic [ref=e353]:
+                  - paragraph [ref=e354]: Akash Suri
+                  - paragraph [ref=e355]: Local Guide · AM Hyundai Jammu
+              - generic [ref=e356]:
+                - generic [ref=e357]:
+                  - generic [ref=e358]: RECORD 02 · 7 MONTHS AGO
+                  - blockquote [ref=e359]: “The staff was professional and cooperative, and the overall process was smooth and hassle-free. A special thanks to Shivani Ma'am for her outstanding support, polite behaviour and clear guidance throughout the entire buying journey.”
+                - generic [ref=e360]:
+                  - paragraph [ref=e361]: Junaid Ahmad
+                  - paragraph [ref=e362]: AM Hyundai Jammu
+              - generic [ref=e363]:
+                - generic [ref=e364]:
+                  - generic [ref=e365]: RECORD 03 · 4 WEEKS AGO
+                  - blockquote [ref=e366]: “The entire process, from booking to delivery, was smooth and transparent. The sales team was courteous, patient, and answered all my questions regarding the vehicle, insurance, loan and documentation.”
+                - generic [ref=e367]:
+                  - paragraph [ref=e368]: Abbu Ayad
+                  - paragraph [ref=e369]: AM Hyundai Jammu
+          - generic [ref=e371]:
+            - generic [ref=e372]:
+              - generic [ref=e373]: MEASURE / SCALE
+              - generic [ref=e374]: CHAPTER 07 / SCALE
+              - generic [ref=e375]: VERIFIED METRICS
+            - generic [ref=e376]:
+              - text: THE GROUP MEASURED
+              - heading "Verified Operations Today" [level=2] [ref=e377]
+            - generic [ref=e378]:
+              - generic [ref=e379]:
+                - generic [ref=e380]: METRIC 01
+                - generic [ref=e381]:
+                  - text: 58+
+                  - paragraph [ref=e382]: YEARS OF OPERATION
+                - generic [ref=e383]: Trading Since 1968
+              - generic [ref=e384]:
+                - generic [ref=e385]: METRIC 02
+                - generic [ref=e386]:
+                  - text: "26"
+                  - paragraph [ref=e387]: DEALERSHIP OUTLETS
+                - generic [ref=e388]: Across J&K Region
+              - generic [ref=e389]:
+                - generic [ref=e390]: METRIC 03
+                - generic [ref=e391]:
+                  - text: "07"
+                  - paragraph [ref=e392]: ACTIVE VEHICLE MARQUES
+                - generic [ref=e393]: +1 Heritage Marque
+              - generic [ref=e394]:
+                - generic [ref=e395]: METRIC 04
+                - generic [ref=e396]:
+                  - text: "04"
+                  - paragraph [ref=e397]: COMMERCIAL SECTORS
+                - generic [ref=e398]: Auto, Fuel, Real Estate, Retail
+              - generic [ref=e399]:
+                - generic [ref=e400]: METRIC 05
+                - generic [ref=e401]:
+                  - text: "27"
+                  - paragraph [ref=e402]: USED CARS IN STOCK
+                - generic [ref=e403]: Live Certified Inventory
+            - generic [ref=e405]:
+              - generic [ref=e406]:
+                - text: OEM RECOGNITION
+                - heading "17National & Global OEM Awards" [level=3] [ref=e407]
+                - paragraph [ref=e408]: Awards on record from Hyundai Motor India and General Motors India (2006–2019) across Los Angeles, New York, Paris, Lisbon, and Rio de Janeiro.
+              - img "AM Group OEM Award Trophies" [ref=e410]
+          - generic [ref=e412]:
+            - generic [ref=e413]:
+              - generic [ref=e414]: THE NEXT CHAPTER
+              - generic [ref=e415]: EST. 1968
+              - generic [ref=e416]: CONTINUING THE STORY
+            - generic [ref=e417]:
+              - text: FUTURE HORIZON
+              - heading "The Story Is Still Moving." [level=2] [ref=e418]
+              - paragraph [ref=e419]: In 2024, AM Group delivered its broadest expansion since 1968 — adding Kia, MG, and Bajaj franchises in a single year alongside organised retail.
+            - generic [ref=e420]:
+              - link "01 / DISCOVER Discover Browse live certified stock — real photos, recorded odometer readings. ACCESS →" [ref=e421] [cursor=pointer]:
+                - /url: /inventory
+                - generic [ref=e422]:
+                  - generic [ref=e423]:
+                    - generic [ref=e424]: 01 / DISCOVER
+                    - heading "Discover" [level=3] [ref=e425]
+                    - paragraph [ref=e426]: Browse live certified stock — real photos, recorded odometer readings.
+                  - generic [ref=e427]:
+                    - generic [ref=e428]: ACCESS
+                    - generic [ref=e429]: →
+              - link "02 / BUY Buy New across 7 current franchises, or certified pre-owned held in Jammu. ACCESS →" [ref=e430] [cursor=pointer]:
+                - /url: /used-cars/jammu
+                - generic [ref=e431]:
+                  - generic [ref=e432]:
+                    - generic [ref=e433]: 02 / BUY
+                    - heading "Buy" [level=3] [ref=e434]
+                    - paragraph [ref=e435]: New across 7 current franchises, or certified pre-owned held in Jammu.
+                  - generic [ref=e436]:
+                    - generic [ref=e437]: ACCESS
+                    - generic [ref=e438]: →
+              - link "03 / FINANCE Finance Bank finance arranged in-house, indicative decisions same day. ACCESS →" [ref=e439] [cursor=pointer]:
+                - /url: /contact
+                - generic [ref=e440]:
+                  - generic [ref=e441]:
+                    - generic [ref=e442]: 03 / FINANCE
+                    - heading "Finance" [level=3] [ref=e443]
+                    - paragraph [ref=e444]: Bank finance arranged in-house, indicative decisions same day.
+                  - generic [ref=e445]:
+                    - generic [ref=e446]: ACCESS
+                    - generic [ref=e447]: →
+              - link "04 / INSURE Insure Motor insurance and renewals handled at the dealership. ACCESS →" [ref=e448] [cursor=pointer]:
+                - /url: /contact
+                - generic [ref=e449]:
+                  - generic [ref=e450]:
+                    - generic [ref=e451]: 04 / INSURE
+                    - heading "Insure" [level=3] [ref=e452]
+                    - paragraph [ref=e453]: Motor insurance and renewals handled at the dealership.
+                  - generic [ref=e454]:
+                    - generic [ref=e455]: ACCESS
+                    - generic [ref=e456]: →
+              - link "05 / SERVICE Service Authorised workshops with genuine parts. ACCESS →" [ref=e457] [cursor=pointer]:
+                - /url: /contact
+                - generic [ref=e458]:
+                  - generic [ref=e459]:
+                    - generic [ref=e460]: 05 / SERVICE
+                    - heading "Service" [level=3] [ref=e461]
+                    - paragraph [ref=e462]: Authorised workshops with genuine parts.
+                  - generic [ref=e463]:
+                    - generic [ref=e464]: ACCESS
+                    - generic [ref=e465]: →
+              - link "06 / EXCHANGE Exchange Part-exchange valued while you wait; the circuit begins again. ACCESS →" [ref=e466] [cursor=pointer]:
+                - /url: /contact
+                - generic [ref=e467]:
+                  - generic [ref=e468]:
+                    - generic [ref=e469]: 06 / EXCHANGE
+                    - heading "Exchange" [level=3] [ref=e470]
+                    - paragraph [ref=e471]: Part-exchange valued while you wait; the circuit begins again.
+                  - generic [ref=e472]:
+                    - generic [ref=e473]: ACCESS
+                    - generic [ref=e474]: →
+            - generic [ref=e475]:
+              - link "VISIT A SHOWROOM →" [ref=e476] [cursor=pointer]:
+                - /url: /locations
+              - link "CERTIFIED USED CARS" [ref=e477] [cursor=pointer]:
+                - /url: /inventory
+              - link "info@amgroupind.com" [ref=e478] [cursor=pointer]:
+                - /url: mailto:info@amgroupind.com
+    - contentinfo [ref=e479]:
+      - navigation "The group" [ref=e482]:
+        - heading "The group" [level=3] [ref=e483]
+        - list [ref=e484]:
+          - listitem [ref=e485]:
+            - link "About the group" [ref=e486] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=e487]:
+            - link "Automobile division" [ref=e488] [cursor=pointer]:
+              - /url: /automobile
+          - listitem [ref=e489]:
+            - link "HP & Indian Oil" [ref=e490] [cursor=pointer]:
+              - /url: /hp-indian-oil
+          - listitem [ref=e491]:
+            - link "Real estate" [ref=e492] [cursor=pointer]:
+              - /url: /real-estate
+          - listitem [ref=e493]:
+            - link "S Mega Mart" [ref=e494] [cursor=pointer]:
+              - /url: /s-mega-mart
+          - listitem [ref=e495]:
+            - link "All used cars" [ref=e496] [cursor=pointer]:
+              - /url: /inventory
+          - listitem [ref=e497]:
+            - link "Showrooms & directions" [ref=e498] [cursor=pointer]:
+              - /url: /locations
+          - listitem [ref=e499]:
+            - link "News & updates" [ref=e500] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=e501]:
+            - link "Contact" [ref=e502] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=e504]:
+        - generic [ref=e505]:
+          - link "AM Group — home" [ref=e506] [cursor=pointer]:
+            - /url: /
+            - img "AM Group" [ref=e507]
+          - paragraph [ref=e508]: Est. 1968 · Jammu & Kashmir
+          - generic [ref=e509]:
+            - strong [ref=e510]: AM Group Jammu — AM Business Park
+            - text: AM Business Park, N-H 1 Bye-Pass Road, Jammu, Jammu and Kashmir 180012Open Mon–Sat, 9:30 am – 6:30 pm.
+        - generic [ref=e511]:
+          - heading "Showrooms" [level=3] [ref=e512]
+          - list [ref=e513]:
+            - listitem [ref=e514]:
+              - link "Jammu" [ref=e515] [cursor=pointer]:
+                - /url: /locations/jammu
+            - listitem [ref=e516]:
+              - link "Srinagar" [ref=e517] [cursor=pointer]:
+                - /url: /locations/srinagar
+        - generic [ref=e518]:
+          - link "+91 94191 00000" [ref=e519] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - link "info@amgroupind.com" [ref=e522] [cursor=pointer]:
+            - /url: mailto:info@amgroupind.com
+      - generic [ref=e524]:
+        - paragraph [ref=e525]: © 2026 AM Group Jammu — all rights reserved
+        - generic [ref=e526]:
+          - link "Privacy policy" [ref=e527] [cursor=pointer]:
+            - /url: /privacy-policy
+          - generic [ref=e528]: "|"
+          - link "Terms" [ref=e529] [cursor=pointer]:
+            - /url: /terms
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=e535] [cursor=pointer]

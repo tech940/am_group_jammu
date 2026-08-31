@@ -1,0 +1,706 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - banner [ref=f1e3]:
+      - generic [ref=f1e4]:
+        - link "AM Group — home" [ref=f1e5] [cursor=pointer]:
+          - /url: /
+          - img "AM Group" [ref=f1e6]
+          - generic [ref=f1e7]: Est. 1968Jammu & Kashmir
+        - navigation "Primary" [ref=f1e8]:
+          - link "About" [ref=f1e9] [cursor=pointer]:
+            - /url: /about
+          - button "Businesses" [ref=f1e11]
+          - link "Used Cars" [ref=f1e12] [cursor=pointer]:
+            - /url: /inventory
+          - link "Locations" [ref=f1e13] [cursor=pointer]:
+            - /url: /locations
+          - link "News" [ref=f1e14] [cursor=pointer]:
+            - /url: /blog
+          - link "Contact" [ref=f1e15] [cursor=pointer]:
+            - /url: /contact
+          - link "+91 94191 00000" [ref=f1e16] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - button "Book test drive" [ref=f1e19]
+    - main [ref=f1e20]:
+      - region [ref=f1e21]:
+        - generic [ref=f1e26]:
+          - generic [ref=f1e27]:
+            - generic [ref=f1e28]:
+              - paragraph [ref=f1e29]: Jammu & Kashmir · since 1968
+              - heading "58 years. 26 outlets. 4 divisions." [level=1] [ref=f1e31]: 58 years.26 outlets.4 divisions.
+              - paragraph [ref=f1e32]: AM Group opened a Hindustan Petroleum forecourt in Jammu in 1968. It now runs seven vehicle franchises, fuel stations, property and retail across the union territory — and publishes the numbers behind all of it.
+              - generic [ref=f1e33]:
+                - link "Browse 29 used cars" [ref=f1e34] [cursor=pointer]:
+                  - /url: /inventory
+                - link "Call +91 94191 00000" [ref=f1e35] [cursor=pointer]:
+                  - /url: tel:+919419100000
+                - link "WhatsApp" [ref=f1e36] [cursor=pointer]:
+                  - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I%20found%20you%20through%20your%20website.%20Can%20you%20help%20me%20with%20a%20car%3F
+            - paragraph [ref=f1e38]: AM Kia, Jammu — appointed 2024, the group's newest passenger-car franchise.
+          - generic [ref=f1e39]:
+            - generic [ref=f1e40]:
+              - term [ref=f1e41]: Founded
+              - definition [ref=f1e42]: "1968"
+              - definition [ref=f1e43]: Hindustan Petroleum, Jammu
+            - generic [ref=f1e44]:
+              - term [ref=f1e45]: Current franchises
+              - definition [ref=f1e46]: "7"
+              - definition [ref=f1e47]: plus Chevrolet, held 2004–2017
+            - generic [ref=f1e48]:
+              - term [ref=f1e49]: Cities served
+              - definition [ref=f1e50]: "4"
+              - definition [ref=f1e51]: Jammu · Srinagar · Udhampur · Kathua
+            - generic [ref=f1e52]:
+              - term [ref=f1e53]: Used cars in stock
+              - definition [ref=f1e54]: "29"
+              - definition [ref=f1e55]: certified, held in Jammu
+      - region [ref=f1e56]:
+        - generic [ref=f1e57]:
+          - generic [ref=f1e58]:
+            - generic [ref=f1e59]:
+              - paragraph [ref=f1e60]: Our businesses
+              - heading "Four divisions, one company" [level=2] [ref=f1e62]
+            - paragraph [ref=f1e63]: Fuel first, cars second, then property and retail. Each division is a separate operating business with its own sites, staff and appointments.
+          - generic [ref=f1e64]:
+            - article [ref=f1e65]:
+              - figure "AM Tata, Jammu" [ref=f1e66]:
+                - img "The AM Tata Motors showroom in Jammu with new cars lined up on the forecourt" [ref=f1e68]
+              - generic [ref=f1e70]:
+                - heading "Automobile" [level=3] [ref=f1e71]
+                - generic [ref=f1e72]: Since 2004
+              - paragraph [ref=f1e73]: Seven current vehicle franchises across passenger cars and two-wheelers — plus Chevrolet, held 2004–2017 and still serviced — with sales, authorised service and certified pre-owned stock.
+              - link "The automobile division" [ref=f1e74] [cursor=pointer]:
+                - /url: /automobile
+            - list [ref=f1e78]:
+              - listitem [ref=f1e79]:
+                - 'link "Petroleum Since 1968 Where the group began: Hindustan Petroleum and Indian Oil stations serving the region''s fuel demand since 1968." [ref=f1e80] [cursor=pointer]':
+                  - /url: /hp-indian-oil
+                  - generic [ref=f1e82]:
+                    - generic [ref=f1e83]:
+                      - generic [ref=f1e84]: Petroleum
+                      - generic [ref=f1e85]: Since 1968
+                    - generic [ref=f1e86]: "Where the group began: Hindustan Petroleum and Indian Oil stations serving the region's fuel demand since 1968."
+              - listitem [ref=f1e87]:
+                - link "Real Estate Since c. 2000 Commercial and residential development, including AM Business Park on the N-H 1 Bye-Pass — the group's own flagship address." [ref=f1e88] [cursor=pointer]:
+                  - /url: /real-estate
+                  - generic [ref=f1e90]:
+                    - generic [ref=f1e91]:
+                      - generic [ref=f1e92]: Real Estate
+                      - generic [ref=f1e93]: Since c. 2000
+                    - generic [ref=f1e94]: Commercial and residential development, including AM Business Park on the N-H 1 Bye-Pass — the group's own flagship address.
+              - listitem [ref=f1e95]:
+                - link "Retail Since 2025 S Mega Mart brings organised retail to the valley — the group's newest business and its first outside automotive and energy." [ref=f1e96] [cursor=pointer]:
+                  - /url: /s-mega-mart
+                  - generic [ref=f1e98]:
+                    - generic [ref=f1e99]:
+                      - generic [ref=f1e100]: Retail
+                      - generic [ref=f1e101]: Since 2025
+                    - generic [ref=f1e102]: S Mega Mart brings organised retail to the valley — the group's newest business and its first outside automotive and energy.
+      - region [ref=f1e103]:
+        - generic [ref=f1e104]:
+          - generic [ref=f1e105]:
+            - generic [ref=f1e106]:
+              - paragraph [ref=f1e107]: Franchise register
+              - heading "Seven marques, every appointment dated" [level=2] [ref=f1e109]
+            - paragraph [ref=f1e110]: Four passenger-car franchises and three two-wheeler franchises, held under six trading entities across Jammu and Srinagar.
+          - generic [ref=f1e111]:
+            - generic [ref=f1e112]:
+              - table [ref=f1e113]:
+                - caption [ref=f1e114]: AM Group vehicle franchises, trading entity, product type and year of appointment.
+                - rowgroup [ref=f1e115]:
+                  - row [ref=f1e116]:
+                    - columnheader "Marque" [ref=f1e117]
+                    - columnheader "Type" [ref=f1e118]
+                    - columnheader "Appointed" [ref=f1e119]
+                - rowgroup [ref=f1e120]:
+                  - row [ref=f1e121]:
+                    - rowheader "Hyundai AM Hyundai" [ref=f1e122]:
+                      - generic [ref=f1e123]: Hyundai
+                      - generic [ref=f1e124]: AM Hyundai
+                    - cell "Passenger cars" [ref=f1e125]
+                    - cell "2008" [ref=f1e126]
+                  - row [ref=f1e127]:
+                    - rowheader "Tata Motors AM Tata" [ref=f1e128]:
+                      - generic [ref=f1e129]: Tata Motors
+                      - generic [ref=f1e130]: AM Tata
+                    - cell "Passenger cars" [ref=f1e131]
+                    - cell "2017" [ref=f1e132]
+                  - row [ref=f1e133]:
+                    - rowheader "Kia AM Kia" [ref=f1e134]:
+                      - generic [ref=f1e135]: Kia
+                      - generic [ref=f1e136]: AM Kia
+                    - cell "Passenger cars" [ref=f1e137]
+                    - cell "2024" [ref=f1e138]
+                  - row [ref=f1e139]:
+                    - rowheader "MG AMG Autocraft" [ref=f1e140]:
+                      - generic [ref=f1e141]: MG
+                      - generic [ref=f1e142]: AMG Autocraft
+                    - cell "Passenger cars" [ref=f1e143]
+                    - cell "2024" [ref=f1e144]
+                  - row [ref=f1e145]:
+                    - rowheader "Honda Diamond Honda" [ref=f1e146]:
+                      - generic [ref=f1e147]: Honda
+                      - generic [ref=f1e148]: Diamond Honda
+                    - cell "Two-wheelers" [ref=f1e149]
+                    - cell "2010" [ref=f1e150]
+                  - row [ref=f1e151]:
+                    - rowheader "KTM KTM Jammu" [ref=f1e152]:
+                      - generic [ref=f1e153]: KTM
+                      - generic [ref=f1e154]: KTM Jammu
+                    - cell "Two-wheelers" [ref=f1e155]
+                    - cell "2012" [ref=f1e156]
+                  - row [ref=f1e157]:
+                    - rowheader "Bajaj AM Bajaj" [ref=f1e158]:
+                      - generic [ref=f1e159]: Bajaj
+                      - generic [ref=f1e160]: AM Bajaj
+                    - cell "Two-wheelers" [ref=f1e161]
+                    - cell "2024" [ref=f1e162]
+                  - row [ref=f1e163]:
+                    - rowheader "Chevrolet 2004 – 2017 · service honoured" [ref=f1e164]:
+                      - generic [ref=f1e165]: Chevrolet
+                      - generic [ref=f1e166]: 2004 – 2017 · service honoured
+                    - cell "Ended 2017" [ref=f1e167]
+                    - cell "2004" [ref=f1e168]
+              - paragraph [ref=f1e169]: Chevrolet is listed because AM Group held the franchise from 2004 until General Motors left India in 2017, and still honours service on those cars. It is not a current appointment.
+            - generic [ref=f1e170]:
+              - figure "AM Hyundai, Jammu — appointed 2008, the group's largest car business." [ref=f1e171]:
+                - img "The AM Hyundai flagship showroom building in Jammu" [ref=f1e173]
+              - link "All showrooms and workshops" [ref=f1e175] [cursor=pointer]:
+                - /url: /automobile
+      - region [ref=f1e178]:
+        - generic [ref=f1e179]:
+          - generic [ref=f1e180]:
+            - generic [ref=f1e181]:
+              - paragraph [ref=f1e182]: In stock now
+              - heading "29 certified used cars" [level=2] [ref=f1e184]
+            - paragraph [ref=f1e185]: Every car below is physically at the Jammu site and can be inspected without an appointment. Photographs and odometer readings are the dealership's own.
+          - generic [ref=f1e186]:
+            - region "Certified used cars currently in stock" [ref=f1e187]:
+              - generic [ref=f1e189]:
+                - generic [ref=f1e190]:
+                  - link [ref=f1e191] [cursor=pointer]:
+                    - /url: /inventory/hyundai-exter-2025-5161
+                    - img "Hyundai EXTER" [ref=f1e192]
+                  - generic [ref=f1e193]:
+                    - button "Previous photo" [ref=f1e194] [cursor=pointer]
+                    - button "Next photo" [ref=f1e197] [cursor=pointer]
+                  - generic [ref=f1e209]:
+                    - generic [ref=f1e210]: Certified Used
+                    - generic [ref=f1e211]: 29% off
+                  - generic [ref=f1e212]: 8 photos
+                - generic [ref=f1e214]:
+                  - generic [ref=f1e215]:
+                    - generic [ref=f1e216]:
+                      - paragraph [ref=f1e217]: 2025 • Hyundai
+                      - link "View 2025 Hyundai EXTER" [ref=f1e218] [cursor=pointer]:
+                        - /url: /inventory/hyundai-exter-2025-5161
+                        - heading "2025 Hyundai EXTER" [level=3] [ref=f1e219]
+                    - generic [ref=f1e220]:
+                      - paragraph [ref=f1e221]: Asking Price
+                      - paragraph [ref=f1e222]: ₹7,80,000
+                      - paragraph [ref=f1e223]: ₹11,00,000
+                  - generic [ref=f1e224]:
+                    - generic [ref=f1e225]: "2025"
+                    - generic [ref=f1e226]: 18,000 km
+                    - generic [ref=f1e227]: Gasoline
+                    - generic [ref=f1e228]: Manual
+                  - generic [ref=f1e230]:
+                    - link "View Details" [ref=f1e231] [cursor=pointer]:
+                      - /url: /inventory/hyundai-exter-2025-5161
+                    - button "Enquire Now" [ref=f1e232] [cursor=pointer]
+              - generic [ref=f1e234]:
+                - generic [ref=f1e235]:
+                  - link [ref=f1e236] [cursor=pointer]:
+                    - /url: /inventory/mahindra-xuv-700-2024-5116
+                    - img "MAHINDRA XUV 700" [ref=f1e237]
+                  - generic [ref=f1e238]:
+                    - button "Previous photo" [ref=f1e239] [cursor=pointer]
+                    - button "Next photo" [ref=f1e242] [cursor=pointer]
+                  - generic [ref=f1e254]:
+                    - generic [ref=f1e255]: Used Cars
+                    - generic [ref=f1e256]: 14% off
+                  - generic [ref=f1e257]: SUV
+                  - generic [ref=f1e259]: 9 photos
+                - generic [ref=f1e261]:
+                  - generic [ref=f1e262]:
+                    - generic [ref=f1e263]:
+                      - paragraph [ref=f1e264]: 2024 • MAHINDRA
+                      - link "View 2024 MAHINDRA XUV 700" [ref=f1e265] [cursor=pointer]:
+                        - /url: /inventory/mahindra-xuv-700-2024-5116
+                        - heading "2024 MAHINDRA XUV 700" [level=3] [ref=f1e266]
+                    - generic [ref=f1e267]:
+                      - paragraph [ref=f1e268]: Asking Price
+                      - paragraph [ref=f1e269]: ₹19,00,000
+                      - paragraph [ref=f1e270]: ₹22,00,000
+                  - generic [ref=f1e271]:
+                    - generic [ref=f1e272]: "2024"
+                    - generic [ref=f1e273]: 36,684 km
+                    - generic [ref=f1e274]: Diesel
+                    - generic [ref=f1e275]: Manual
+                  - generic [ref=f1e277]:
+                    - link "View Details" [ref=f1e278] [cursor=pointer]:
+                      - /url: /inventory/mahindra-xuv-700-2024-5116
+                    - button "Enquire Now" [ref=f1e279] [cursor=pointer]
+              - generic [ref=f1e281]:
+                - generic [ref=f1e282]:
+                  - link [ref=f1e283] [cursor=pointer]:
+                    - /url: /inventory/hyundai-alcazar-2022-5099
+                    - img "Hyundai ALCAZAR" [ref=f1e284]
+                  - generic [ref=f1e285]:
+                    - button "Previous photo" [ref=f1e286] [cursor=pointer]
+                    - button "Next photo" [ref=f1e289] [cursor=pointer]
+                  - generic [ref=f1e301]:
+                    - generic [ref=f1e302]: Certified Used
+                    - generic [ref=f1e303]: 52% off
+                  - generic [ref=f1e304]: Premium SUV
+                  - generic [ref=f1e306]: 9 photos
+                - generic [ref=f1e308]:
+                  - generic [ref=f1e309]:
+                    - generic [ref=f1e310]:
+                      - paragraph [ref=f1e311]: 2022 • Hyundai
+                      - link "View 2022 Hyundai ALCAZAR" [ref=f1e312] [cursor=pointer]:
+                        - /url: /inventory/hyundai-alcazar-2022-5099
+                        - heading "2022 Hyundai ALCAZAR" [level=3] [ref=f1e313]
+                    - generic [ref=f1e314]:
+                      - paragraph [ref=f1e315]: Asking Price
+                      - paragraph [ref=f1e316]: ₹9,20,000
+                      - paragraph [ref=f1e317]: ₹19,00,000
+                  - generic [ref=f1e318]:
+                    - generic [ref=f1e319]: "2022"
+                    - generic [ref=f1e320]: 94,000 km
+                    - generic [ref=f1e321]: Gasoline
+                    - generic [ref=f1e322]: Manual
+                  - generic [ref=f1e324]:
+                    - link "View Details" [ref=f1e325] [cursor=pointer]:
+                      - /url: /inventory/hyundai-alcazar-2022-5099
+                    - button "Enquire Now" [ref=f1e326] [cursor=pointer]
+              - generic [ref=f1e328]:
+                - generic [ref=f1e329]:
+                  - link [ref=f1e330] [cursor=pointer]:
+                    - /url: /inventory/maruti-suzuki-alto-k10-vxi-2015-5087
+                    - img "MARUTI SUZUKI ALTO K10 VXI" [ref=f1e331]
+                  - generic [ref=f1e332]:
+                    - button "Previous photo" [ref=f1e333] [cursor=pointer]
+                    - button "Next photo" [ref=f1e336] [cursor=pointer]
+                  - generic [ref=f1e346]:
+                    - generic [ref=f1e347]: Used Cars
+                    - generic [ref=f1e348]: 48% off
+                  - generic [ref=f1e349]: Hatchback
+                  - generic [ref=f1e351]: 6 photos
+                - generic [ref=f1e353]:
+                  - generic [ref=f1e354]:
+                    - generic [ref=f1e355]:
+                      - paragraph [ref=f1e356]: 2015 • MARUTI SUZUKI
+                      - link "View 2015 MARUTI SUZUKI ALTO K10 VXI" [ref=f1e357] [cursor=pointer]:
+                        - /url: /inventory/maruti-suzuki-alto-k10-vxi-2015-5087
+                        - heading "2015 MARUTI SUZUKI ALTO K10 VXI" [level=3] [ref=f1e358]
+                    - generic [ref=f1e359]:
+                      - paragraph [ref=f1e360]: Asking Price
+                      - paragraph [ref=f1e361]: ₹2,60,000
+                      - paragraph [ref=f1e362]: ₹5,00,000
+                  - generic [ref=f1e363]:
+                    - generic [ref=f1e364]: "2015"
+                    - generic [ref=f1e365]: 57,278 km
+                    - generic [ref=f1e366]: Gasoline
+                    - generic [ref=f1e367]: Manual
+                  - generic [ref=f1e369]:
+                    - link "View Details" [ref=f1e370] [cursor=pointer]:
+                      - /url: /inventory/maruti-suzuki-alto-k10-vxi-2015-5087
+                    - button "Enquire Now" [ref=f1e371] [cursor=pointer]
+              - generic [ref=f1e373]:
+                - generic [ref=f1e374]:
+                  - link [ref=f1e375] [cursor=pointer]:
+                    - /url: /inventory/hyundai-exter-2024-5074
+                    - img "Hyundai EXTER" [ref=f1e376]
+                  - generic [ref=f1e377]:
+                    - button "Previous photo" [ref=f1e378] [cursor=pointer]
+                    - button "Next photo" [ref=f1e381] [cursor=pointer]
+                  - generic [ref=f1e393]:
+                    - generic [ref=f1e394]: Certified Used
+                    - generic [ref=f1e395]: 23% off
+                  - generic [ref=f1e396]: Compact SUV
+                  - generic [ref=f1e398]: 9 photos
+                - generic [ref=f1e400]:
+                  - generic [ref=f1e401]:
+                    - generic [ref=f1e402]:
+                      - paragraph [ref=f1e403]: 2024 • Hyundai
+                      - link "View 2024 Hyundai EXTER" [ref=f1e404] [cursor=pointer]:
+                        - /url: /inventory/hyundai-exter-2024-5074
+                        - heading "2024 Hyundai EXTER" [level=3] [ref=f1e405]
+                    - generic [ref=f1e406]:
+                      - paragraph [ref=f1e407]: Asking Price
+                      - paragraph [ref=f1e408]: ₹5,77,500
+                      - paragraph [ref=f1e409]: ₹7,50,000
+                  - generic [ref=f1e410]:
+                    - generic [ref=f1e411]: "2024"
+                    - generic [ref=f1e412]: 7,704 km
+                    - generic [ref=f1e413]: Gasoline
+                    - generic [ref=f1e414]: Manual
+                  - generic [ref=f1e416]:
+                    - link "View Details" [ref=f1e417] [cursor=pointer]:
+                      - /url: /inventory/hyundai-exter-2024-5074
+                    - button "Enquire Now" [ref=f1e418] [cursor=pointer]
+              - generic [ref=f1e420]:
+                - generic [ref=f1e421]:
+                  - link [ref=f1e422] [cursor=pointer]:
+                    - /url: /inventory/hyundai-i20-2022-5060
+                    - img "Hyundai i20" [ref=f1e423]
+                  - generic [ref=f1e424]:
+                    - button "Previous photo" [ref=f1e425] [cursor=pointer]
+                    - button "Next photo" [ref=f1e428] [cursor=pointer]
+                  - generic [ref=f1e440]: Certified Used
+                  - generic [ref=f1e442]: Hatchback
+                  - generic [ref=f1e444]: 11 photos
+                - generic [ref=f1e446]:
+                  - generic [ref=f1e447]:
+                    - generic [ref=f1e448]:
+                      - paragraph [ref=f1e449]: 2022 • Hyundai
+                      - link "View 2022 Hyundai i20" [ref=f1e450] [cursor=pointer]:
+                        - /url: /inventory/hyundai-i20-2022-5060
+                        - heading "2022 Hyundai i20" [level=3] [ref=f1e451]
+                    - generic [ref=f1e452]:
+                      - paragraph [ref=f1e453]: Asking Price
+                      - paragraph [ref=f1e454]: ₹5,10,000
+                      - paragraph [ref=f1e455]: ₹85,00,000
+                  - generic [ref=f1e456]:
+                    - generic [ref=f1e457]: "2022"
+                    - generic [ref=f1e458]: 27,601 km
+                    - generic [ref=f1e459]: Gasoline
+                    - generic [ref=f1e460]: Manual
+                  - generic [ref=f1e462]:
+                    - link "View Details" [ref=f1e463] [cursor=pointer]:
+                      - /url: /inventory/hyundai-i20-2022-5060
+                    - button "Enquire Now" [ref=f1e464] [cursor=pointer]
+              - generic [ref=f1e466]:
+                - generic [ref=f1e467]:
+                  - link [ref=f1e468] [cursor=pointer]:
+                    - /url: /inventory/hyundai-i20-2023-5045
+                    - img "Hyundai i20" [ref=f1e469]
+                  - generic [ref=f1e470]:
+                    - button "Previous photo" [ref=f1e471] [cursor=pointer]
+                    - button "Next photo" [ref=f1e474] [cursor=pointer]
+                  - generic [ref=f1e486]:
+                    - generic [ref=f1e487]: Certified Used
+                    - generic [ref=f1e488]: 45% off
+                  - generic [ref=f1e489]: Premium Hatchback
+                  - generic [ref=f1e491]: 10 photos
+                - generic [ref=f1e493]:
+                  - generic [ref=f1e494]:
+                    - generic [ref=f1e495]:
+                      - paragraph [ref=f1e496]: 2023 • Hyundai
+                      - link "View 2023 Hyundai i20" [ref=f1e497] [cursor=pointer]:
+                        - /url: /inventory/hyundai-i20-2023-5045
+                        - heading "2023 Hyundai i20" [level=3] [ref=f1e498]
+                    - generic [ref=f1e499]:
+                      - paragraph [ref=f1e500]: Asking Price
+                      - paragraph [ref=f1e501]: ₹6,00,000
+                      - paragraph [ref=f1e502]: ₹11,00,000
+                  - generic [ref=f1e503]:
+                    - generic [ref=f1e504]: "2023"
+                    - generic [ref=f1e505]: 18,224 km
+                    - generic [ref=f1e506]: Gasoline
+                    - generic [ref=f1e507]: Manual
+                  - generic [ref=f1e509]:
+                    - link "View Details" [ref=f1e510] [cursor=pointer]:
+                      - /url: /inventory/hyundai-i20-2023-5045
+                    - button "Enquire Now" [ref=f1e511] [cursor=pointer]
+              - generic [ref=f1e513]:
+                - generic [ref=f1e514]:
+                  - link [ref=f1e515] [cursor=pointer]:
+                    - /url: /inventory/kia-sonet-2025-5026
+                    - img "Kia SONET" [ref=f1e516]
+                  - generic [ref=f1e517]:
+                    - button "Previous photo" [ref=f1e518] [cursor=pointer]
+                    - button "Next photo" [ref=f1e521] [cursor=pointer]
+                  - generic [ref=f1e533]:
+                    - generic [ref=f1e534]: Certified Used
+                    - generic [ref=f1e535]: 16% off
+                  - generic [ref=f1e536]: Compact SUV
+                  - generic [ref=f1e538]: 12 photos
+                - generic [ref=f1e540]:
+                  - generic [ref=f1e541]:
+                    - generic [ref=f1e542]:
+                      - paragraph [ref=f1e543]: 2025 • Kia
+                      - link "View 2025 Kia SONET" [ref=f1e544] [cursor=pointer]:
+                        - /url: /inventory/kia-sonet-2025-5026
+                        - heading "2025 Kia SONET" [level=3] [ref=f1e545]
+                    - generic [ref=f1e546]:
+                      - paragraph [ref=f1e547]: Asking Price
+                      - paragraph [ref=f1e548]: ₹9,20,000
+                      - paragraph [ref=f1e549]: ₹11,00,000
+                  - generic [ref=f1e550]:
+                    - generic [ref=f1e551]: "2025"
+                    - generic [ref=f1e552]: 8,701 km
+                    - generic [ref=f1e553]: Gasoline
+                    - generic [ref=f1e554]: Manual
+                  - generic [ref=f1e556]:
+                    - link "View Details" [ref=f1e557] [cursor=pointer]:
+                      - /url: /inventory/kia-sonet-2025-5026
+                    - button "Enquire Now" [ref=f1e558] [cursor=pointer]
+            - generic [ref=f1e559]:
+              - link "See all 29 cars" [ref=f1e560] [cursor=pointer]:
+                - /url: /inventory
+              - link "Used cars in Jammu" [ref=f1e561] [cursor=pointer]:
+                - /url: /used-cars/jammu
+      - region [ref=f1e562]:
+        - generic [ref=f1e567]:
+          - generic [ref=f1e568]:
+            - generic [ref=f1e569]:
+              - paragraph [ref=f1e570]: The record
+              - heading "Dated, placed, checkable" [level=2] [ref=f1e572]
+            - paragraph [ref=f1e573]: Eight franchise appointments between 1968 and 2024, and the manufacturer awards that came with them — each with the year and the city it was given in.
+          - generic [ref=f1e574]:
+            - generic [ref=f1e575]:
+              - heading "Appointments" [level=3] [ref=f1e576]
+              - list [ref=f1e577]:
+                - listitem [ref=f1e578]:
+                  - generic [ref=f1e579]: "1968"
+                  - generic [ref=f1e581]:
+                    - generic [ref=f1e582]: Hindustan Petroleum
+                    - generic [ref=f1e583]: The group begins with HPCL gas stations and kerosene distribution in Jammu.
+                - listitem [ref=f1e584]:
+                  - generic [ref=f1e585]: "1977"
+                  - generic [ref=f1e587]:
+                    - generic [ref=f1e588]: Indian Oil
+                    - generic [ref=f1e589]: IOCL dealership extends the petroleum business across the region.
+                - listitem [ref=f1e590]:
+                  - generic [ref=f1e591]: "2004"
+                  - generic [ref=f1e593]:
+                    - generic [ref=f1e594]: Chevrolet
+                    - generic [ref=f1e595]: First passenger-car franchise; GM awards follow from 2006.
+                - listitem [ref=f1e596]:
+                  - generic [ref=f1e597]: "2008"
+                  - generic [ref=f1e599]:
+                    - generic [ref=f1e600]: Hyundai
+                    - generic [ref=f1e601]: AM Hyundai opens — the group's largest car business to this day.
+                - listitem [ref=f1e602]:
+                  - generic [ref=f1e603]: "2010"
+                  - generic [ref=f1e605]:
+                    - generic [ref=f1e606]: Honda 2-Wheelers
+                    - generic [ref=f1e607]: Diamond Honda brings the group into two-wheelers.
+                - listitem [ref=f1e608]:
+                  - generic [ref=f1e609]: "2012"
+                  - generic [ref=f1e611]:
+                    - generic [ref=f1e612]: KTM
+                    - generic [ref=f1e613]: The only KTM showroom in Jammu.
+                - listitem [ref=f1e614]:
+                  - generic [ref=f1e615]: "2017"
+                  - generic [ref=f1e617]:
+                    - generic [ref=f1e618]: Tata Motors
+                    - generic [ref=f1e619]: AM Tata adds India's home-grown passenger range.
+                - listitem [ref=f1e620]:
+                  - generic [ref=f1e621]: "2024"
+                  - generic [ref=f1e623]:
+                    - generic [ref=f1e624]: Bajaj · Kia · MG
+                    - generic [ref=f1e625]: Three franchises in one year — the group's broadest expansion since 1968.
+            - generic [ref=f1e626]:
+              - heading "Manufacturer awards" [level=3] [ref=f1e627]
+              - list [ref=f1e628]:
+                - listitem [ref=f1e629]:
+                  - generic [ref=f1e630]:
+                    - generic [ref=f1e631]: Best Seller of the Half Year
+                    - generic [ref=f1e632]: Hyundai · Los Angeles, USA
+                  - generic [ref=f1e633]: "2009"
+                - listitem [ref=f1e634]:
+                  - generic [ref=f1e635]:
+                    - generic [ref=f1e636]: Best Seller Award
+                    - generic [ref=f1e637]: Hyundai · Ho Chi Minh City, Vietnam
+                  - generic [ref=f1e638]: "2010"
+                - listitem [ref=f1e639]:
+                  - generic [ref=f1e640]:
+                    - generic [ref=f1e641]: Best Seller Award
+                    - generic [ref=f1e642]: Hyundai · Auckland, New Zealand
+                  - generic [ref=f1e643]: "2010"
+                - listitem [ref=f1e644]:
+                  - generic [ref=f1e645]:
+                    - generic [ref=f1e646]: Best Seller Award
+                    - generic [ref=f1e647]: Hyundai · Paris, France
+                  - generic [ref=f1e648]: "2011"
+                - listitem [ref=f1e649]:
+                  - generic [ref=f1e650]:
+                    - generic [ref=f1e651]: Best Seller Award
+                    - generic [ref=f1e652]: Hyundai · New York, USA
+                  - generic [ref=f1e653]: "2012"
+                - listitem [ref=f1e654]:
+                  - generic [ref=f1e655]:
+                    - generic [ref=f1e656]: Business Performance Award — i20
+                    - generic [ref=f1e657]: Hyundai · Lisbon, Portugal
+                  - generic [ref=f1e658]: "2018"
+                - listitem [ref=f1e659]:
+                  - generic [ref=f1e660]:
+                    - generic [ref=f1e661]: Business Performance Award — i20
+                    - generic [ref=f1e662]: Hyundai · Rio de Janeiro, Brazil
+                  - generic [ref=f1e663]: "2019"
+                - listitem [ref=f1e664]:
+                  - generic [ref=f1e665]:
+                    - generic [ref=f1e666]: Customer Satisfaction Award
+                    - generic [ref=f1e667]: Chevrolet · GM Office
+                  - generic [ref=f1e668]: "2006"
+                - listitem [ref=f1e669]:
+                  - generic [ref=f1e670]:
+                    - generic [ref=f1e671]: Sales & Achievement Award
+                    - generic [ref=f1e672]: Chevrolet · Zone Level
+                  - generic [ref=f1e673]: "2010"
+              - link "The full award register" [ref=f1e674] [cursor=pointer]:
+                - /url: /about
+      - region [ref=f1e677]:
+        - generic [ref=f1e678]:
+          - generic [ref=f1e679]:
+            - generic [ref=f1e680]:
+              - paragraph [ref=f1e681]: Customer reviews
+              - heading "What buyers actually wrote" [level=2] [ref=f1e683]
+            - paragraph [ref=f1e684]: Published reviews from Google, quoted in full and attributed. Nothing here is edited for length or written in-house.
+          - generic [ref=f1e685]:
+            - figure "Akash Suri·Local Guide · AM Hyundai Jammu·3 months ago" [ref=f1e686]:
+              - blockquote [ref=f1e687]:
+                - paragraph [ref=f1e688]: “I had an excellent experience working with my sales advisors Rahida and Sheetal. They took the time to understand my preferences, explained all available options clearly, and ensured I felt confident in my purchase decision.”
+            - generic [ref=f1e690]:
+              - figure "Junaid Ahmad·AM Hyundai Jammu·7 months ago" [ref=f1e691]:
+                - blockquote [ref=f1e692]:
+                  - paragraph [ref=f1e693]: “The staff was professional and cooperative, and the overall process was smooth and hassle-free. A special thanks to Shivani Ma'am for her outstanding support, polite behaviour and clear guidance throughout the entire buying journey.”
+              - figure "Abbu Ayad·AM Hyundai Jammu·4 weeks ago" [ref=f1e695]:
+                - blockquote [ref=f1e696]:
+                  - paragraph [ref=f1e697]: “The entire process, from booking to delivery, was smooth and transparent. The sales team was courteous, patient, and answered all my questions regarding the vehicle, insurance, loan and documentation.”
+      - region [ref=f1e699]:
+        - generic [ref=f1e700]:
+          - generic [ref=f1e701]:
+            - generic [ref=f1e702]:
+              - paragraph [ref=f1e703]: Come and see
+              - heading "Two offices, open six days" [level=2] [ref=f1e705]
+            - paragraph [ref=f1e706]: All certified pre-owned stock is held in Jammu and can be inspected without an appointment. Cars can be moved to Srinagar on request — call ahead.
+          - generic [ref=f1e707]:
+            - generic [ref=f1e708]:
+              - heading "Jammu" [level=3] [ref=f1e709]
+              - generic [ref=f1e710]: AM Business Park, N-H 1 Bye-Pass RoadJammu, Jammu and Kashmir 180012Opposite Jammu Railway Station
+              - generic [ref=f1e711]:
+                - generic [ref=f1e712]:
+                  - term [ref=f1e713]: Hours
+                  - definition [ref=f1e714]: Mon–Sat, 9:30 am – 6:30 pm
+                - generic [ref=f1e715]:
+                  - term [ref=f1e716]: Phone
+                  - definition [ref=f1e717]:
+                    - link "+91 94191 00000" [ref=f1e718] [cursor=pointer]:
+                      - /url: tel:+919419100000
+                - generic [ref=f1e719]:
+                  - term [ref=f1e720]: Email
+                  - definition [ref=f1e721]:
+                    - link "info@amgroupind.com" [ref=f1e722] [cursor=pointer]:
+                      - /url: mailto:info@amgroupind.com
+              - paragraph [ref=f1e723]: Our flagship site on the N-H 1 Bye-Pass Road, opposite the railway station. All certified pre-owned stock is held here and can be inspected without an appointment.
+              - generic [ref=f1e724]:
+                - link "Call Jammu" [ref=f1e725] [cursor=pointer]:
+                  - /url: tel:+919419100000
+                - link "WhatsApp" [ref=f1e726] [cursor=pointer]:
+                  - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20visit%20your%20Jammu%20office.%20What%20are%20your%20timings%3F
+                - link "Directions" [ref=f1e727] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=AM+Business+Park+NH+1+Bye+Pass+Road+Jammu+180012
+            - generic [ref=f1e728]:
+              - heading "Srinagar" [level=3] [ref=f1e729]
+              - generic [ref=f1e730]: AM Tower, Hyderpora Bye-PassSrinagar, Jammu and Kashmir 190014Hyderpora Bye-Pass, near the airport road
+              - generic [ref=f1e731]:
+                - generic [ref=f1e732]:
+                  - term [ref=f1e733]: Hours
+                  - definition [ref=f1e734]: Mon–Sat, 9:30 am – 6:30 pm
+                - generic [ref=f1e735]:
+                  - term [ref=f1e736]: Phone
+                  - definition [ref=f1e737]:
+                    - link "+91 94191 00000" [ref=f1e738] [cursor=pointer]:
+                      - /url: tel:+919419100000
+                - generic [ref=f1e739]:
+                  - term [ref=f1e740]: Email
+                  - definition [ref=f1e741]:
+                    - link "info@amgroupind.com" [ref=f1e742] [cursor=pointer]:
+                      - /url: mailto:info@amgroupind.com
+              - paragraph [ref=f1e743]: Our Kashmir Valley office at AM Tower on the Hyderpora Bye-Pass. Cars from the Jammu stock can be brought here for inspection — call ahead so we have the one you want on site.
+              - generic [ref=f1e744]:
+                - link "Call Srinagar" [ref=f1e745] [cursor=pointer]:
+                  - /url: tel:+919419100000
+                - link "WhatsApp" [ref=f1e746] [cursor=pointer]:
+                  - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20visit%20your%20Srinagar%20office.%20What%20are%20your%20timings%3F
+                - link "Directions" [ref=f1e747] [cursor=pointer]:
+                  - /url: https://www.google.com/maps/dir/?api=1&destination=AM+Tower+Hyderpora+Bye+Pass+Srinagar+190014
+          - generic [ref=f1e748]:
+            - button "Send an enquiry" [ref=f1e749] [cursor=pointer]
+            - link "Contact page" [ref=f1e750] [cursor=pointer]:
+              - /url: /contact
+            - link "All branches" [ref=f1e751] [cursor=pointer]:
+              - /url: /locations
+      - region [ref=f1e752]:
+        - generic [ref=f1e759]:
+          - generic [ref=f1e760]:
+            - paragraph [ref=f1e761]: Talk to us
+            - heading "Someone answers the phone" [level=2] [ref=f1e763]
+            - paragraph [ref=f1e764]: Mon–Sat, 9:30 am to 6:30 pm, at the Jammu site on the N-H 1 Bye-Pass. No appointment needed to look at the stock.
+          - generic [ref=f1e765]:
+            - link "Call +91 94191 00000" [ref=f1e766] [cursor=pointer]:
+              - /url: tel:+919419100000
+            - link "WhatsApp" [ref=f1e767] [cursor=pointer]:
+              - /url: https://wa.me/919419100000?text=Hi%20AM%20Group%2C%20I'd%20like%20to%20speak%20to%20someone%20about%20a%20car.%20Are%20you%20free%20now%3F
+            - button "Send an enquiry" [ref=f1e768] [cursor=pointer]
+            - link "Find us" [ref=f1e769] [cursor=pointer]:
+              - /url: /locations
+    - contentinfo [ref=f1e770]:
+      - navigation "The group" [ref=f1e773]:
+        - heading "The group" [level=2] [ref=f1e774]
+        - list [ref=f1e775]:
+          - listitem [ref=f1e776]:
+            - link "About the group" [ref=f1e777] [cursor=pointer]:
+              - /url: /about
+          - listitem [ref=f1e778]:
+            - link "Automobile division" [ref=f1e779] [cursor=pointer]:
+              - /url: /automobile
+          - listitem [ref=f1e780]:
+            - link "HP & Indian Oil" [ref=f1e781] [cursor=pointer]:
+              - /url: /hp-indian-oil
+          - listitem [ref=f1e782]:
+            - link "Real estate" [ref=f1e783] [cursor=pointer]:
+              - /url: /real-estate
+          - listitem [ref=f1e784]:
+            - link "S Mega Mart" [ref=f1e785] [cursor=pointer]:
+              - /url: /s-mega-mart
+          - listitem [ref=f1e786]:
+            - link "All used cars" [ref=f1e787] [cursor=pointer]:
+              - /url: /inventory
+          - listitem [ref=f1e788]:
+            - link "Showrooms & directions" [ref=f1e789] [cursor=pointer]:
+              - /url: /locations
+          - listitem [ref=f1e790]:
+            - link "News & updates" [ref=f1e791] [cursor=pointer]:
+              - /url: /blog
+          - listitem [ref=f1e792]:
+            - link "Contact" [ref=f1e793] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=f1e795]:
+        - generic [ref=f1e796]:
+          - link "AM Group — home" [ref=f1e797] [cursor=pointer]:
+            - /url: /
+            - img "AM Group" [ref=f1e798]
+          - paragraph [ref=f1e799]: Est. 1968 · Jammu & Kashmir
+          - generic [ref=f1e800]:
+            - strong [ref=f1e801]: AM Group Jammu — AM Business Park
+            - text: AM Business Park, N-H 1 Bye-Pass Road, Jammu, Jammu and Kashmir 180012Open Mon–Sat, 9:30 am – 6:30 pm.
+        - generic [ref=f1e802]:
+          - heading "Showrooms" [level=2] [ref=f1e803]
+          - list [ref=f1e804]:
+            - listitem [ref=f1e805]:
+              - link "Jammu" [ref=f1e806] [cursor=pointer]:
+                - /url: /locations/jammu
+            - listitem [ref=f1e807]:
+              - link "Srinagar" [ref=f1e808] [cursor=pointer]:
+                - /url: /locations/srinagar
+        - generic [ref=f1e809]:
+          - link "+91 94191 00000" [ref=f1e810] [cursor=pointer]:
+            - /url: tel:+919419100000
+          - link "info@amgroupind.com" [ref=f1e813] [cursor=pointer]:
+            - /url: mailto:info@amgroupind.com
+      - generic [ref=f1e815]:
+        - paragraph [ref=f1e816]: © 2026 AM Group Jammu — all rights reserved
+        - generic [ref=f1e817]:
+          - link "Privacy policy" [ref=f1e818] [cursor=pointer]:
+            - /url: /privacy-policy
+          - generic [ref=f1e819]: "|"
+          - link "Terms" [ref=f1e820] [cursor=pointer]:
+            - /url: /terms
+  - region "Notifications (F8)":
+    - list
+  - button "Open Next.js Dev Tools" [ref=f1e826] [cursor=pointer]
