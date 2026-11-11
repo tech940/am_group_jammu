@@ -14,6 +14,8 @@ import {
   updateLead,
 } from './store.ts'
 import { rateLimit, validateLead } from './validation.ts'
+import { sendLeadEmail } from './notify.ts'
+import { PRIMARY_LOCATION } from '../locations.ts'
 import type {
   CreateLeadInput,
   Lead,
@@ -65,9 +67,22 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
 
   const clean = validation.clean
 
+  const vehicle = input.vehicle
+    ? {
+        listingId: input.vehicle.listingId ?? null,
+        title: input.vehicle.title ?? null,
+        price: input.vehicle.price ?? null,
+        url: input.vehicle.url ?? null,
+      }
+    : { listingId: null, title: null, price: null, url: null }
+
+  // An enquiry goes to TWO places — the lead desk and an inbox — and counts as
+  // received if either works. The database used to be the only destination, so
+  // when it was unreachable every enquiry on the site reached nobody.
+  let leadId: string | null = null
   try {
     // Double-click and refresh protection: the same person asking about the
-    // same thing twice in ten minutes is one lead, not two.
+    // same thing twice in ten minutes is one lead, not two — and not two emails.
     const duplicate = await findRecentDuplicate(clean.phone, clean.intent)
     if (duplicate) {
       await addActivity(
@@ -79,30 +94,27 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
       return { ok: true, data: { id: duplicate.id, duplicate: true } }
     }
 
-    const vehicle = input.vehicle
-      ? {
-          listingId: input.vehicle.listingId ?? null,
-          title: input.vehicle.title ?? null,
-          price: input.vehicle.price ?? null,
-          url: input.vehicle.url ?? null,
-        }
-      : { listingId: null, title: null, price: null, url: null }
-
+    // Deliberately NOT calling revalidatePath('/admin') after this. The admin
+    // routes are dynamic, so there is no cache to bust — and revalidating them
+    // from a public visitor's action makes the client follow the proxy's
+    // redirect to /admin/login mid-stream, which aborts the action response.
     const lead = await insertLead({ ...clean, vehicle })
-
-    // Deliberately NOT calling revalidatePath('/admin') here. The admin routes
-    // are dynamic, so there is no cache to bust — and revalidating them from a
-    // public visitor's action makes the client follow the proxy's redirect to
-    // /admin/login mid-stream, which aborts the action response and leaves the
-    // form stuck on "Processing…" even though the lead was saved.
-    return { ok: true, data: { id: lead.id, duplicate: false } }
+    leadId = lead.id
   } catch (err) {
-    console.error('[leads] submit failed', err)
-    return {
-      ok: false,
-      error: 'We could not save your enquiry. Please call us on +91 94191 00000.',
-      code: 'storage',
-    }
+    console.error('[leads] database save failed', err)
+  }
+
+  const mail = await sendLeadEmail({ ...clean, vehicle, leadId })
+
+  if (leadId || mail.sent) {
+    if (!leadId) console.error('[leads] delivered by EMAIL ONLY — the database did not take this lead')
+    return { ok: true, data: { id: leadId ?? 'email-only', duplicate: false } }
+  }
+
+  return {
+    ok: false,
+    error: `We could not send your enquiry. Please call us on ${PRIMARY_LOCATION.phone}.`,
+    code: 'storage',
   }
 }
 
