@@ -18,16 +18,19 @@ import type { InventoryVehicle } from "@/lib/inventory/types"
 export function StockRail({
   vehicles,
   sourceLabel = "stock-rail",
+  label = "Certified used cars currently in stock",
 }: {
   vehicles: InventoryVehicle[]
   sourceLabel?: string
+  /** Names the scroll region. Two rails on one page must not share a name. */
+  label?: string
 }) {
   const onOpen = useEnquiryModal((s) => s.onOpen)
 
   return (
     <div
       role="region"
-      aria-label="Certified used cars currently in stock"
+      aria-label={label}
       tabIndex={0}
       className="no-scrollbar overscroll-x-contain -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 md:-mx-10 md:px-10"
     >

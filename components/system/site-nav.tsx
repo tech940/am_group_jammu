@@ -50,7 +50,10 @@ const ENTRIES: Entry[] = [
 ]
 
 /** Routes whose first viewport is a dark ground, so the header starts transparent. */
-const DARK_HERO_ROUTES = new Set(["/"])
+// Empty since the homepage went light: no route starts with a dark
+// photographic hero any more, so the header is always its filled self and
+// always reserves its 64px. The machinery stays for any future dark opener.
+const DARK_HERO_ROUTES = new Set<string>([])
 
 /**
  * The brand mark. White artwork, transparent ground — never filtered, never

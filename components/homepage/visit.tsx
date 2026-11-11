@@ -1,11 +1,7 @@
 import Link from "next/link"
 import { Band, Head } from "@/components/system/page-kit"
-import {
-  Grain,
-  GridLines,
-  WaveEdge,
-  WaveRibbons,
-} from "@/components/system/backdrops"
+import { RevealGroup, RevealItem } from "@/components/system/reveal"
+import { Grain, GridLines, WaveRibbons } from "@/components/system/backdrops"
 import { EnquireCta } from "@/components/system/enquire-cta"
 import { Button } from "@/components/ui/button"
 import { LOCATIONS, formatHours, whatsappUrl } from "@/lib/locations"
@@ -21,14 +17,11 @@ import { LOCATIONS, formatHours, whatsappUrl } from "@/lib/locations"
 export function Visit() {
   return (
     <Band
-      ground="ground-2"
+      ground="ground"
       labelledBy="visit-title"
       id="visit"
       backdrop={
         <>
-          {/* Flipped, so it is not the same curve as the one on the divisions
-              band further up the page. */}
-          <WaveEdge side="top" ground="text-ground" flip />
           <WaveRibbons id="visit" tone="light" layers={4} strength={0.7} />
           <GridLines cell={80} strength={0.03} fade="top" />
           <Grain />
@@ -42,12 +35,12 @@ export function Visit() {
         lede="All certified pre-owned stock is held in Jammu and can be inspected without an appointment. Cars can be moved to Srinagar on request — call ahead."
       />
 
-      <div className="mt-14 grid grid-cols-1 gap-10 border-t border-line-strong pt-10 md:grid-cols-2 md:gap-14">
+      <RevealGroup className="mt-14 grid grid-cols-1 gap-10 border-t border-line-strong pt-10 md:grid-cols-2 md:gap-14">
         {LOCATIONS.map((location) => {
           const waMessage = `Hi AM Group, I'd like to visit your ${location.city} office. What are your timings?`
 
           return (
-            <div key={location.slug}>
+            <RevealItem key={location.slug}>
               <h3 className="font-display text-h2 uppercase text-ink">
                 {location.shortName}
               </h3>
@@ -125,10 +118,10 @@ export function Visit() {
                   </a>
                 </Button>
               </div>
-            </div>
+            </RevealItem>
           )
         })}
-      </div>
+      </RevealGroup>
 
       {/* Closing path — the form, for anyone who would rather write than call. */}
       <div className="mt-14 flex flex-wrap items-center gap-3 border-t border-line-strong pt-10">

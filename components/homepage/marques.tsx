@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Band, Head, Plate } from "@/components/system/page-kit"
+import { RevealGroup, RevealItem } from "@/components/system/reveal"
 import { Grain, GridLines, WaveRibbons } from "@/components/system/backdrops"
 import { FRANCHISES } from "@/components/home/content"
 import { SUPABASE_MEDIA } from "@/lib/supabase-media"
@@ -60,8 +61,8 @@ export function Marques() {
         lede="Four passenger-car franchises and three two-wheeler franchises, held under six trading entities across Jammu and Srinagar."
       />
 
-      <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
-        <div>
+      <RevealGroup className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1.15fr_1fr] lg:gap-16">
+        <RevealItem>
           <table className="w-full border-collapse text-left">
             <caption className="sr-only">
               AM Group vehicle franchises, trading entity, product type and year of
@@ -133,9 +134,9 @@ export function Marques() {
             General Motors left India in 2017, and still honours service on those cars.
             It is not a current appointment.
           </p>
-        </div>
+        </RevealItem>
 
-        <div>
+        <RevealItem>
           <Plate
             src={SUPABASE_MEDIA.branches["jammu-hyundai"].exterior}
             alt="The AM Hyundai flagship showroom building in Jammu"
@@ -151,8 +152,8 @@ export function Marques() {
             All showrooms and workshops
             <ArrowGlyph />
           </Link>
-        </div>
-      </div>
+        </RevealItem>
+      </RevealGroup>
     </Band>
   )
 }

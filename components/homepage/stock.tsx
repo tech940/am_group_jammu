@@ -17,10 +17,13 @@ import type { InventoryVehicle } from "@/lib/inventory/types"
  */
 export function Stock({
   vehicles,
+  bestValue = [],
   total,
   degraded,
 }: {
   vehicles: InventoryVehicle[]
+  /** Cheapest first. Shown as a second rail when it adds cars the first lacks. */
+  bestValue?: InventoryVehicle[]
   total: number
   degraded: boolean
 }) {
@@ -45,14 +48,31 @@ export function Stock({
       <Head
         id="stock-title"
         label="In stock now"
-        title={available ? `${total} certified used cars` : "Certified used cars"}
+        title={available ? "Latest arrivals" : "Certified used cars"}
         lede="Every car below is physically at the Jammu site and can be inspected without an appointment. Photographs and odometer readings are the dealership's own."
       />
 
       <div className="mt-12">
         {available ? (
           <>
-            <StockRail vehicles={vehicles} sourceLabel="home-stock-rail" />
+            <StockRail
+              vehicles={vehicles}
+              sourceLabel="home-stock-rail"
+              label="Latest used cars in stock"
+            />
+
+            {bestValue.length > 0 && (
+              <div className="mt-14">
+                <h3 className="mb-6 border-b border-line-strong pb-3 font-display text-h3 uppercase text-ink">
+                  Lowest priced today
+                </h3>
+                <StockRail
+                  vehicles={bestValue}
+                  sourceLabel="home-value-rail"
+                  label="Lowest priced used cars in stock"
+                />
+              </div>
+            )}
 
             <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-line pt-8">
               <Button asChild variant="primary" size="lg">

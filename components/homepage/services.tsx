@@ -1,6 +1,7 @@
 import { Band, Head } from "@/components/system/page-kit"
 import { DotMatrix, Grain, RadialWash } from "@/components/system/backdrops"
 import { EnquireCta } from "@/components/system/enquire-cta"
+import { RevealGroup, RevealItem } from "@/components/system/reveal"
 import type { LeadIntent } from "@/lib/leads/types"
 
 /**
@@ -26,23 +27,25 @@ const SERVICES: {
   body: string
   action: string
 }[] = [
+  // Ordered for a used-car buyer: the car they already own comes first,
+  // because a part-exchange is what makes most purchases possible.
+  {
+    intent: "Sell Your Car",
+    title: "Sell or exchange your car",
+    body: "Bring the car to the Jammu site and have it valued while you wait. Payment and RC transfer are handled in-house.",
+    action: "Get a valuation",
+  },
+  {
+    intent: "Finance",
+    title: "Car finance",
+    body: "Bank finance arranged at the dealership desk for any car in stock. Ask for the EMI on the one you like.",
+    action: "Ask about finance",
+  },
   {
     intent: "Insurance",
     title: "Motor insurance",
     body: "New policies and renewals handled at the dealership desk — quotes compared for you, paperwork done on site.",
     action: "Get an insurance quote",
-  },
-  {
-    intent: "Sell Your Car",
-    title: "Sell your car",
-    body: "Bring the car to the Jammu site and have it valued while you wait. Payment and RC transfer are handled in-house.",
-    action: "Get a valuation",
-  },
-  {
-    intent: "Service",
-    title: "Book a service",
-    body: "Authorised workshops with factory-trained technicians and genuine parts, for every marque the group holds.",
-    action: "Book a slot",
   },
 ]
 
@@ -62,14 +65,14 @@ export function Services() {
     >
       <Head
         id="services-title"
-        label="Featured services"
-        title="Three things besides buying"
-        lede="Not everyone arrives shopping for a car. These desks exist in the building, and each button reaches the right one directly."
+        label="Around the purchase"
+        title="Exchange, finance, insure"
+        lede="The three things that usually sit between liking a car and driving it home. Each button reaches the right desk directly."
       />
 
-      <div className="mt-14 grid grid-cols-1 gap-x-12 gap-y-12 border-t border-line-strong pt-10 md:grid-cols-3">
+      <RevealGroup className="mt-14 grid grid-cols-1 gap-x-12 gap-y-12 border-t border-line-strong pt-10 md:grid-cols-3">
         {SERVICES.map((service, i) => (
-          <div key={service.intent} className="flex flex-col">
+          <RevealItem key={service.intent} className="flex flex-col">
             <p className="flex items-baseline gap-4">
               <span className="font-display text-h3 text-ink-2" data-num>
                 {String(i + 1).padStart(2, "0")}
@@ -87,9 +90,9 @@ export function Services() {
                 variant="secondary"
               />
             </div>
-          </div>
+          </RevealItem>
         ))}
-      </div>
+      </RevealGroup>
     </Band>
   )
 }

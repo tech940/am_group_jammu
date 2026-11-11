@@ -161,7 +161,7 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
         <path
           d={ROAD}
           fill="none"
-          stroke="rgb(var(--backdrop-paper) / 0.06)"
+          stroke="rgb(var(--backdrop-ink) / 0.07)"
           strokeWidth={22}
           strokeLinecap="round"
         />
@@ -172,7 +172,7 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
           ref={pathRef}
           d={ROAD}
           fill="none"
-          stroke="rgb(var(--backdrop-bright) / 0.3)"
+          stroke="rgb(var(--backdrop-accent) / 0.5)"
           strokeWidth={1.75}
           strokeDasharray="9 11"
           style={{ pathLength: progress }}
@@ -191,8 +191,8 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
                 y2={stemEnd}
                 stroke={
                   lit
-                    ? "rgb(var(--backdrop-bright) / 0.45)"
-                    : "rgb(var(--backdrop-paper) / 0.16)"
+                    ? "rgb(var(--backdrop-accent) / 0.55)"
+                    : "rgb(var(--backdrop-ink) / 0.18)"
                 }
                 strokeWidth={1}
                 style={{ transition: "stroke var(--duration-2)" }}
@@ -201,11 +201,11 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
                 cx={stop.x}
                 cy={stop.y}
                 r={9}
-                fill="rgb(12 14 18)"
+                fill="rgb(246 247 248)"
                 stroke={
                   lit
-                    ? "rgb(var(--backdrop-bright) / 0.9)"
-                    : "rgb(var(--backdrop-paper) / 0.3)"
+                    ? "rgb(var(--backdrop-accent) / 0.9)"
+                    : "rgb(var(--backdrop-ink) / 0.3)"
                 }
                 strokeWidth={1.75}
                 style={{ transition: "stroke var(--duration-2)" }}
@@ -215,7 +215,7 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
                 cy={stop.y}
                 r={3}
                 fill={
-                  lit ? "rgb(var(--backdrop-bright))" : "rgb(var(--backdrop-paper) / 0.35)"
+                  lit ? "rgb(var(--backdrop-accent))" : "rgb(var(--backdrop-ink) / 0.35)"
                 }
                 style={{ transition: "fill var(--duration-2)" }}
               />
@@ -229,7 +229,7 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
         <text
           x={40}
           y={272}
-          fill="rgb(var(--backdrop-paper) / 0.55)"
+          fill="rgb(var(--backdrop-ink) / 0.55)"
           fontSize={13}
           letterSpacing={1.6}
         >
@@ -239,7 +239,7 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
           x={1392}
           y={306}
           textAnchor="end"
-          fill="rgb(var(--backdrop-paper) / 0.55)"
+          fill="rgb(var(--backdrop-ink) / 0.55)"
           fontSize={13}
           letterSpacing={1.6}
         >
@@ -249,9 +249,9 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
         {/* The car — top view, so rotate stays honest at every heading. */}
         <g ref={carRef}>
           <g transform="translate(-15, -8)">
-            <rect x="2" y="2.5" width="26" height="11" rx="4.5" fill="rgb(var(--backdrop-bright))" />
-            <rect x="17.5" y="4" width="4.5" height="8" rx="1.5" fill="rgb(12 14 18 / 0.55)" />
-            <rect x="6" y="4.5" width="3" height="7" rx="1.2" fill="rgb(12 14 18 / 0.35)" />
+            <rect x="2" y="2.5" width="26" height="11" rx="4.5" fill="rgb(var(--backdrop-accent))" />
+            <rect x="17.5" y="4" width="4.5" height="8" rx="1.5" fill="rgb(246 247 248 / 0.7)" />
+            <rect x="6" y="4.5" width="3" height="7" rx="1.2" fill="rgb(246 247 248 / 0.5)" />
           </g>
         </g>
       </svg>
@@ -286,15 +286,15 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border transition-colors duration-(--duration-2) ${
                       lit
-                        ? "border-accent-bright/60 text-accent-bright"
-                        : "border-line-on-deep text-on-deep-2"
+                        ? "border-accent/60 text-accent"
+                        : "border-line-strong text-ink-2"
                     }`}
                   >
                     <Kind className="h-5 w-5" />
                   </span>
                   <span
                     className={`font-display text-h3 transition-colors duration-(--duration-2) ${
-                      lit ? "text-accent-bright" : "text-on-deep-2"
+                      lit ? "text-accent" : "text-ink-2"
                     }`}
                     data-num
                   >
@@ -303,10 +303,10 @@ export function JourneyRoad({ milestones }: { milestones: Milestone[] }) {
                 </div>
               </div>
               <div className={stop.above ? "mb-2" : "mt-2"}>
-                <p className="font-display text-h4 uppercase text-on-deep">
+                <p className="font-display text-h4 uppercase text-ink">
                   {milestone.stage}
                 </p>
-                <p className="mt-1 text-small leading-snug text-on-deep-2">
+                <p className="mt-1 text-small leading-snug text-ink-2">
                   {milestone.note}
                 </p>
               </div>

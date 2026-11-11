@@ -1,61 +1,74 @@
-import { Hero } from "./hero"
-import { MarqueRail } from "./marque-rail"
-import { Divisions } from "./divisions"
-import { Marques } from "./marques"
+import { UsedHero } from "./used-hero"
 import { Stock } from "./stock"
+import { Browse } from "./browse"
+import { Why } from "./why"
 import { Services } from "./services"
-import { Record } from "./record"
-import { Voices } from "./voices"
 import { Visit } from "./visit"
+import { Voices } from "./voices"
 import { ClosingCall } from "@/components/system/closing-call"
-import type { InventoryVehicle } from "@/lib/inventory/types"
+import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
 
 /**
- * The homepage, in the order a stranger needs it:
+ * The homepage of a used-car site, in the order a buyer needs it:
  *
- *   Hero      who this is, how long they have been here, and three ways to act
- *   Rail      every marque's own mark — instant proof under the claim
- *   Divisions what the company actually does
- *   Marques   the franchise register, every appointment dated
- *   Stock     live certified cars — the commercial reason the site exists
- *   Services  insurance, sell-your-car, book-a-service — the non-buyer doors
- *   Record    the appointments and awards behind the claims
- *   Voices    what customers wrote
- *   Visit     where to go, when it is open, and the branch lead paths
- *   Closing   one loud final call, on glass
+ *   Hero      how many cars, a search, one real car at its real price
+ *   Stock     the newest arrivals, then the lowest priced
+ *   Browse    by budget, body type, make, fuel — every link with its count
+ *   Why       four checkable reasons to buy here, and how buying works
+ *   Services  exchange, finance, insure — what sits around a purchase
+ *   Visit     where the cars are, when it is open, how to get there
+ *   Voices    what buyers wrote, just before the last call
+ *   Closing   call, WhatsApp, enquire
  *
- * Grounds alternate the whole way down and no two adjacent bands share one.
- * Three of them are photographic and dark — hero, record, closing — and those
- * are the only three that carry frosted panels, because glass over a flat
- * ground has nothing to refract and is just a bordered grey box. The five bands
- * between them are light and flat, which is what long-form registers, a stock
- * grid and an address block actually want to be read on.
+ * WHAT CHANGED, AND WHY. This page used to be a profile of AM Group — hero on
+ * the company's age and size, then divisions, the franchise register, and the
+ * appointment journey — with the stock in the fifth band. It now leads with
+ * the cars, because that is what the site sells. The company appears as the
+ * reason to trust the stock (the Why band) rather than as the subject.
  *
- * Everything here is a server component except two leaves (the stock rail's
- * enquire handler and the closing enquiry button), so the timeline, the
- * register, the award table and the addresses are all in the served HTML.
+ * The group bands are not deleted. Divisions, Marques, MarqueRail and Record
+ * (the journey road) still exist in this folder, unmounted; the same content
+ * is on /about and /automobile, which the Why band and the nav link to.
+ *
+ * Grounds alternate all the way down. Everything is a server component except
+ * the stock rails and the enquiry buttons.
  */
 export function Homepage({
+  latest,
+  bestValue,
+  featured,
   vehicles,
+  facets,
   total,
   degraded,
 }: {
+  latest: InventoryVehicle[]
+  bestValue: InventoryVehicle[]
+  featured: InventoryVehicle | null
+  /** The whole stock, for counts only — it is never rendered as a list here. */
   vehicles: InventoryVehicle[]
+  facets: InventoryFacets
   total: number
   degraded: boolean
 }) {
+  const live = !degraded && total > 0
+
   return (
     <>
-      <Hero stockCount={degraded ? 0 : total} />
-      <MarqueRail />
-      <Divisions />
-      <Marques />
-      <Stock vehicles={vehicles} total={total} degraded={degraded} />
+      <UsedHero
+        total={total}
+        degraded={degraded}
+        facets={facets}
+        featured={featured}
+        vehicles={vehicles}
+      />
+      <Stock vehicles={latest} bestValue={bestValue} total={total} degraded={degraded} />
+      {live && <Browse facets={facets} vehicles={vehicles} />}
+      <Why />
       <Services />
-      <Record />
-      <Voices />
       <Visit />
-      <ClosingCall sourceLabel="home-closing" />
+      <Voices />
+      <ClosingCall sourceLabel="home-closing" tone="light" />
     </>
   )
 }

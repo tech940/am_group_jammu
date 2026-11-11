@@ -1,48 +1,69 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Plate } from "@/components/system/page-kit"
 import {
-  Aurora,
-  GlowOrbs,
   GradientMesh,
   Grain,
-  LightBeams,
-  Veil,
+  RadialWash,
   WaveRibbons,
 } from "@/components/system/backdrops"
 import { CursorGlow } from "@/components/system/backdrop-motion"
 import { RuleDraw } from "@/components/system/rule-draw"
 import { ScrollDrift } from "@/components/system/scroll-drift"
-import { AM_KIA_SHOWROOM } from "@/lib/supabase-media"
+import { HeroGallery } from "./hero-gallery"
+import { SUPABASE_MEDIA, AM_KIA_SHOWROOM } from "@/lib/supabase-media"
 import { FOUNDED, YEARS_TRADING, SCALE } from "@/components/home/content"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
 
 /**
- * The opening claim, and the first lead path — now built on a gradient rather
- * than on a photograph.
+ * The opening claim, now on a LIGHT ground with a rotating gallery of the
+ * group's own sites.
  *
- * Three consequences of that change, none of them cosmetic:
+ * Light changes the arithmetic, not the argument. Ink on these pale ribbon
+ * tints measures 12:1 with 5:1 for secondary — the same family measured when
+ * the light bands got their gradients — so the veil that seated the dark
+ * version is simply not needed and is gone. The nav no longer overlays this
+ * band either (DARK_HERO_ROUTES lost "/"), so the filled header and its
+ * spacer sit above and the hero starts on its own ground.
  *
- * 1. THE GLASS PANEL IS GONE. Glass needs something behind it to refract; over a
- *    gradient it is a bordered grey box, which is the rule this system already
- *    holds itself to (DESIGN.md, Glass). The type sits directly on the gradient
- *    instead — and because every stop here is authored rather than photographed,
- *    the contrast floor is *known* rather than defended against. That was the
- *    whole reason the panel existed.
- *
- * 2. THE PHOTOGRAPH BECOMES CONTENT. It is the evidence that this is a real
- *    company with a real building, which is the page's entire argument, so it
- *    stays — as a bordered captioned plate, which is what DESIGN.md says
- *    photography is. It is no longer load-bearing for legibility.
- *
- * 3. THE LEDGER IS RULED, NOT FROSTED. Hairlines on the gradient, for the same
- *    reason as (1).
- *
- * Call, WhatsApp and browse-stock stay in the first viewport. The previous
- * homepage carried no `tel:` or `wa.me` anchor on its entire 19,000px, so the
- * delegated LinkTracker recorded nothing and the page produced no attributable
- * leads at all.
+ * The gallery replaces the single plate: six real sites, captioned, rotating
+ * on a fenced loop (see hero-gallery.tsx for the pause/reduce/manual rules).
+ * The captions live HERE, next to the image list, because a caption that
+ * drifts from its photograph is how this site once told readers a Hyundai
+ * showroom was a workshop.
  */
+const GALLERY = [
+  {
+    src: AM_KIA_SHOWROOM,
+    alt: "The AM Kia showroom floor in Jammu, cars on display under the roof lights",
+    caption: "AM Kia, Jammu — appointed 2024.",
+  },
+  {
+    src: SUPABASE_MEDIA.branches["jammu-hyundai"].exterior,
+    alt: "The AM Hyundai showroom building in Jammu",
+    caption: "AM Hyundai, Jammu — appointed 2008.",
+  },
+  {
+    src: SUPABASE_MEDIA.branches.petroleum.exterior,
+    alt: "An AM Group fuel station forecourt",
+    caption: "AM Group forecourt — fuel since 1968.",
+  },
+  {
+    src: SUPABASE_MEDIA.branches["two-wheelers"].ktm,
+    alt: "The KTM Jammu showroom",
+    caption: "KTM Jammu — the only KTM showroom in Jammu.",
+  },
+  {
+    src: SUPABASE_MEDIA.branches["real-estate"].exterior,
+    alt: "An AM Group commercial development in Jammu",
+    caption: "AM Group development, Jammu.",
+  },
+  {
+    src: SUPABASE_MEDIA.branches["srinagar-hyundai"].exterior,
+    alt: "The AM Hyundai showroom in Srinagar",
+    caption: "AM Hyundai, Srinagar — the Kashmir Valley site.",
+  },
+]
+
 export function Hero({ stockCount }: { stockCount: number }) {
   const waMessage =
     "Hi AM Group, I found you through your website. Can you help me with a car?"
@@ -69,62 +90,30 @@ export function Hero({ stockCount }: { stockCount: number }) {
   return (
     <section
       aria-labelledby="hero-title"
-      data-ground="deep"
-      className="relative isolate overflow-hidden bg-deep-2"
+      className="relative isolate overflow-hidden bg-ground"
     >
-      {/*
-        The gradient, bottom to top. Six layers and not one photograph:
+      {/* The light gradient field: pale ribbons and a mesh in the same two
+          token ends as everything else, no veil needed — every layer here was
+          measured against ink when the light bands were tuned. */}
+      <GradientMesh tone="light" />
+      <WaveRibbons id="hero" tone="light" layers={4} flip />
+      <RadialWash at="16% 0%" strength={0.12} />
+      <CursorGlow strength={0.2} />
+      <Grain />
 
-          1  gradient mesh     four soft radials, the base colour field
-          2  wave ribbons      broad filled sheets, the structure in the field
-          3  aurora (animated) slow movement across 28s, reduced-motion gated
-          4  glow orbs         two points of light, one behind each column
-          5  light beams       directional streaks
-          6  cursor glow       follows a fine pointer only
-          7  veil              seats the whole stack on a known floor
-          8  grain             over everything, unifying the stack
-
-        All of it is built from `accent` and `accent-bright` — the same two ends
-        of the one hue the buttons use. None of it uses filter: blur().
-      */}
-      <GradientMesh tone="deep" />
-      <WaveRibbons id="hero" tone="deep" layers={5} strength={0.9} />
-      <Aurora animate />
-      <GlowOrbs
-        orbs={[
-          { at: "18% 34%", size: "42%", strength: 0.26 },
-          { at: "82% 66%", size: "34%", strength: 0.16 },
-        ]}
-      />
-      <LightBeams />
-      <CursorGlow strength={0.14} />
-      {/* Five sources of light accumulate. Untreated, the brightest region
-          measured on-deep-2 2.91:1 — under AA — so the stack is seated on a
-          floor, the same way a photograph is seated under `.photo-scrim`.
-
-          0.54 is solved, not chosen. The first solve (0.40) fixed the headline
-          region but not the ledger, which sits where the second glow orb and the
-          mesh's bottom radial peak together. Backing out the pre-veil colour and
-          re-solving against THAT point gave 0.50, which still landed the worst
-          pixel at 4.47:1 — inside measurement noise of the 4.5 threshold, which
-          is not a pass. 0.54 puts it at 5.3:1 and costs almost nothing
-          visually. */}
-      <Veil strength={0.54} />
-      <Grain onDeep animate />
-
-      <div className="relative mx-auto max-w-[1400px] px-5 pb-14 pt-28 md:px-10 md:pb-20 md:pt-36">
+      <div className="relative mx-auto max-w-[1400px] px-5 pb-14 pt-12 md:px-10 md:pb-20 md:pt-20">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.08fr_1fr] lg:gap-16">
           <div>
-            <p className="flex items-center gap-4 text-meta uppercase text-on-deep-2">
-              <RuleDraw className="w-10 bg-accent-bright" />
+            <p className="flex items-center gap-4 text-meta uppercase text-ink-2">
+              <RuleDraw className="w-10 bg-accent" />
               Jammu &amp; Kashmir · since {FOUNDED}
             </p>
 
-            {/* The heading IS the data. Every line is a figure this site can show
-                its working for, which is the whole argument of the page. */}
+            {/* The heading IS the data. Every line is a figure this site can
+                show its working for. */}
             <h1
               id="hero-title"
-              className="mt-7 font-display text-display uppercase text-on-deep"
+              className="mt-7 font-display text-display uppercase text-ink"
             >
               <span data-num>{YEARS_TRADING}</span> years.
               <br />
@@ -133,29 +122,29 @@ export function Hero({ stockCount }: { stockCount: number }) {
               <span data-num>{SCALE.divisions}</span> divisions.
             </h1>
 
-            <p className="mt-8 max-w-[52ch] text-body-lg text-on-deep-2">
+            <p className="mt-8 max-w-[52ch] text-body-lg text-ink-2">
               AM Group opened a Hindustan Petroleum forecourt in Jammu in {FOUNDED}. It
               now runs seven vehicle franchises, fuel stations, property and retail
               across the union territory — and publishes the numbers behind all of it.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-3">
-              <Button asChild variant="bright" size="lg">
+              <Button asChild variant="primary" size="lg">
                 <Link href="/inventory">
                   {stockCount > 0 ? `Browse ${stockCount} used cars` : "Browse used cars"}
                 </Link>
               </Button>
 
-              {/* data-track-location rather than onClick: the delegated listener
-                  in components/analytics/link-tracker.tsx reads it, which is what
-                  keeps this whole band a server component. */}
-              <Button asChild variant="glass" size="lg">
+              {/* data-track-location rather than onClick: the delegated
+                  listener in link-tracker.tsx reads it, which is what keeps
+                  this whole band a server component. */}
+              <Button asChild variant="secondary" size="lg">
                 <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="home-hero">
                   Call {PRIMARY_LOCATION.phone}
                 </a>
               </Button>
 
-              <Button asChild variant="glass" size="lg">
+              <Button asChild variant="secondary" size="lg">
                 <a
                   href={whatsappUrl(waMessage)}
                   target="_blank"
@@ -168,42 +157,31 @@ export function Hero({ stockCount }: { stockCount: number }) {
             </div>
           </div>
 
-          {/* Content, not ground. The building is the evidence behind every
-              number to the left of it. The drift gives the plate a different
-              scroll speed from the type beside it — depth, read only while
-              scrolling, zero under reduce. */}
+          {/* The gallery drifts at a slightly different rate from the type
+              beside it — depth, read only while scrolling, zero under reduce. */}
           <ScrollDrift distance={20}>
-          <Plate
-            onDeep
-            priority
-            quality={90}
-            src={AM_KIA_SHOWROOM}
-            alt="The AM Kia showroom floor in Jammu, with cars on display under the roof lights"
-            caption="AM Kia, Jammu — appointed 2024, the group's newest passenger-car franchise."
-            ratio="aspect-[4/3] lg:aspect-[5/4]"
-            sizes="(max-width: 1024px) 100vw, 45vw"
-          />
+            <HeroGallery slides={GALLERY} />
           </ScrollDrift>
         </div>
 
         {/* Four figures on one hairline, closing the first viewport with
             verifiable scale instead of a scroll prompt. */}
-        <dl className="mt-14 grid grid-cols-2 border-t border-line-on-deep md:mt-16 lg:grid-cols-4">
+        <dl className="mt-14 grid grid-cols-2 border-t border-line-strong md:mt-16 lg:grid-cols-4">
           {ledger.map((item, i) => (
             <div
               key={item.term}
-              // Rules drawn per cell rather than with `divide-*`: the grid wraps
-              // to two columns below lg, and a divide utility leaves a rule
-              // hanging off the end of the last row.
-              className={`py-6 md:py-7 ${i % 2 === 1 ? "border-l border-line-on-deep pl-5 md:pl-6" : "pr-5"} ${
-                i < 2 ? "border-b border-line-on-deep lg:border-b-0" : ""
-              } ${i === 2 ? "lg:border-l lg:border-line-on-deep lg:pl-6" : ""}`}
+              // Rules drawn per cell rather than with `divide-*`: the grid
+              // wraps to two columns below lg, and a divide utility leaves a
+              // rule hanging off the end of the last row.
+              className={`py-6 md:py-7 ${i % 2 === 1 ? "border-l border-line pl-5 md:pl-6" : "pr-5"} ${
+                i < 2 ? "border-b border-line lg:border-b-0" : ""
+              } ${i === 2 ? "lg:border-l lg:border-line lg:pl-6" : ""}`}
             >
-              <dt className="text-meta uppercase text-on-deep-2">{item.term}</dt>
-              <dd className="mt-2 font-display text-h2 text-on-deep" data-num>
+              <dt className="text-meta uppercase text-ink-2">{item.term}</dt>
+              <dd className="mt-2 font-display text-h2 text-ink" data-num>
                 {item.detail}
               </dd>
-              <dd className="mt-1 text-small text-on-deep-2">{item.note}</dd>
+              <dd className="mt-1 text-small text-ink-2">{item.note}</dd>
             </div>
           ))}
         </dl>

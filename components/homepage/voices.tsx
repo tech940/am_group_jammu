@@ -1,4 +1,5 @@
 import { Band, Head } from "@/components/system/page-kit"
+import { RevealGroup, RevealItem } from "@/components/system/reveal"
 import { GradientGround, Grain, WaveField } from "@/components/system/backdrops"
 import { REVIEWS } from "@/components/home/content"
 
@@ -15,7 +16,7 @@ export function Voices() {
 
   return (
     <Band
-      ground="ground"
+      ground="ground-2"
       labelledBy="voices-title"
       id="voices"
       backdrop={
@@ -33,7 +34,8 @@ export function Voices() {
         lede="Published reviews from Google, quoted in full and attributed. Nothing here is edited for length or written in-house."
       />
 
-      <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-20">
+      <RevealGroup className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-20">
+        <RevealItem>
         <figure className="border-t border-line-strong pt-8">
           <blockquote className="font-display text-h2 leading-tight text-ink">
             <p>&ldquo;{lead.quote}&rdquo;</p>
@@ -46,8 +48,9 @@ export function Voices() {
             {lead.date}
           </figcaption>
         </figure>
+        </RevealItem>
 
-        <div className="border-t border-line">
+        <RevealItem className="border-t border-line">
           {rest.map((review) => (
             <figure key={review.name} className="border-b border-line py-7">
               <blockquote className="text-body text-ink-2">
@@ -62,8 +65,8 @@ export function Voices() {
               </figcaption>
             </figure>
           ))}
-        </div>
-      </div>
+        </RevealItem>
+      </RevealGroup>
     </Band>
   )
 }

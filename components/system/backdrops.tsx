@@ -596,6 +596,55 @@ export function WaveRibbons({
 }
 
 /**
+ * THE big wave — one full-width curve splitting two bands of different
+ * colours.
+ *
+ * This is the page's single statement wave, as opposed to `WaveEdge`'s small
+ * repeated cuts: one crest and one trough across the whole viewport, tall
+ * enough to read as the section genuinely changing colour along a curve
+ * rather than as a decorated border. Because it is a statement, it appears
+ * ONCE per page — a wave on every seam stops being a shape and becomes a
+ * texture.
+ *
+ * Painted in the NEIGHBOURING band's ground via currentColor, same contract
+ * as WaveEdge.
+ */
+export function BigWave({
+  side = "top",
+  ground = "text-ground",
+  className = "",
+}: {
+  side?: "top" | "bottom"
+  /** Tailwind TEXT colour class — the wave is filled with currentColor. */
+  ground?: string
+  className?: string
+}) {
+  const d =
+    side === "top"
+      ? "M0,0 L1440,0 L1440,64 C1180,150 900,10 620,58 C380,98 180,150 0,96 Z"
+      : "M0,180 L1440,180 L1440,116 C1180,30 900,170 620,122 C380,82 180,30 0,84 Z"
+
+  return (
+    <div
+      aria-hidden
+      className={`pointer-events-none absolute inset-x-0 z-0 ${
+        side === "top" ? "top-0" : "bottom-0"
+      } ${ground} ${className}`}
+      style={{ height: "clamp(84px, 11vw, 176px)" }}
+    >
+      <svg
+        viewBox="0 0 1440 180"
+        preserveAspectRatio="none"
+        className="h-full w-full"
+        role="presentation"
+      >
+        <path d={d} fill="currentColor" />
+      </svg>
+    </div>
+  )
+}
+
+/**
  * A wave edge between two bands.
  *
  * Solid fill, not a gradient. The wave is painted in the NEIGHBOURING band's

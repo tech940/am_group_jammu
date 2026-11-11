@@ -58,22 +58,22 @@ export function JourneyNumbers({
   items: { value: number; suffix?: string; label: string; note?: string }[]
 }) {
   return (
-    <dl className="grid grid-cols-2 gap-y-8 border-y border-line-on-deep py-8 lg:grid-cols-4">
+    <dl className="grid grid-cols-2 gap-y-8 border-y border-line-strong py-8 lg:grid-cols-4">
       {items.map((item, i) => (
         <div
           key={item.label}
-          className={`px-1 ${i % 2 === 1 ? "border-l border-line-on-deep pl-6" : ""} ${
-            i === 2 ? "lg:border-l lg:border-line-on-deep lg:pl-6" : ""
+          className={`px-1 ${i % 2 === 1 ? "border-l border-line-strong pl-6" : ""} ${
+            i === 2 ? "lg:border-l lg:border-line-strong lg:pl-6" : ""
           }`}
         >
-          <dd className="font-display text-h1 text-on-deep">
+          <dd className="font-display text-h1 text-ink">
             <CountUp value={item.value} />
             {/* The suffix is typographic, not counted: "10K+" rolls the 10 and
                 holds the K+, the way the figure is actually read. */}
             {item.suffix && <span>{item.suffix}</span>}
           </dd>
-          <dt className="mt-1 text-meta uppercase text-on-deep-2">{item.label}</dt>
-          {item.note && <dd className="mt-1 text-small text-on-deep-2">{item.note}</dd>}
+          <dt className="mt-1 text-meta uppercase text-ink-2">{item.label}</dt>
+          {item.note && <dd className="mt-1 text-small text-ink-2">{item.note}</dd>}
         </div>
       ))}
     </dl>

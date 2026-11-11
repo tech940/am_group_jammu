@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { ScrollDrift } from "@/components/system/scroll-drift"
 import { Grain } from "@/components/system/backdrops"
+import { RevealGroup, RevealItem } from "@/components/system/reveal"
 import { FRANCHISES, TIMELINE } from "@/components/home/content"
 
 /**
@@ -46,13 +47,12 @@ export function MarqueRail() {
   return (
     <section
       aria-label="The group's franchise marques"
-      data-ground="deep"
-      className="relative isolate overflow-hidden border-t border-line-on-deep bg-deep-2 py-8 md:py-10"
+      className="relative isolate overflow-hidden border-y border-line bg-ground-2 py-8 md:py-10"
     >
-      <Grain onDeep />
+      <Grain />
 
       <div className="relative mx-auto max-w-[1400px] px-5 md:px-10">
-        <p className="text-meta uppercase text-on-deep-2">
+        <p className="text-meta uppercase text-ink-2">
           {/* SEVEN current — Chevrolet's mark is shown because its appointment
               is part of the record, and the register band dates its exit. */}
           Eight appointments since 1968
@@ -61,13 +61,15 @@ export function MarqueRail() {
         {/* The drift: ±24px of sideways travel across the strip's trip
             through the viewport. Direct manipulation, zero under reduce. */}
         <ScrollDrift axis="x" distance={24} className="mt-5">
+          <RevealGroup>
           <ul className="flex flex-wrap items-center gap-3 md:flex-nowrap md:justify-between md:gap-4">
             {marques.map((marque) => (
               <li key={marque.year} className="shrink-0">
+                <RevealItem>
                 <Link
                   href={hrefFor(marque.title, marque.kind)}
                   aria-label={`${marque.title} — appointed ${marque.year}`}
-                  className="group block rounded-sm border border-line-on-deep bg-ground p-2.5 transition-colors duration-(--duration-1) hover:border-accent-bright/60"
+                  className="group block rounded-sm border border-line bg-surface p-2.5 transition-colors duration-(--duration-1) hover:border-accent/60"
                 >
                   <span className="relative block h-9 w-20 md:h-10 md:w-24">
                     <Image
@@ -82,9 +84,11 @@ export function MarqueRail() {
                     {marque.year}
                   </span>
                 </Link>
+                </RevealItem>
               </li>
             ))}
           </ul>
+          </RevealGroup>
         </ScrollDrift>
       </div>
     </section>

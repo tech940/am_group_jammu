@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Head } from "@/components/system/page-kit"
-import { Grain, RadialWash, WaveEdge } from "@/components/system/backdrops"
+import { BigWave, GradientGround, Grain } from "@/components/system/backdrops"
 import { JourneyRoad } from "./journey-road"
 import { JourneyNumbers } from "./journey-numbers"
 import { TIMELINE, AWARDS, CLAIMS, FOUNDED, YEARS_TRADING, SCALE } from "@/components/home/content"
@@ -59,21 +59,22 @@ export function Record() {
     <section
       id="record"
       aria-labelledby="record-title"
-      data-ground="deep"
-      className="relative isolate overflow-hidden bg-deep-2 py-20 md:py-28"
+      className="relative isolate overflow-hidden bg-ground py-24 md:py-32"
     >
-      <RadialWash at="50% 12%" tone="deep" strength={0.12} />
-      {/* No seam on the way in any more: the seam existed to keep a hard white
-          line off a photograph, and the photograph is gone. Against a flat dark
-          ground it read as a bar of fog. The hard ground swap at the top IS the
-          system's rhythm; the wave on the way out stays because the next band
-          cuts back to light. */}
-      <WaveEdge side="bottom" ground="text-ground" />
-      <Grain onDeep />
+      {/* THE wave. The page's one big curve, splitting the services band's
+          grey into this band's ice tint — one crest, one trough, full width.
+          Every other seam on the page is a straight ground swap now; a wave on
+          every edge stops being a shape and becomes a texture. The extra top
+          padding is the wave's landing room. */}
+      <BigWave side="top" ground="text-ground-2" />
+      {/* The ice tint that makes the split read as two COLOURS, not two greys:
+          the same two token ends as every gradient on the site, held at the
+          strengths measured against ink when the light bands were tuned. */}
+      <GradientGround tone="light" angle="176deg" strength={1.1} />
+      <Grain />
 
       <div className="relative mx-auto max-w-[1400px] px-5 md:px-10">
         <Head
-          onDeep
           id="record-title"
           label="The record"
           title="The route so far"
@@ -88,7 +89,7 @@ export function Record() {
         <ol className="relative mt-4 md:hidden">
           <span
             aria-hidden
-            className="absolute bottom-8 left-[3px] top-8 w-px bg-line-on-deep"
+            className="absolute bottom-8 left-[3px] top-8 w-px bg-line-strong"
           />
           {TIMELINE.map((milestone) => (
             <li
@@ -97,20 +98,20 @@ export function Record() {
             >
               <span
                 aria-hidden
-                className="absolute left-[3px] top-[1.95rem] h-px w-3.5 bg-accent-bright"
+                className="absolute left-[3px] top-[1.95rem] h-px w-3.5 bg-accent"
               />
-              <span className="w-14 shrink-0 font-display text-h3 text-on-deep" data-num>
+              <span className="w-14 shrink-0 font-display text-h3 text-ink" data-num>
                 {milestone.year}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="flex items-center gap-2 font-display text-h4 uppercase text-on-deep">
+                <span className="flex items-center gap-2 font-display text-h4 uppercase text-ink">
                   {(() => {
                     const Kind = KIND_GLYPH[milestone.kind]
-                    return <Kind className="h-[1.1em] w-[1.1em] shrink-0 text-on-deep-2" />
+                    return <Kind className="h-[1.1em] w-[1.1em] shrink-0 text-ink-2" />
                   })()}
                   {milestone.stage}
                 </span>
-                <span className="mt-1 block text-small text-on-deep-2">
+                <span className="mt-1 block text-small text-ink-2">
                   {milestone.title} — {milestone.note}
                 </span>
               </span>
@@ -141,26 +142,26 @@ export function Record() {
             {groups.map((group) => (
               <div key={group.marque}>
                 <p className="flex items-baseline justify-between gap-4">
-                  <span className="font-display text-h3 uppercase text-accent-bright">
+                  <span className="font-display text-h3 uppercase text-accent">
                     {group.marque}
                   </span>
-                  <span className="text-meta uppercase text-on-deep-2" data-num>
+                  <span className="text-meta uppercase text-ink-2" data-num>
                     {group.items.length} awards
                   </span>
                 </p>
-                <ul className="mt-3 border-t border-line-on-deep">
+                <ul className="mt-3 border-t border-line">
                   {group.items.map((award) => (
                     <li
                       key={`${award.title}-${award.year}-${award.place}`}
-                      className="flex items-baseline justify-between gap-6 border-b border-line-on-deep py-3.5"
+                      className="flex items-baseline justify-between gap-6 border-b border-line py-3.5"
                     >
                       <span className="min-w-0">
-                        <span className="block text-body text-on-deep">{award.title}</span>
-                        <span className="mt-0.5 block text-small text-on-deep-2">
+                        <span className="block text-body text-ink">{award.title}</span>
+                        <span className="mt-0.5 block text-small text-ink-2">
                           {award.place}
                         </span>
                       </span>
-                      <span className="shrink-0 text-small text-on-deep-2" data-num>
+                      <span className="shrink-0 text-small text-ink-2" data-num>
                         {award.year}
                       </span>
                     </li>
@@ -172,7 +173,7 @@ export function Record() {
 
           <Link
             href="/about"
-            className="mt-8 inline-flex min-h-11 items-center gap-2 text-button uppercase text-accent-bright transition-colors duration-(--duration-1) hover:text-on-deep"
+            className="mt-8 inline-flex min-h-11 items-center gap-2 text-button uppercase text-accent transition-colors duration-(--duration-1) hover:text-accent-hover"
           >
             The full award register
             <ArrowGlyph />

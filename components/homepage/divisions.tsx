@@ -2,12 +2,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { Band, Head, Plate } from "@/components/system/page-kit"
 import { ScrollDrift } from "@/components/system/scroll-drift"
-import {
-  DotMatrix,
-  Grain,
-  WaveEdge,
-  WaveRibbons,
-} from "@/components/system/backdrops"
+import { DotMatrix, Grain, WaveRibbons } from "@/components/system/backdrops"
+import { RevealGroup, RevealItem } from "@/components/system/reveal"
 import { DIVISIONS } from "@/components/home/content"
 import { ArrowGlyph } from "@/components/system/marks"
 
@@ -29,12 +25,6 @@ export function Divisions() {
       id="divisions"
       backdrop={
         <>
-          {/* The hero above is dark; this cuts the light band up into it along a
-              curve. Filled with bg-ground through currentColor, so the seam is a
-              real token colour and not an approximation. */}
-          <WaveEdge side="top" ground="text-ground" />
-          {/* Flipped against the register band below, so the two do not repeat
-              one silhouette down the page. */}
           <WaveRibbons id="divisions" tone="light" layers={4} flip />
           <DotMatrix cell={24} strength={0.05} fade="both" />
           <Grain />
@@ -48,9 +38,10 @@ export function Divisions() {
         lede="Fuel first, cars second, then property and retail. Each division is a separate operating business with its own sites, staff and appointments."
       />
 
-      <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+      <RevealGroup className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         {/* The lead division ------------------------------------------- */}
-        <article className="lg:col-span-7">
+        <RevealItem className="lg:col-span-7">
+        <article>
           {/* The lead photograph moves at a slightly different rate from the
               list beside it — the same depth cue as the hero plate. */}
           <ScrollDrift distance={14}>
@@ -80,9 +71,10 @@ export function Divisions() {
             <ArrowGlyph />
           </Link>
         </article>
+        </RevealItem>
 
         {/* The other three, as a register ------------------------------ */}
-        <div className="lg:col-span-5">
+        <RevealItem className="lg:col-span-5">
           <ul className="border-t border-line">
             {rest.map((division) => (
               <li key={division.key}>
@@ -119,8 +111,8 @@ export function Divisions() {
               </li>
             ))}
           </ul>
-        </div>
-      </div>
+        </RevealItem>
+      </RevealGroup>
     </Band>
   )
 }
