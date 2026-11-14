@@ -21,8 +21,11 @@ const MAX_PHOTOS = 8
 const EAGER_CARDS = 3
 
 const ARROW =
-  "pointer-events-auto h-11 w-11 rounded-sm border border-line bg-surface text-ink flex items-center justify-center " +
-  "transition-colors duration-(--duration-1) hover:bg-ground-2 cursor-pointer"
+  "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface/90 text-ink " +
+  "shadow-raised transition-colors duration-(--duration-1) hover:bg-surface hover:text-accent cursor-pointer"
+
+/** A mouse drag shorter than this is still a click on the photo. */
+const DRAG_THRESHOLD = 6
 
 /**
  * Photo strip for a card.
@@ -55,11 +58,22 @@ function ImageArea({
 
   const stripRef = useRef<HTMLDivElement>(null)
   const frame = useRef(0)
+  const anim = useRef(0)
+  const guard = useRef(0)
+  /** The photo an arrow or drag is currently moving to. */
+  const target = useRef(0)
   const [active, setActive] = useState(0)
   /** Furthest slide reached so far; images mount one slide ahead of it. */
   const [reached, setReached] = useState(0)
 
-  useEffect(() => () => cancelAnimationFrame(frame.current), [])
+  useEffect(
+    () => () => {
+      cancelAnimationFrame(frame.current)
+      cancelAnimationFrame(anim.current)
+      window.clearTimeout(guard.current)
+    },
+    [],
+  )
 
   /* Throttled to one read per frame; the dots follow the scroll position. */
   const onScroll = () => {
@@ -67,21 +81,125 @@ function ImageArea({
     frame.current = requestAnimationFrame(() => {
       frame.current = 0
       const el = stripRef.current
-      if (!el || el.clientWidth === 0) return
+      if (!el || el.clientWidth === 0 || el.dataset.dragging) return
       const i = Math.min(count - 1, Math.max(0, Math.round(el.scrollLeft / el.clientWidth)))
       setActive(i)
       setReached((r) => Math.max(r, i))
     })
   }
 
-  /* Pointer and keyboard path. Smoothness comes from `motion-safe:scroll-smooth`
-     on the strip, so reduced-motion users get an instant jump. */
+  /* Arrow path. */
   const step = (dir: 1 | -1) => {
     const el = stripRef.current
     if (!el) return
-    const next = (active + dir + count) % count
+    // From where the strip is heading, not from `active`: that state follows
+    // the scroll a frame behind, so two quick clicks would both read the same
+    // photo and the second would do nothing.
+    const from = el.dataset.dragging ? target.current : Math.round(el.scrollLeft / el.clientWidth)
+    settle((from + dir + count) % count)
+  }
+
+  /* Move the strip to a photo, animating the scroll position by hand.
+
+     The browser's own smooth scroll is not used: inside a scroll-snap strip
+     that React is re-rendering (the next image mounts as it is reached) the
+     smooth scroll was being cancelled, so the arrows called scrollTo and the
+     strip stayed exactly where it was. Here snap is switched off for the
+     ~260ms of the move (data-dragging), scrollLeft is set each frame, and snap
+     comes back on at rest. Reduced motion jumps straight there. */
+  const settle = (next: number) => {
+    const el = stripRef.current
+    if (!el) return
+    target.current = next
+    setActive(next)
     setReached((r) => Math.max(r, next))
-    el.scrollTo({ left: next * el.clientWidth })
+    cancelAnimationFrame(anim.current)
+    window.clearTimeout(guard.current)
+    const from = el.scrollLeft
+    const to = next * el.clientWidth
+    const finish = () => {
+      cancelAnimationFrame(anim.current)
+      window.clearTimeout(guard.current)
+      el.scrollLeft = to
+      delete el.dataset.dragging
+    }
+    el.dataset.dragging = "true"
+    if (from === to || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finish()
+      return
+    }
+    const start = performance.now()
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / 260)
+      el.scrollLeft = from + (to - from) * (1 - Math.pow(1 - t, 3))
+      if (t < 1) anim.current = requestAnimationFrame(tick)
+      else finish()
+    }
+    anim.current = requestAnimationFrame(tick)
+    // Frames stop arriving when the tab is in the background. Without this the
+    // strip would be left part-way with snapping switched off.
+    guard.current = window.setTimeout(finish, 500)
+  }
+
+  /* Mouse drag. Touch already scrolls the strip natively, so this handles the
+     mouse only: press, drag sideways, release, and it settles on the nearest
+     photo. Snap is switched off while the button is down (data-dragging), or
+     the browser would fight every pixel of the drag. */
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null)
+  const suppressClick = useRef(false)
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return
+    const el = stripRef.current
+    if (!el) return
+    cancelAnimationFrame(anim.current)
+    window.clearTimeout(guard.current)
+    drag.current = { x: e.clientX, left: el.scrollLeft, moved: false }
+  }
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current
+    const el = stripRef.current
+    if (!d || !el) return
+    const dx = e.clientX - d.x
+    if (!d.moved) {
+      if (Math.abs(dx) < DRAG_THRESHOLD) return
+      d.moved = true
+      el.dataset.dragging = "true"
+      // Capture keeps the drag alive when the cursor leaves the card. It can
+      // throw for a pointer the browser no longer tracks; the drag still works.
+      try {
+        el.setPointerCapture(e.pointerId)
+      } catch {}
+      // Mount the neighbours so the drag never reveals an empty slide.
+      setReached((r) => Math.max(r, Math.min(count - 1, active + 1)))
+    }
+    el.scrollLeft = d.left - dx
+  }
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current
+    const el = stripRef.current
+    drag.current = null
+    if (!d || !el || !d.moved) return
+    suppressClick.current = true
+    const dx = e.clientX - d.x
+    const from = Math.round(d.left / el.clientWidth)
+    // A short flick is enough to move one photo; otherwise settle on the nearest.
+    const target =
+      Math.abs(dx) > el.clientWidth * 0.15
+        ? from + (dx < 0 ? 1 : -1)
+        : Math.round(el.scrollLeft / el.clientWidth)
+    const next = Math.min(count - 1, Math.max(0, target))
+    try {
+      if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId)
+    } catch {}
+    settle(next)
+  }
+  /* The click that ends a drag must not open the car page. */
+  const onClickCapture = (e: React.MouseEvent) => {
+    if (!suppressClick.current) return
+    suppressClick.current = false
+    e.preventDefault()
+    e.stopPropagation()
   }
 
   return (
@@ -91,9 +209,15 @@ function ImageArea({
           <div
             ref={stripRef}
             onScroll={count > 1 ? onScroll : undefined}
+            onPointerDown={count > 1 ? onPointerDown : undefined}
+            onPointerMove={count > 1 ? onPointerMove : undefined}
+            onPointerUp={count > 1 ? endDrag : undefined}
+            onPointerCancel={count > 1 ? endDrag : undefined}
+            onClickCapture={count > 1 ? onClickCapture : undefined}
             className={`absolute inset-0 flex ${
               count > 1
-                ? "no-scrollbar snap-x snap-mandatory overflow-x-auto overscroll-x-contain motion-safe:scroll-smooth"
+                ? "no-scrollbar snap-x snap-mandatory overflow-x-auto overscroll-x-contain " +
+                  "md:cursor-grab data-[dragging]:cursor-grabbing data-[dragging]:snap-none data-[dragging]:scroll-auto data-[dragging]:select-none"
                 : "overflow-hidden"
             }`}
           >
@@ -124,9 +248,11 @@ function ImageArea({
 
           {count > 1 && (
             <>
-              {/* Arrows are for a mouse or keyboard. On touch the swipe does
-                  the job, and an invisible 44px button would swallow taps. */}
-              <div className="pointer-events-none absolute inset-x-3 top-1/2 z-30 flex -translate-y-1/2 justify-between opacity-0 transition-opacity duration-(--duration-2) group-hover:opacity-100 focus-within:opacity-100 [@media(hover:none)]:hidden">
+              {/* Arrows are for a mouse or keyboard, and are always visible
+                  from tablet width up: hidden-until-hover arrows were not being
+                  found. On a phone the swipe does the job and the arrows would
+                  cover a third of the photo, so they are not shown. */}
+              <div className="pointer-events-none absolute inset-x-2.5 top-1/2 z-30 hidden -translate-y-1/2 justify-between md:flex">
                 <button type="button" onClick={() => step(-1)} aria-label="Previous photo" className={ARROW}>
                   <ChevronGlyph direction="left" />
                 </button>
