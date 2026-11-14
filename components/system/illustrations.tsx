@@ -27,16 +27,16 @@ const TONES: Record<Tone, CSSProperties> = {
     "--il-line": "var(--color-ink)",
     "--il-body": "var(--color-accent)",
     "--il-mid": "rgb(var(--backdrop-bright))",
-    "--il-pale": "#d6e9f4",
-    "--il-paper": "#ffffff",
+    "--il-pale": "var(--il-pool)",
+    "--il-paper": "var(--color-surface)",
   } as CSSProperties,
   // On a blue tile the car turns white and the pool becomes a lighter blue.
   blue: {
-    "--il-line": "#0a3247",
-    "--il-body": "#ffffff",
+    "--il-line": "var(--il-line-on-blue)",
+    "--il-body": "var(--color-surface)",
     "--il-mid": "rgb(var(--backdrop-bright))",
     "--il-pale": "rgb(255 255 255 / 0.16)",
-    "--il-paper": "#ffffff",
+    "--il-paper": "var(--color-surface)",
   } as CSSProperties,
 }
 

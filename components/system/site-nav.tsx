@@ -166,7 +166,9 @@ export function SiteNav() {
                   aria-current={current ? "page" : undefined}
                   onClick={closeAll}
                   className={`inline-flex h-11 items-center text-nav transition-colors duration-(--duration-1) ${
-                    current ? "text-on-deep" : "text-on-deep-2 hover:text-on-deep"
+                    current
+                      ? "font-semibold text-on-deep underline decoration-2 underline-offset-8"
+                      : "text-on-deep-2 hover:text-on-deep"
                   }`}
                 >
                   {e.label}

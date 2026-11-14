@@ -311,7 +311,12 @@
   --backdrop-bright: 143 199 232;  /* = accent-bright #8fc7e8 */
   --backdrop-accent: 20 98 135;    /* = accent        #146287 */
   --backdrop-ink: 13 36 51;        /* = ink           #12151a */
-  --backdrop-paper: 243 247 250;   /* = ground        #f6f7f8 */
+  --backdrop-paper: 243 247 250;
+
+  /* Illustration set (components/system/illustrations.tsx): the pale pool a
+     drawing sits on, and its outline when the drawing is on a blue tile. */
+  --il-pool: #d6e9f4;
+  --il-line-on-blue: #0a3247;   /* = ground        #f6f7f8 */
 
   --grain-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
