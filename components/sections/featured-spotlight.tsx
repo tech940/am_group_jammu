@@ -87,7 +87,7 @@ export function FeaturedSpotlight({
 
             {/* MAIN IMAGE — shorter on a phone so the search bar and the
                 listing below are not pushed a full screen down. */}
-            <div className={`${thumbnails.length > 0 ? "lg:col-span-7" : "lg:col-span-12"} relative h-[240px] sm:h-[420px] lg:h-[480px] w-full overflow-hidden bg-ink`}>
+            <div className={`${thumbnails.length > 0 ? "lg:col-span-7" : "lg:col-span-12"} relative h-[240px] sm:h-[420px] lg:h-[480px] w-full overflow-hidden bg-deep-2`}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeVehicle.id}
@@ -110,7 +110,7 @@ export function FeaturedSpotlight({
 
               <Link href={href} className="absolute inset-0 z-[5]" aria-label={`View ${activeVehicle.title}`} />
 
-              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-ink/40 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-deep-2/80 via-transparent to-deep-2/40 pointer-events-none" />
 
               <div className="absolute top-3 left-3 right-3 sm:top-4 sm:left-4 sm:right-4 z-10 flex flex-col sm:flex-row sm:items-start justify-between gap-2 pointer-events-none">
                 <div className="pointer-events-auto self-start flex flex-wrap gap-2">
@@ -126,7 +126,7 @@ export function FeaturedSpotlight({
                   )}
                 </div>
 
-                <div className="pointer-events-auto self-end text-right bg-ink px-3 py-1.5 sm:px-4 sm:py-2 border border-line-on-deep text-on-deep max-w-[210px] xs:max-w-[240px] sm:max-w-none">
+                <div className="pointer-events-auto self-end text-right bg-deep-2 px-3 py-1.5 sm:px-4 sm:py-2 border border-line-on-deep text-on-deep max-w-[210px] xs:max-w-[240px] sm:max-w-none">
                   <h3 className="font-display text-h4 text-on-deep">
                     {activeVehicle.year ? `${activeVehicle.year} ` : ""}{activeVehicle.title}
                   </h3>
@@ -166,13 +166,13 @@ export function FeaturedSpotlight({
                       sizes="(max-width: 1024px) 50vw, 20vw"
                       className="object-cover brightness-[0.92]"
                     />
-                    <div className="absolute inset-0 bg-ink/25 group-hover:bg-transparent transition-colors duration-(--duration-1)" />
+                    <div className="absolute inset-0 bg-deep-2/25 group-hover:bg-transparent transition-colors duration-(--duration-1)" />
                   </Link>
                 ))}
 
                 {activeVehicle.photoCount > thumbnails.length + 1 && (
                   <div className="absolute top-2 left-2 z-10">
-                    <span data-num className="bg-ink px-2 py-1 rounded-sm text-meta uppercase text-on-deep">
+                    <span data-num className="bg-deep-2 px-2 py-1 rounded-sm text-meta uppercase text-on-deep">
                       {activeVehicle.photoCount} photos
                     </span>
                   </div>

@@ -276,7 +276,9 @@ function Glyph({ children, className = "" }: { children: ReactNode; className?: 
       viewBox="0 0 20 20"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={`h-[1.1em] w-[1.1em] shrink-0 ${className}`}
     >
       {children}
@@ -303,7 +305,7 @@ export function ArrowDownGlyph({ className = "" }: { className?: string }) {
 export function PhoneGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M4 3h4l1.5 4L7 9c1 2.5 2.5 4 5 5l2-2.5 4 1.5v4c-7 .5-14.5-7-15-14Z" strokeLinejoin="miter" />
+      <path d="M4 3h4l1.5 4L7 9c1 2.5 2.5 4 5 5l2-2.5 4 1.5v4c-7 .5-14.5-7-15-14Z" />
     </Glyph>
   )
 }
@@ -311,7 +313,7 @@ export function PhoneGlyph({ className = "" }: { className?: string }) {
 export function ChatGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M3 4h14v9H8l-4 3.5V4Z" strokeLinejoin="miter" />
+      <path d="M3 4h14v9H8l-4 3.5V4Z" />
     </Glyph>
   )
 }
@@ -328,7 +330,7 @@ export function CompassGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
       <circle cx="10" cy="10" r="7.5" />
-      <path d="m13 7-2 5-4 1 2-5 4-1Z" strokeLinejoin="miter" />
+      <path d="m13 7-2 5-4 1 2-5 4-1Z" />
     </Glyph>
   )
 }
@@ -394,7 +396,7 @@ export function Settle({
 export function PinGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M10 18s6-5.5 6-10a6 6 0 1 0-12 0c0 4.5 6 10 6 10Z" strokeLinejoin="miter" />
+      <path d="M10 18s6-5.5 6-10a6 6 0 1 0-12 0c0 4.5 6 10 6 10Z" />
       <circle cx="10" cy="8" r="2.25" />
     </Glyph>
   )
@@ -444,7 +446,7 @@ export function CheckGlyph({ className = "" }: { className?: string }) {
 export function AlertGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M10 2.5 18.5 17.5H1.5L10 2.5Z" strokeLinejoin="miter" />
+      <path d="M10 2.5 18.5 17.5H1.5L10 2.5Z" />
       <path d="M10 8v3.5M10 14.25v.5" />
     </Glyph>
   )
@@ -463,8 +465,8 @@ export function FuelPumpGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
       {/* Pump body, display window, base, and the hose over the side. */}
-      <path d="M4 17.25 V3.5 h8.5 v13.75 M2.5 17.25 h11.5" strokeLinejoin="miter" />
-      <path d="M6.25 6 h4 v3.25 h-4 Z" strokeLinejoin="miter" />
+      <path d="M4 17.25 V3.5 h8.5 v13.75 M2.5 17.25 h11.5" />
+      <path d="M6.25 6 h4 v3.25 h-4 Z" />
       <path d="M12.5 8 h2.25 a1.5 1.5 0 0 1 1.5 1.5 v4.75 a1.15 1.15 0 0 0 2.3 0 V9" />
     </Glyph>
   )
@@ -475,7 +477,7 @@ export function CarGlyph({ className = "" }: { className?: string }) {
     <Glyph className={className}>
       <path
         d="M2.5 13.5 v-2 l2.75-1 2.25-3 h5 l2.25 3 2.75 1 v2 h-1.75 M8.75 13.5 h2.5 M4.5 13.5 h-2"
-        strokeLinejoin="miter"
+       
       />
       <circle cx="6.5" cy="13.75" r="1.9" />
       <circle cx="13.5" cy="13.75" r="1.9" />
@@ -499,7 +501,7 @@ export function FlagGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
       <path d="M5.5 17.5 V2.75" />
-      <path d="M5.5 3.5 h9 l-2.5 3.25 2.5 3.25 h-9" strokeLinejoin="miter" />
+      <path d="M5.5 3.5 h9 l-2.5 3.25 2.5 3.25 h-9" />
     </Glyph>
   )
 }
@@ -507,7 +509,7 @@ export function FlagGlyph({ className = "" }: { className?: string }) {
 export function StarGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="m10 2.5 2.35 4.9 5.15.72-3.75 3.7.9 5.18L10 14.55 5.35 17l.9-5.18L2.5 8.12l5.15-.72L10 2.5Z" strokeLinejoin="miter" />
+      <path d="m10 2.5 2.35 4.9 5.15.72-3.75 3.7.9 5.18L10 14.55 5.35 17l.9-5.18L2.5 8.12l5.15-.72L10 2.5Z" />
     </Glyph>
   )
 }
@@ -523,8 +525,8 @@ export function StarGlyph({ className = "" }: { className?: string }) {
 export function HomeGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M2.5 9.75 10 3l7.5 6.75" strokeLinejoin="miter" />
-      <path d="M4.75 8.25V17h10.5V8.25M8.25 17v-5h3.5v5" strokeLinejoin="miter" />
+      <path d="M2.5 9.75 10 3l7.5 6.75" />
+      <path d="M4.75 8.25V17h10.5V8.25M8.25 17v-5h3.5v5" />
     </Glyph>
   )
 }
@@ -543,7 +545,7 @@ export function KeyGlyph({ className = "" }: { className?: string }) {
 export function TagGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M3 3h7l7.25 7.25-7 7L3 10V3Z" strokeLinejoin="miter" />
+      <path d="M3 3h7l7.25 7.25-7 7L3 10V3Z" />
       <circle cx="6.75" cy="6.75" r="1.25" />
     </Glyph>
   )
@@ -553,7 +555,7 @@ export function TagGlyph({ className = "" }: { className?: string }) {
 export function ShieldGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M10 2.5 16.5 5v5c0 3.75-2.75 6.25-6.5 7.5-3.75-1.25-6.5-3.75-6.5-7.5V5L10 2.5Z" strokeLinejoin="miter" />
+      <path d="M10 2.5 16.5 5v5c0 3.75-2.75 6.25-6.5 7.5-3.75-1.25-6.5-3.75-6.5-7.5V5L10 2.5Z" />
       <path d="m7 10 2.25 2.25L13.25 8" />
     </Glyph>
   )
@@ -574,7 +576,7 @@ export function PercentGlyph({ className = "" }: { className?: string }) {
 export function RupeeGlyph({ className = "" }: { className?: string }) {
   return (
     <Glyph className={className}>
-      <path d="M5.5 3.5h9M5.5 7.25h9M5.5 3.5h2.75a3.75 3.75 0 0 1 0 7.5H5.5l6.5 6" strokeLinejoin="miter" />
+      <path d="M5.5 3.5h9M5.5 7.25h9M5.5 3.5h2.75a3.75 3.75 0 0 1 0 7.5H5.5l6.5 6" />
     </Glyph>
   )
 }

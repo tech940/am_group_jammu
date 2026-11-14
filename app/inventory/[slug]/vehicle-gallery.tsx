@@ -123,7 +123,7 @@ export function VehicleGallery({ images, heading }: { images: string[]; heading:
             </div>
 
             {/* Scrim over photography, so the count stays readable on any photo. */}
-            <div className="pointer-events-none absolute bottom-3 right-3 rounded-sm bg-ink/80 px-3 py-1">
+            <div className="pointer-events-none absolute bottom-3 right-3 rounded-sm bg-deep-2/80 px-3 py-1">
               <span className="text-caption text-on-deep" data-num>
                 {current + 1} / {count}
               </span>

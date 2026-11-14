@@ -41,11 +41,11 @@
      are a hair cool, and the only colour in the system is an ice blue that
      behaves like a light source rather than a fill. Every value was measured
      against WCAG before it was written; ratios are in DESIGN.md. */
-  --color-ground: #f6f7f8;      /* page background */
-  --color-ground-2: #e9ecef;    /* alternating band */
+  --color-ground: #f3f7fa;      /* page background */
+  --color-ground-2: #e4eef5;    /* alternating band */
   --color-surface: #ffffff;     /* data surfaces: cards, tables, modals */
-  --color-deep: #14181e;        /* dark ground: photographic bands, admin rail */
-  --color-deep-2: #0c0e12;      /* deepest ground: footer, filled nav, scrim base */
+  --color-deep: #146287;        /* the BLUE ground: bands, tiles, admin rail */
+  --color-deep-2: #0f4e6d;      /* deeper blue: footer, header, scrim base */
 
   /* Aliases left from the retired homepage "story world"; nothing routed uses
      them, and they resolve onto the deep family so the unrouted
@@ -55,17 +55,17 @@
   --color-graphite: var(--color-deep);
 
   /* Ink */
-  --color-ink: #12151a;         /* primary text on light   — 17.1:1 on ground */
-  --color-ink-2: #4c555f;       /* secondary text on light —  7.1:1 on ground */
-  --color-ink-3: #5f6971;       /* tertiary text, placeholders — 5.2:1 on ground */
-  --color-on-deep: #f6f7f8;     /* primary text on dark    — 16.6:1 on deep */
-  --color-on-deep-2: #aebdc9;   /* secondary text on dark  —  9.3:1 on deep */
+  --color-ink: #0d2433;         /* primary text on light   — 17.1:1 on ground */
+  --color-ink-2: #41566a;       /* secondary text on light —  7.1:1 on ground */
+  --color-ink-3: #566a7a;       /* tertiary text, placeholders — 5.2:1 on ground */
+  --color-on-deep: #ffffff;     /* primary text on dark    — 16.6:1 on deep */
+  --color-on-deep-2: #dcecf5;   /* secondary text on dark  —  9.3:1 on deep */
 
   /* Line */
-  --color-line: rgb(18 21 26 / 0.12);        /* hairline rules, table borders */
-  --color-line-strong: rgb(18 21 26 / 0.24); /* input borders */
-  --color-line-deep: #6a7b8b;                /* rules on dark grounds — 4.1:1 */
-  --color-line-on-deep: rgb(246 247 248 / 0.16);
+  --color-line: rgb(13 36 51 / 0.12);        /* hairline rules, table borders */
+  --color-line-strong: rgb(13 36 51 / 0.24); /* input borders */
+  --color-line-deep: #a9cde0;                /* rules on dark grounds — 4.1:1 */
+  --color-line-on-deep: rgb(255 255 255 / 0.26);
 
   /* Accent — one hue, two ends, because an ice blue cannot do both jobs.
 
@@ -82,11 +82,11 @@
      a style choice. */
   --color-accent: #146287;             /* 6.3:1 on ground, 5.7:1 on ground-2 */
   --color-accent-hover: #0f4e6d;
-  --color-on-accent: #f6f7f8;          /* label on an accent fill — 6.3:1 */
+  --color-on-accent: #ffffff;          /* label on an accent fill — 6.3:1 */
 
-  --color-accent-bright: #8fc7e8;      /* 9.8:1 on deep, 10.6:1 on deep-2 */
-  --color-accent-bright-hover: #aedaf1;
-  --color-on-accent-bright: #0c0e12;   /* label on a bright fill — 10.6:1 */
+  --color-accent-bright: #ffffff;      /* 9.8:1 on deep, 10.6:1 on deep-2 */
+  --color-accent-bright-hover: #e4f1f8;
+  --color-on-accent-bright: #0f4e6d;   /* label on a bright fill — 10.6:1 */
 
   /* The ground-specific names the rest of the app already addresses. They are
      aliases of the two ends above, so no call site had to change. */
@@ -190,17 +190,17 @@
      section band is not softness, it is a gap.
      --------------------------------------------------------------------------- */
   --radius-none: 0px;
-  --radius-sm: 6px;    /* buttons, inputs, chips, badges */
-  --radius-md: 10px;   /* cards, photographic plates, panels, tables */
-  --radius-lg: 12px;   /* modals, drawers, popovers */
+  --radius-sm: 8px;    /* buttons, inputs, chips, badges */
+  --radius-md: 14px;   /* cards, photographic plates, panels, tables */
+  --radius-lg: 18px;   /* modals, drawers, popovers */
   --radius-full: 9999px; /* avatars and status dots — nothing else */
 
   /* ---------------------------------------------------------------------------
      ELEVATION — exactly two, and only for surfaces that float over content.
      Page content is flat: depth comes from ground swaps and hairlines.
      --------------------------------------------------------------------------- */
-  --shadow-overlay: 0 24px 48px -12px rgb(20 22 26 / 0.18);
-  --shadow-raised: 0 8px 16px -4px rgb(20 22 26 / 0.12);
+  --shadow-overlay: 0 24px 48px -12px rgb(15 78 109 / 0.22);
+  --shadow-raised: 0 8px 20px -6px rgb(15 78 109 / 0.16);
 
   /* ---------------------------------------------------------------------------
      MOTION — one easing family, four durations, no exceptions.
@@ -310,8 +310,8 @@
      component" rule exists to catch. */
   --backdrop-bright: 143 199 232;  /* = accent-bright #8fc7e8 */
   --backdrop-accent: 20 98 135;    /* = accent        #146287 */
-  --backdrop-ink: 18 21 26;        /* = ink           #12151a */
-  --backdrop-paper: 246 247 248;   /* = ground        #f6f7f8 */
+  --backdrop-ink: 13 36 51;        /* = ink           #12151a */
+  --backdrop-paper: 243 247 250;   /* = ground        #f6f7f8 */
 
   --grain-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -436,31 +436,71 @@
    panels, never many small ones, and blur is never animated.
    ============================================================================= */
 :root {
-  --glass-blur: 18px;
-  /* Panel over photography. Cool graphite at 58%, lifted a few points toward
-     the accent hue so it reads as glass rather than as a grey scrim. */
-  --glass-tint: rgb(16 24 32 / 0.58);
+  --glass-blur: 22px;
+  /* LIGHT glass. White at 80%: measured against the worst thing it can sit
+     over (a black part of a photograph) ink still holds above 9:1, and over the
+     blue wash it holds above 11:1. Ratios are in DESIGN.md. */
+  --glass-tint: rgb(255 255 255 / 0.8);
   /* What the same panel becomes with no blur available, or when the reader has
      asked for reduced transparency. */
-  --glass-solid: rgb(13 19 26 / 0.92);
-  /* The lit edge. This is the accent doing the one job a pale blue is good at. */
-  --glass-edge: rgb(143 199 232 / 0.30);
-  --glass-edge-strong: rgb(143 199 232 / 0.48);
+  --glass-solid: rgb(250 252 253 / 0.96);
+  /* The lit edge: a white highlight, not a coloured border. */
+  --glass-edge: rgb(255 255 255 / 0.82);
+  --glass-edge-strong: rgb(20 98 135 / 0.5);
+  --glass-shadow: 0 12px 36px -12px rgb(15 78 109 / 0.32), inset 0 1px 0 rgb(255 255 255 / 0.9);
+  /* The blue bar (header). The logo is white artwork, so the header is blue. */
+  --glass-blue-tint: rgb(15 78 109 / 0.86);
+  --glass-blue-solid: rgb(15 78 109 / 0.98);
 }
 
 @layer components {
+  /* A LIGHT ISLAND. Glass used to be a dark panel and everything inside it was
+     written with the on-deep tokens. Now the panel is light, so instead of
+     rewriting every component that sits in one, the panel re-points those
+     tokens at their light-ground partners for itself and its descendants:
+     white text becomes ink, the white button becomes the blue one, and the
+     focus ring follows. A component inside glass needs no changes. */
+  .glass,
+  .glass-bar,
+  .panel {
+    --color-on-deep: var(--color-ink);
+    --color-on-deep-2: var(--color-ink-2);
+    --color-line-on-deep: var(--color-line);
+    --color-line-deep: var(--color-line-strong);
+    --color-accent-bright: var(--color-accent);
+    --color-accent-bright-hover: var(--color-accent-hover);
+    --color-on-accent-bright: var(--color-on-accent);
+    /* Small accent text on glass uses the deeper end: 6:1 or better on the
+       composited panel, where the base accent can dip under 4.5:1. */
+    --color-accent-text-dark: var(--color-accent-hover);
+    --color-accent-text-light: var(--color-accent-hover);
+    color: var(--color-ink);
+  }
+
   .glass {
     background-color: var(--glass-solid);
     border: 1px solid var(--glass-edge);
     border-radius: var(--radius-md);
+    box-shadow: var(--glass-shadow);
   }
 
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .glass {
       background-color: var(--glass-tint);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
-      backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
     }
+  }
+
+  /* Glass on glass blurs the hierarchy the material exists to create. A glass
+     control inside a glass panel is a plain bordered surface instead. */
+  .glass .glass,
+  .panel .glass {
+    background-color: var(--color-surface);
+    border-color: var(--color-line-strong);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -471,22 +511,18 @@
     }
   }
 
-  /* The frosted bar: the same material with no radius and no border of its own,
-     so the caller can put the edge on whichever side it needs — bottom for the
-     header, top for the mobile action bar.
-
-     The header uses this while it sits over a photographic hero: a fully
-     transparent header over a photograph is a contrast gamble against an image
-     nobody controls, and the showroom ceiling in this one is nearly white. */
+  /* The frosted bar: the same light material with no radius and no border of
+     its own, so the caller puts the edge on whichever side it needs. Used by
+     the phone tab bar and the sticky bars. */
   .glass-bar {
     background-color: var(--glass-solid);
   }
 
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .glass-bar {
-      background-color: var(--glass-tint);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
-      backdrop-filter: blur(var(--glass-blur)) saturate(1.35);
+      background-color: rgb(255 255 255 / 0.84);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
     }
   }
 
@@ -498,33 +534,61 @@
     }
   }
 
-  /* The same panel with no blur.
+  /* The header. Blue, because the logo is white artwork; frosted, so the page
+     is felt moving beneath it. White text stays white here. */
+  .glass-blue {
+    background-color: var(--glass-blue-solid);
+  }
 
-     Blur is a compositor cost that scales with PAINTED AREA and is recomputed
-     as the page scrolls, so a screen-height panel full of text is the expensive
-     case, not the impressive one. Large content regions on a dark ground use
-     this instead: identical tint, identical lit edge, no backdrop-filter. Glass
-     is spent where it is actually seen refracting something — the hero, the
-     closing call — and not on a wall of table rows. */
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass-blue {
+      background-color: var(--glass-blue-tint);
+      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass-blue {
+      background-color: var(--glass-blue-solid);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* The same light panel with no blur, for large text-heavy regions: blur is a
+     compositor cost that scales with painted area. */
   .panel {
     background-color: var(--glass-solid);
     border: 1px solid var(--glass-edge);
     border-radius: var(--radius-md);
+    box-shadow: var(--glass-shadow);
   }
 
-  /* The scrim a photographic band paints under its glass. Two stops, because a
-     single flat tint either crushes the photograph or fails to hold the type:
-     this keeps the image readable at the top and guarantees a dark floor where
-     the panels actually sit. */
+  /* The wash a photographic band paints under its glass. Blue, not black: the
+     photograph stays visible as a blue duotone and the light panel above it has
+     colour to refract. Two stops, so the image reads at the top and the floor
+     where panels sit is a known colour. */
   .photo-scrim {
     background-image: linear-gradient(
       to bottom,
-      rgb(12 14 18 / 0.55) 0%,
-      rgb(12 14 18 / 0.72) 45%,
-      rgb(12 14 18 / 0.88) 100%
+      rgb(20 98 135 / 0.36) 0%,
+      rgb(20 98 135 / 0.6) 45%,
+      rgb(15 78 109 / 0.86) 100%
     );
   }
+
+  /* The soft blue ground the illustrated bands sit on: light, with two pale
+     pools of the accent so a glass tile placed on it has something to show. */
+  .sky-ground {
+    background-color: var(--color-ground-2);
+    background-image:
+      radial-gradient(60% 80% at 8% 0%, rgb(143 199 232 / 0.55) 0%, transparent 70%),
+      radial-gradient(50% 70% at 96% 100%, rgb(143 199 232 / 0.42) 0%, transparent 70%),
+      linear-gradient(180deg, #eef6fb 0%, #dcebf4 100%);
+  }
 }
+
 
 @layer base {
   html {

@@ -1,9 +1,9 @@
 import Link from "next/link"
-import { Band } from "@/components/system/page-kit"
 import { ArrowGlyph } from "@/components/system/marks"
+import { IlloChoose, IlloDrive, IlloPapers } from "@/components/system/illustrations"
 import { FOUNDED, YEARS_TRADING } from "@/components/home/content"
 import { LOCATIONS } from "@/lib/locations"
-import { SectionHead, TIGHT_BAND } from "./section-head"
+import { SectionHead } from "./section-head"
 
 /**
  * Why buy a used car here, and what happens when you do.
@@ -41,58 +41,74 @@ const REASONS = [
 ]
 
 const STEPS = [
-  { label: "Pick a car", detail: "Browse the live stock list and shortlist what suits your budget." },
-  { label: "Call, then come and see it", detail: "We confirm which site the car is at. Inspect it and take a test drive." },
-  { label: "Exchange your old car", detail: "If you have one to sell, we value it while you wait." },
-  { label: "Finance and insurance", detail: "Arranged at the dealership if you need them." },
-  { label: "RC transfer", detail: "Handled in-house once the sale is agreed." },
+  {
+    Illo: IlloChoose,
+    label: "Pick a car",
+    detail: "Browse the live stock list and shortlist what suits your budget.",
+  },
+  {
+    Illo: IlloDrive,
+    label: "Come and drive it",
+    detail: "Call first and we confirm which site the car is at. Inspect it and take a test drive.",
+  },
+  {
+    Illo: IlloPapers,
+    label: "We do the paperwork",
+    detail: "Exchange valuation, bank finance, insurance and RC transfer, all at the dealership.",
+  },
 ]
 
 export function Why() {
   return (
-    <Band ground="ground-2" labelledBy="why-title" id="why" className={TIGHT_BAND}>
-      <SectionHead
-        id="why-title"
-        title="Bought from a dealer, not a stranger"
-        lede="A used car is only as good as the people standing behind it. These are things you can check before you buy."
-      />
+    <section aria-labelledby="why-title" id="why" className="sky-ground relative py-12 md:py-24">
+      <div className="mx-auto max-w-[1400px] px-5 md:px-10">
+        <SectionHead
+          id="why-title"
+          title="How buying works"
+          lede="Three steps, and you deal with one dealership the whole way through."
+        />
 
-      <div className="mt-8 grid grid-cols-1 gap-10 md:mt-12 lg:grid-cols-[1.15fr_1fr] lg:gap-20">
-        <ul className="grid grid-cols-1 content-start gap-x-10 gap-y-6 sm:grid-cols-2 md:gap-y-10">
+        {/* The steps ARE a sequence, so they are numbered. */}
+        <ol className="mt-8 grid grid-cols-1 gap-3 md:mt-12 md:grid-cols-3 md:gap-5">
+          {STEPS.map(({ Illo, label, detail }, i) => (
+            <li
+              key={label}
+              className="glass flex items-center gap-4 p-4 md:flex-col md:items-start md:gap-0 md:p-7"
+            >
+              <Illo className="h-24 w-auto shrink-0 md:h-44" />
+              <div className="md:mt-5">
+                <h3 className="flex items-baseline gap-2.5 font-display text-h3 uppercase text-ink md:text-h2">
+                  <span className="text-accent" data-num>
+                    {i + 1}
+                  </span>
+                  {label}
+                </h3>
+                <p className="mt-1.5 text-body text-ink-2">{detail}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <h3 className="mt-12 font-display text-h2 uppercase text-ink md:mt-20">
+          Bought from a dealer, not a stranger
+        </h3>
+        <ul className="mt-6 grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line-strong pt-6 sm:grid-cols-2 lg:grid-cols-4">
           {REASONS.map((r) => (
             <li key={r.title}>
-              <h3 className="font-display text-h3 uppercase text-ink">{r.title}</h3>
+              <h4 className="text-h4 text-ink">{r.title}</h4>
               <p className="mt-1.5 text-body text-ink-2">{r.body}</p>
             </li>
           ))}
         </ul>
 
-        <div>
-          <h3 className="border-b border-line-strong pb-3 font-display text-h3 uppercase text-ink">
-            How buying works
-          </h3>
-          <ol>
-            {STEPS.map((step, i) => (
-              <li key={step.label} className="flex gap-4 border-b border-line py-3.5">
-                <span className="w-6 shrink-0 font-display text-h3 text-ink-2" data-num>
-                  {i + 1}
-                </span>
-                <span>
-                  <span className="block text-h4 text-ink">{step.label}</span>
-                  <span className="mt-0.5 block text-small text-ink-2">{step.detail}</span>
-                </span>
-              </li>
-            ))}
-          </ol>
-          <Link
-            href="/locations"
-            className="mt-4 inline-flex min-h-11 items-center gap-2 text-button text-accent transition-colors duration-(--duration-1) hover:text-accent-hover"
-          >
-            Where to see the cars
-            <ArrowGlyph />
-          </Link>
-        </div>
+        <Link
+          href="/locations"
+          className="mt-6 inline-flex min-h-11 items-center gap-2 text-button text-accent transition-colors duration-(--duration-1) hover:text-accent-hover"
+        >
+          Where to see the cars
+          <ArrowGlyph />
+        </Link>
       </div>
-    </Band>
+    </section>
   )
 }

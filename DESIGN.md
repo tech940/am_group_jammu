@@ -527,3 +527,53 @@ buy here → the three Jammu sites → reviews → closing call. Files:
 ---
 
 *Audit that produced this system, plus the phase plan and route tracking board: `REDESIGN.md`.*
+
+## Blue and light (2026-11-14) — supersedes the graphite and dark-glass rules above
+
+The owner's instruction, verbatim in spirit: keep the current bluish colour, do
+not pair it with dark or black, and put glassmorphism on top. The reference was
+a used-car marketplace whose friendliness comes from its icons and
+illustrations. Where this section disagrees with *Colours*, *Glass* or
+*Shapes* above, this section wins.
+
+**Grounds.** `ground #F3F7FA`, `ground-2 #E4EEF5`, `surface #FFFFFF`. The
+`deep` tokens kept their names and changed meaning: `deep #146287` and
+`deep-2 #0F4E6D` are the blue. There is no graphite or black ground. `bg-ink`
+and `bg-black` are not used as grounds.
+
+**Text.** `ink #0D2433` (14.8:1 on ground), `ink-2 #41566A` (7.1:1, 6.5:1 on
+ground-2), `ink-3 #566A7A` (5.2:1, 4.8:1). On blue: `on-deep #FFFFFF` (6.7:1
+on deep), `on-deep-2 #DCECF5` (5.6:1 on deep, 7.5:1 on deep-2).
+
+**Accent.** Still one hue. On light grounds it is the fill and the small text
+(`#146287`, 6.2:1 on ground). On a blue ground the loud control is white with a
+`#0F4E6D` label (9.0:1); `accent-bright` is now `#FFFFFF`.
+
+**Glass is light.** White at 80% with a 22px blur, a white lit edge and a soft
+blue shadow. Over the blue wash ink measures above 11:1 and `ink-2` above 5:1.
+Small accent text inside glass uses the deeper end (`#0F4E6D`), which the
+panel sets itself. `.glass`, `.glass-bar` and `.panel` re-point `on-deep`,
+`on-deep-2`, `line-on-deep`, `accent-bright` and friends to their light-ground
+partners for their whole subtree, so a component written for a blue ground
+needs no changes when it sits in a panel. Glass inside glass is a plain
+bordered surface. The `@supports` and `prefers-reduced-transparency` fallbacks
+are a 96% white panel.
+
+**Where glass goes.** Over a photograph under `.photo-scrim` (now a blue wash:
+the photograph the managing director asked to keep stays, as a blue duotone),
+over `.sky-ground` (a pale blue ground with two soft pools of the accent), the
+phone tab bar, and the header (`.glass-blue`, because the logo is white
+artwork). Not on content cards in a list.
+
+**Radius.** 8px controls, 14px surfaces, 18px overlays, 0 for bands.
+
+**Illustrations.** `components/system/illustrations.tsx`. Flat shapes in the
+accent, its pale end and white; a 2.5px rounded ink outline; a few loose
+squares. Objects only (cars, keys, a phone, papers, a showroom front), no
+characters. Colour is four CSS variables with a `light` and a `blue` tone, so
+one drawing works on white and on a blue tile. Every drawing is decorative and
+`aria-hidden`. They are original; nothing is traced from the reference site.
+
+**Glyphs.** Same 20x20 set in `marks.tsx`, now with rounded caps and joins at
+1.6px so they sit with the illustrations. On service tiles the glyph sits in a
+pale blue disc.

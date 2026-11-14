@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { ArrowGlyph, KeyGlyph, TagGlyph } from "@/components/system/marks"
+import { ArrowGlyph } from "@/components/system/marks"
+import { IlloBuy, IlloSell } from "@/components/system/illustrations"
 import { Services } from "./services"
 
 /**
@@ -16,10 +17,9 @@ import { Services } from "./services"
  * hero is `overflow-hidden isolate` (its photograph sits at a negative
  * z-index), so anything inside it that tried to hang below would be clipped.
  *
- * TWO TILES, NOT A MATCHED PAIR. Buy is the accent fill and Sell is the deep
- * ground: same size, same weight, plainly different, so the choice is read by
- * colour before it is read by label. Each is the correct end of the accent
- * for its own ground (DESIGN.md, The Accent Contrast Rule).
+ * TWO TILES, NOT A MATCHED PAIR. Buy is the blue fill with a white car; Sell
+ * is a white surface with a blue one. Same size, same weight, plainly
+ * different, so the choice is read by colour and picture before the label.
  *
  * The counts are live. With the feed down the Buy tile still goes to
  * /inventory but prints no number it cannot stand behind.
@@ -49,17 +49,16 @@ export function Doors({
         <div className="grid grid-cols-2 gap-2.5 md:gap-4">
           <Link
             href="/inventory"
-            className="group flex min-h-36 flex-col justify-between rounded-md bg-accent p-4 text-on-accent transition-colors duration-(--duration-1) hover:bg-accent-hover md:min-h-48 md:p-7"
+            data-ground="deep"
+            className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-md bg-accent p-4 text-on-accent transition-colors duration-(--duration-1) hover:bg-accent-hover md:min-h-56 md:flex-row md:items-end md:p-7"
           >
-            <span className="flex items-start justify-between">
-              <span aria-hidden className="text-h1 leading-none">
-                <KeyGlyph />
-              </span>
-              <ArrowGlyph className="mt-1 transition-transform duration-(--duration-2) group-hover:translate-x-1" />
-            </span>
+            <IlloBuy tone="blue" className="-mr-2 -mt-1 h-24 w-auto self-end md:order-2 md:h-44" />
             <span>
-              <span className="block font-display text-h2 uppercase md:text-h1">Buy a car</span>
-              <span className="mt-1 block text-small md:text-body" data-num>
+              <span className="flex items-center gap-2 font-display text-h2 uppercase md:text-h1">
+                Buy a car
+                <ArrowGlyph className="text-body-lg transition-transform duration-(--duration-2) group-hover:translate-x-1" />
+              </span>
+              <span className="mt-1 block text-small text-on-deep-2 md:text-body" data-num>
                 {live ? (
                   <>
                     {total} in stock
@@ -79,18 +78,15 @@ export function Doors({
 
           <Link
             href="/sell-your-car"
-            data-ground="deep"
-            className="group flex min-h-36 flex-col justify-between rounded-md bg-deep p-4 text-on-deep transition-colors duration-(--duration-1) hover:bg-deep-2 md:min-h-48 md:p-7"
+            className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-md border border-line bg-surface p-4 text-ink shadow-raised transition-colors duration-(--duration-1) hover:border-accent md:min-h-56 md:flex-row md:items-end md:p-7"
           >
-            <span className="flex items-start justify-between">
-              <span aria-hidden className="text-h1 leading-none text-accent-bright">
-                <TagGlyph />
-              </span>
-              <ArrowGlyph className="mt-1 transition-transform duration-(--duration-2) group-hover:translate-x-1" />
-            </span>
+            <IlloSell className="-mr-2 -mt-1 h-24 w-auto self-end md:order-2 md:h-44" />
             <span>
-              <span className="block font-display text-h2 uppercase md:text-h1">Sell your car</span>
-              <span className="mt-1 block text-small text-on-deep-2 md:text-body">
+              <span className="flex items-center gap-2 font-display text-h2 uppercase md:text-h1">
+                Sell your car
+                <ArrowGlyph className="text-body-lg text-accent transition-transform duration-(--duration-2) group-hover:translate-x-1" />
+              </span>
+              <span className="mt-1 block text-small text-ink-2 md:text-body">
                 Free valuation while you wait
               </span>
             </span>

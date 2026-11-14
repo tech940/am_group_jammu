@@ -32,7 +32,7 @@ export function StockRail({
     <section
       aria-labelledby="stock-title"
       data-ground="deep"
-      className="bg-ink py-20 text-on-deep md:py-24"
+      className="bg-deep-2 py-20 text-on-deep md:py-24"
     >
       <div className="mx-auto max-w-[1400px] px-5 md:px-10">
         <SectionHead
@@ -51,7 +51,7 @@ export function StockRail({
       >
         <ul className="flex w-max gap-px bg-line-on-deep px-5 md:px-10">
           {vehicles.map((v, i) => (
-            <li key={v.id} className="w-[270px] shrink-0 bg-ink md:w-[300px]">
+            <li key={v.id} className="w-[270px] shrink-0 bg-deep-2 md:w-[300px]">
               <Settle delay={Math.min(i * 0.05, 0.3)} className="flex h-full flex-col">
                 <Link href={`/inventory/${v.slug}`} className="group block">
                   <div className="relative aspect-[4/3] overflow-hidden bg-deep-2">
@@ -68,7 +68,7 @@ export function StockRail({
                         Photo pending
                       </span>
                     )}
-                    <span data-num className="absolute left-3 top-3 bg-ink px-2 py-1 text-meta text-on-deep">
+                    <span data-num className="absolute left-3 top-3 bg-deep-2 px-2 py-1 text-meta text-on-deep">
                       {String(i + 1).padStart(2, "0")} / {vehicles.length}
                     </span>
                   </div>

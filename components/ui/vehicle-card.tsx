@@ -152,7 +152,7 @@ function ImageArea({
       )}
 
       {/* Scrim over photography, so the plate labels stay legible. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-ink/35 via-transparent to-transparent pointer-events-none z-20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-deep-2/35 via-transparent to-transparent pointer-events-none z-20" />
 
       {/* Badges — only rendered when the underlying data exists. They never
           take pointer events: a swipe or tap that starts on one still reaches
@@ -178,7 +178,7 @@ function ImageArea({
       )}
       {count > 1 && (
         <div className="pointer-events-none absolute bottom-3 right-3 z-30">
-          <span className="inline-flex items-center rounded-sm bg-ink px-2 py-0.5 text-meta text-on-deep" data-num>
+          <span className="inline-flex items-center rounded-sm bg-deep-2 px-2 py-0.5 text-meta text-on-deep" data-num>
             {vehicle.photoCount} photos
           </span>
         </div>

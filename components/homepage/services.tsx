@@ -28,15 +28,18 @@ import { EnquireTile } from "./enquire-tile"
  * what the thumb finds.
  */
 const tile =
-  "flex min-h-24 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md " +
+  "group flex min-h-28 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md " +
   "border border-line bg-surface px-2 py-3 text-center text-label text-ink " +
-  "transition-colors duration-(--duration-1) hover:border-line-strong hover:bg-ground-2 md:min-h-28"
+  "transition-colors duration-(--duration-1) hover:border-accent md:min-h-32"
 
 function Face({ glyph, label }: { glyph: ReactNode; label: string }) {
   return (
     <>
       {/* Glyphs are sized in em, so the wrapper's font-size is the icon size. */}
-      <span aria-hidden className="text-h2 leading-none text-accent">
+      <span
+        aria-hidden
+        className="grid h-12 w-12 place-items-center rounded-full bg-info-bg text-h3 leading-none text-accent transition-colors duration-(--duration-1) group-hover:bg-accent group-hover:text-on-accent"
+      >
         {glyph}
       </span>
       <span>{label}</span>

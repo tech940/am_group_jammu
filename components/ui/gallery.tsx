@@ -115,7 +115,7 @@ export function Gallery({
               />
               <span
                 aria-hidden
-                className="absolute inset-0 bg-ink/0 transition-colors duration-(--duration-1) group-hover:bg-ink/25"
+                className="absolute inset-0 bg-deep-2/0 transition-colors duration-(--duration-1) group-hover:bg-deep-2/25"
               />
             </button>
           </li>
@@ -151,7 +151,7 @@ function FilterChip({
       aria-pressed={active}
       className={`inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 text-button transition-colors duration-(--duration-1) ${
         active
-          ? "border-ink bg-ink text-ground"
+          ? "border-accent bg-accent text-on-accent"
           : "border-line-strong bg-surface text-ink hover:bg-ground-2"
       }`}
     >
@@ -256,7 +256,7 @@ function Viewer({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.18 }}
-          className="fixed inset-0 z-[110] flex flex-col bg-ink outline-none"
+          className="fixed inset-0 z-[110] flex flex-col bg-deep-2 outline-none"
         >
           <header className="flex items-center justify-between gap-4 border-b border-line-on-deep px-4 py-3 md:px-6">
             <p id={labelId} className="min-w-0 truncate text-meta uppercase text-on-deep-2">

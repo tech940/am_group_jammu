@@ -12,9 +12,9 @@ import { PhoneGlyph } from "./marks"
  * Site-wide navigation for a used-car site. One header on every public route.
  * Four flat entries — buy, sell, locations, contact — and no dropdowns.
  *
- * The header is a dark object in every state. That is not a style preference —
- * the AM Group logo is white artwork on a transparent ground, so it is only
- * legible on ink. Recolouring the mark per background would mean shipping the
+ * The header is blue in every state. That is not a style preference — the AM
+ * Group logo is white artwork on a transparent ground, so it needs a coloured
+ * ground behind it. It is frosted (`.glass-blue`), not a flat slab. Recolouring the mark per background would mean shipping the
  * logo two ways; keeping the header dark means shipping it once, unfiltered,
  * exactly as the brand supplies it.
  *
@@ -138,7 +138,7 @@ export function SiteNav() {
       <header
         data-ground="deep"
         className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-          filled ? "border-b border-line-on-deep bg-deep-2" : "glass-bar border-b border-line-on-deep"
+          filled ? "glass-blue border-b border-line-on-deep" : "glass-blue border-b border-transparent"
         }`}
       >
         <div className="mx-auto flex h-16 max-w-[1400px] items-stretch justify-between px-5 md:px-10">

@@ -148,7 +148,7 @@ export function Dialog({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18 }}
-            className="absolute inset-0 bg-ink/60"
+            className="absolute inset-0 bg-deep-2/60"
           />
 
           <motion.div

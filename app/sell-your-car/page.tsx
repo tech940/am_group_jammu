@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ClosingCall } from "@/components/system/closing-call"
 import { EnquireCta } from "@/components/system/enquire-cta"
 import { ArrowGlyph } from "@/components/system/marks"
+import { IlloPapers, IlloSell, IlloShowroom } from "@/components/system/illustrations"
 import { FaqSection, type FaqItem } from "@/components/seo/faq-section"
 import { PhotoHero } from "@/components/homepage/photo-hero"
 import { SectionHead, TIGHT_BAND } from "@/components/homepage/section-head"
@@ -63,14 +64,17 @@ export function generateMetadata(): Metadata {
 
 const STEPS = [
   {
+    Illo: IlloShowroom,
     title: "Bring the car",
     body: `Come to any of our ${SITE_NAMES.length} sites in Jammu during opening hours (${HOURS}). Bring the registration certificate and the insurance. Calling first means someone is ready for you.`,
   },
   {
+    Illo: IlloSell,
     title: "Inspection and offer",
     body: "We look the car over while you wait and tell you what we would pay for it. The valuation is free, and whether you sell is up to you.",
   },
   {
+    Illo: IlloPapers,
     title: "Payment and RC transfer",
     body: "If you accept, payment and the RC transfer are handled in-house. You can also put the value towards a car from our stock instead.",
   },
@@ -151,19 +155,25 @@ export default function SellYourCarPage() {
           lede="Three steps, all at the dealership. We do not quote a price before we have seen the car."
         />
 
-        <ol className="mt-7 grid grid-cols-1 border-t border-line-strong md:mt-10 md:grid-cols-3 md:gap-x-10">
+        <ol className="mt-7 grid grid-cols-1 gap-3 md:mt-10 md:grid-cols-3 md:gap-5">
           {STEPS.map((step, i) => (
-            <li key={step.title} className="border-b border-line py-6 md:border-b-0 md:py-8">
-              <span className="font-display text-h1 text-accent" data-num aria-hidden>
-                {i + 1}
-              </span>
-              <h3 className="mt-2 font-display text-h2 uppercase text-ink">{step.title}</h3>
+            <li
+              key={step.title}
+              className="rounded-md border border-line bg-surface p-5 shadow-raised md:p-7"
+            >
+              <step.Illo className="h-28 w-auto md:h-40" />
+              <h3 className="mt-4 flex items-baseline gap-2.5 font-display text-h2 uppercase text-ink">
+                <span className="text-accent" data-num>
+                  {i + 1}
+                </span>
+                {step.title}
+              </h3>
               <p className="mt-2 text-body text-ink-2">{step.body}</p>
             </li>
           ))}
         </ol>
 
-        <div className="mt-6 flex flex-wrap items-center gap-3 md:mt-2 md:border-t md:border-line md:pt-8">
+        <div className="mt-6 flex flex-wrap items-center gap-3 md:mt-8">
           <EnquireCta
             label="Ask for a valuation"
             intent="Sell Your Car"
