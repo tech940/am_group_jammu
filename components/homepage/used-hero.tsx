@@ -1,12 +1,21 @@
 import { Button } from "@/components/ui/button"
 import { ChevronGlyph, SearchGlyph } from "@/components/system/marks"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
+import { LOCATIONS } from "@/lib/locations"
+import { formatINRShort } from "@/lib/inventory/adapter"
 import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
+import { underBudget } from "@/lib/seo/landing"
 import { PhotoHero } from "./photo-hero"
 
 /**
- * The opener of a used-car shop: the showroom photograph, how many cars there
- * are, and a search — nothing else.
+ * The opener of a used-car shop: the showroom photograph, what the shop does,
+ * how many cars there are, and a search — nothing else.
+ *
+ * THE H1 NAMES THE SHOP'S TWO JOBS, NOT "USED CARS IN JAMMU". That phrase is
+ * the job of /used-cars/jammu; with the same words in this H1 the two pages
+ * competed for one search. The count moved into the sentence under the H1,
+ * which states the basic facts (how many cars, where, at what prices) in one
+ * line that can be quoted on its own.
  *
  * THE SEARCH IS A PLAIN GET FORM. No client JavaScript. It sends `q`, `make`,
  * `body` and `budget` to /inventory, which already reads exactly those
@@ -71,27 +80,28 @@ export function UsedHero({
 }) {
   const live = !degraded && total > 0
   const budgets = BUDGETS.filter((b) =>
-    vehicles.some((v) => v.price !== null && v.price <= b * 100_000),
+    // "Under" is less than the figure, everywhere on the site.
+    vehicles.some((v) => underBudget(v, b * 100_000)),
   )
 
   return (
     <PhotoHero labelledBy="hero-title" overlap>
       <h1 id="hero-title" className="font-display text-display uppercase text-on-deep">
-        {live ? (
-          <>
-            <span data-num>{total}</span> used cars in <Underlined>Jammu</Underlined>
-          </>
-        ) : (
-          <>
-            Used cars in <Underlined>Jammu</Underlined>
-          </>
-        )}
+        Buy or sell a used car in <Underlined>Jammu</Underlined>
       </h1>
 
       {live ? (
         <>
           <p className="mt-4 text-body text-on-deep-2 md:text-body-lg">
-            Our own photos, recorded kilometres and asking prices, straight from the stock list.
+            <span data-num>{total}</span> used {total === 1 ? "car" : "cars"} in stock today at{" "}
+            {LOCATIONS.length === 3 ? "three" : LOCATIONS.length} sites in Jammu
+            {facets.priceRange.max > 0 && (
+              <>
+                , from <span data-num>{formatINRShort(facets.priceRange.min)}</span> to{" "}
+                <span data-num>{formatINRShort(facets.priceRange.max)}</span>
+              </>
+            )}
+            . Our own photos, odometer readings and asking prices.
           </p>
 
           <form

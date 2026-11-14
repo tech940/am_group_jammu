@@ -40,7 +40,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const closeDrawer = () => setIsDrawerOpen(false)
 
   return (
-    <div className="min-h-screen bg-ground">
+    // data-clarity-mask: no analytics tag is ever loaded on /admin (see
+    // components/analytics/analytics.tsx), so this should never be needed. It
+    // is a second line of defence: if a session recorder were ever running
+    // here, customers' names and numbers would be blanked in the recording.
+    <div data-clarity-mask="true" className="min-h-screen bg-ground">
       {/* Backdrop — mobile only, where the rail overlays content. Without it,
           tapping away from an open drawer does nothing. */}
       {isDrawerOpen && (

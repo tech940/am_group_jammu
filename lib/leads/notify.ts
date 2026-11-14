@@ -22,6 +22,8 @@
 
 import nodemailer from 'nodemailer'
 import type { LeadIntent } from './types.ts'
+import { attributionLines } from './attribution.ts'
+import type { LeadAttribution } from './attribution.ts'
 
 const DEFAULT_TO = 'aryan@amgroupind.com, data@amgroupind.com'
 
@@ -40,6 +42,10 @@ export interface LeadEmail {
   vehicle: { title: string | null; price: number | null; url: string | null }
   /** Lead-desk id, or null when the database did not take it. */
   leadId: string | null
+  /** How the visitor found the site. Already cleaned by validateLead. */
+  attribution?: LeadAttribution | null
+  /** What the visitor agreed to, in words (consentRecord in ./types.ts). */
+  consentNote?: string
 }
 
 export type NotifyResult = { sent: true } | { sent: false; reason: 'not_configured' | 'failed' }
@@ -64,6 +70,11 @@ export async function sendLeadEmail(lead: LeadEmail): Promise<NotifyResult> {
     ['Car page', lead.vehicle.url ?? '—'],
     ['Message', lead.message ?? '—'],
     ['Sent from', [lead.sourcePath, lead.sourceLabel].filter(Boolean).join(' · ') || '—'],
+    // Channel, this visit, first visit. These come from the visitor's address
+    // bar, so like every other value here they go through esc() below and are
+    // never put in a mail header.
+    ...attributionLines(lead.attribution),
+    ['Consent', lead.consentNote ?? '—'],
     [
       'Lead desk',
       lead.leadId

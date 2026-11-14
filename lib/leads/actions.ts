@@ -16,6 +16,8 @@ import {
 import { rateLimit, validateLead } from './validation.ts'
 import { sendLeadEmail } from './notify.ts'
 import { PRIMARY_LOCATION } from '../locations.ts'
+import { attributionNote } from './attribution.ts'
+import { REPEAT_NOTE_PREFIX, consentRecord } from './types.ts'
 import type {
   CreateLeadInput,
   Lead,
@@ -65,7 +67,10 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
     }
   }
 
-  const clean = validation.clean
+  // `attribution` and `consentScope` have no column in the leads table, so
+  // they are kept out of the row and written to the lead's history instead.
+  const { attribution, consentScope, ...clean } = validation.clean
+  const consentNote = consentRecord(clean.consent, consentScope)
 
   const vehicle = input.vehicle
     ? {
@@ -85,10 +90,16 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
     // same thing twice in ten minutes is one lead, not two — and not two emails.
     const duplicate = await findRecentDuplicate(clean.phone, clean.intent)
     if (duplicate) {
+      // No new row, but the second form can say something the first did not:
+      // a ticked marketing box after an enquiry-only consent, or a different
+      // advertisement. The history note is the only place that can be kept,
+      // so it carries both.
+      const origin = attributionNote(attribution)
       await addActivity(
         duplicate.id,
         'note',
-        `Repeat submission from the same number${clean.sourcePath ? ` on ${clean.sourcePath}` : ''}.`,
+        `${REPEAT_NOTE_PREFIX} from the same number${clean.sourcePath ? ` on ${clean.sourcePath}` : ''}. ` +
+          `${origin ? `How they found us. ${origin}. ` : ''}Consent: ${consentNote}.`,
         null,
       )
       return { ok: true, data: { id: duplicate.id, duplicate: true } }
@@ -100,11 +111,27 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
     // redirect to /admin/login mid-stream, which aborts the action response.
     const lead = await insertLead({ ...clean, vehicle })
     leadId = lead.id
+
+    // How the visitor found the site, and exactly what they consented to.
+    // Stored as the lead's first note because the admin lead page already
+    // shows notes, and the table cannot be given new columns from here. A
+    // failure to write it must never cost the lead itself.
+    try {
+      const origin = attributionNote(attribution)
+      await addActivity(
+        lead.id,
+        'note',
+        `${origin ? `How they found us. ${origin}. ` : ''}Consent: ${consentNote}.`,
+        null,
+      )
+    } catch (err) {
+      console.error('[leads] could not record how the lead found us', err)
+    }
   } catch (err) {
     console.error('[leads] database save failed', err)
   }
 
-  const mail = await sendLeadEmail({ ...clean, vehicle, leadId })
+  const mail = await sendLeadEmail({ ...clean, vehicle, leadId, attribution, consentNote })
 
   if (leadId || mail.sent) {
     if (!leadId) console.error('[leads] delivered by EMAIL ONLY — the database did not take this lead')

@@ -1,58 +1,47 @@
 import { getInventory } from "@/lib/inventory/server"
-import { getAllLandingSlugs } from "@/lib/seo/landing"
+import { getLandingDirectory, type LandingEntry } from "@/lib/seo/landing"
 import { H_PROMISE, LOCATIONS, formatHours, PRIMARY_LOCATION } from "@/lib/locations"
 import { formatINR, slugify } from "@/lib/inventory/adapter"
-import { SITE_URL } from "@/lib/seo/site"
-import { locationAddressLine, locationHeading, locationNames } from "@/lib/seo/locations"
+import { DEALER_NAME } from "@/lib/seo/site"
+import { locationAddressLine, locationHeading } from "@/lib/seo/locations"
+import { ABOUT_PARAGRAPHS } from "@/app/locations/about-facts"
+import { carHeading } from "@/app/inventory/[slug]/car-facts"
+import { MARKDOWN_HEADERS, dealerSummary, linkLine as line, stockCheckedAt } from "./shared"
 
 /**
  * /llms.txt — https://llmstxt.org
  *
  * The spec is an H1, an optional blockquote summary, then H2 sections whose
- * bodies are MARKDOWN LINK LISTS. The previous static file in public/ had the
- * H1 and prose but zero links, which is the one thing the format exists to
- * provide — an LLM had nothing to follow.
+ * bodies are MARKDOWN LINK LISTS. This file is the map; /llms-full.txt is the
+ * whole stock in one table, and /api/vehicles is the same stock as JSON.
  *
  * Generated rather than static so the stock counts, prices and vehicle URLs
  * stay true as inventory turns over, exactly like sitemap.xml. A hand-written
- * file would be wrong within a week.
+ * file would be wrong within a week. It prints the time the stock was read, so
+ * a reader can tell how fresh the numbers are.
  */
-
-const SITE = SITE_URL
 
 export const dynamic = "force-static"
 export const revalidate = 1800
 
+/** "5 in stock, from ₹15,00,000." — what a landing page holds right now. */
+function stockNote(entry: LandingEntry): string {
+  const count = `${entry.count} in stock`
+  return entry.priceFrom !== null ? `${count}, from ${formatINR(entry.priceFrom)}.` : `${count}.`
+}
+
 export async function GET() {
-  const [{ vehicles, facets, total }, landings] = await Promise.all([
-    getInventory(),
-    getAllLandingSlugs(),
-  ])
-
-  const line = (name: string, path: string, desc: string) =>
-    `- [${name}](${SITE}${path}): ${desc}`
-
-  const priceRange =
-    vehicles.length > 0
-      ? `${formatINR(facets.priceRange.min)}–${formatINR(facets.priceRange.max)}`
-      : "varies"
+  const [snapshot, directory] = await Promise.all([getInventory(), getLandingDirectory()])
+  const { vehicles, facets, total } = snapshot
 
   const makes = facets.makes.map((m) => `${m.label} (${m.count})`).join(", ")
 
-  const budgetLinks = landings
-    .filter((l) => l.kind === "budget")
-    .map((l) => {
-      const lakhs = l.slug.match(/^under-([\d.]+)-lakh/)?.[1] ?? ""
-      return line(`Used cars under ₹${lakhs} lakh in Jammu`, `/used-cars/${l.slug}`, `Used cars in stock priced under ₹${lakhs} lakh.`)
-    })
-
-  const modelLinks = landings
-    .filter((l) => l.kind === "model")
-    .map((l) => line(l.slug.replace(/-in-jammu$/, "").replace(/-/g, " "), `/used-cars/${l.slug}`, "Model-specific stock, prices and specifications."))
-
-  const bodyLinks = landings
-    .filter((l) => l.kind === "body" || l.kind === "fuel" || l.kind === "transmission")
-    .map((l) => line(l.slug.replace(/-in-jammu$/, "").replace(/-/g, " "), `/used-cars/${l.slug}`, "Filtered stock for this category."))
+  // Link text is the landing page's own label ("Used Hyundai Creta", "Under
+  // ₹5 Lakh"), not its slug, and each line says what is behind it today.
+  const landingLinks = (...kinds: LandingEntry["kind"][]) =>
+    directory
+      .filter((e) => kinds.includes(e.kind))
+      .map((e) => line(`${e.label}${/jammu/i.test(e.label) ? "" : " in Jammu"}`, e.href, stockNote(e)))
 
   const brandLinks = facets.makes.map((m) =>
     line(
@@ -70,21 +59,19 @@ export async function GET() {
     ),
   )
 
-  // Cap the individual listings: llms.txt is a map, not a dump. The full set
-  // is always available via sitemap.xml, which is linked below.
+  // Cap the individual listings: llms.txt is a map, not a dump. Every car is
+  // in /llms-full.txt, which is linked above them.
   const vehicleLinks = vehicles
     .slice(0, 25)
     .map((v) =>
       line(
-        `${v.year ?? ""} ${v.title}`.trim(),
+        // The car page's own heading, so five "2024 Kia Carens" links are not
+        // five links with the same text.
+        carHeading(v, vehicles),
         `/inventory/${v.slug}`,
-        [
-          v.priceLabel,
-          v.mileage !== null ? v.mileageLabel : null,
-          v.fuel,
-          v.transmission,
-          v.condition,
-        ]
+        // Facts recorded for the car only. The stock's "condition" label is
+        // left out: what it certifies has not been stated by the company.
+        [v.priceLabel, v.mileage !== null ? v.mileageLabel : null, v.fuel, v.transmission]
           .filter(Boolean)
           .join(", ") + ".",
       ),
@@ -94,46 +81,50 @@ export async function GET() {
     ? ` H Promise (Hyundai certified used cars) line: ${H_PROMISE.phone}.`
     : ""
 
-  const body = `# AM Group Used Cars, Jammu
+  const body = `# ${DEALER_NAME}
 
-> Used car dealer in Jammu, India. ${total} used cars currently in stock, priced ${priceRange}. ${LOCATIONS.length} used-car locations, all in Jammu: ${locationNames()}.
+> ${dealerSummary(snapshot)}
 
-This website is for people buying or selling a used car in Jammu. Every listing is a car in stock: the photographs are of that specific car and the kilometres shown are the reading recorded when it came in. Prices shown are the asking price; registration transfer and insurance are quoted separately. AM Group also buys cars and takes them in exchange.
+This website is for people buying or selling a used car in Jammu. Every listing is a car in stock: the photographs are of that specific car and the kilometres shown are the odometer reading entered for that car. Prices shown are the asking price; registration transfer and insurance are quoted separately.
 
-Current stock covers ${makes || "a range of makes"}. Stock changes as cars are sold, so the counts and prices on these pages are generated from live data. Each car is kept at one of the ${LOCATIONS.length} locations — phone ${PRIMARY_LOCATION.phone} to confirm where a car is before travelling.${hPromise}
+Current stock covers ${makes || "a range of makes"}. Stock changes as cars are sold, so the counts and prices in this file are generated from live data, last read on ${stockCheckedAt(snapshot.fetchedAt)}. Each car is kept at one of the ${LOCATIONS.length} sites — phone ${PRIMARY_LOCATION.phone} to confirm where a car is before travelling.${hPromise}
+
+## About
+${ABOUT_PARAGRAPHS[2]}
+
+${ABOUT_PARAGRAPHS[3]}
+
+## Stock data
+${line("Full stock list (markdown)", "/llms-full.txt", `Every car in stock in one table (year, make, model, kilometres, fuel, transmission, asking price, page), plus the sites, hours, phone and how buying and selling work.`)}
+${line("Stock as JSON", "/api/vehicles", "The same cars as JSON. Takes the filters the inventory page takes (make, model, bodyType, fuel, transmission, budget, year, q, sort) plus limit and offset.")}
 
 ## Browse used cars
 ${line("All used cars in Jammu", "/inventory", `Full inventory, ${total} cars, with filters for make, model, budget, body type, fuel, transmission, year and kilometres.`)}
-${budgetLinks.join("\n")}
+${[...landingLinks("city"), ...landingLinks("budget")].join("\n")}
 
 ## By brand
 ${brandLinks.join("\n")}
 
 ## By model
-${modelLinks.join("\n")}
+${landingLinks("model").join("\n")}
 
 ## By category
-${bodyLinks.join("\n")}
+${landingLinks("body", "fuel", "transmission").join("\n")}
 
-## Individual listings${vehicles.length > 25 ? ` (first 25 of ${vehicles.length})` : ""}
+## Individual listings${vehicles.length > 25 ? ` (first 25 of ${vehicles.length}; all are in /llms-full.txt)` : ""}
 ${vehicleLinks.join("\n")}
 
 ## Locations and contact
 ${locationLinks.join("\n")}
-${line("All locations", "/locations", `The ${LOCATIONS.length} used-car locations in Jammu, with opening hours and phone.`)}
-${line("Contact AM Group", "/contact", `Enquiry form, phone and WhatsApp. Phone: ${PRIMARY_LOCATION.phone}. Email: ${PRIMARY_LOCATION.email}.`)}
+${line("All locations", "/locations", `The ${LOCATIONS.length} used-car sites in Jammu, with opening hours and phone, and who ${DEALER_NAME} is.`)}
+${line(`Contact ${DEALER_NAME}`, "/contact", `Enquiry form, phone and WhatsApp. Phone: ${PRIMARY_LOCATION.phone}. Email: ${PRIMARY_LOCATION.email}.`)}
 
 ## Selling a car
-${line("Sell your car", "/sell-your-car", "Ask AM Group to value and buy your car, or take it in exchange, at any of the Jammu locations.")}
+${line("Sell your car", "/sell-your-car", "Ask AM Group to value and buy your car, or take it in exchange, at any of the Jammu sites.")}
 
 ## Optional
 ${line("Sitemap", "/sitemap.xml", "Every indexable URL on the site.")}
 `
 
-  return new Response(body, {
-    headers: {
-      "Content-Type": "text/markdown; charset=utf-8",
-      "Cache-Control": "public, max-age=0, s-maxage=1800, stale-while-revalidate=3600",
-    },
-  })
+  return new Response(body, { headers: MARKDOWN_HEADERS })
 }

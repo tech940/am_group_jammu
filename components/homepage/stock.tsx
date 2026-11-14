@@ -1,10 +1,9 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Band } from "@/components/system/page-kit"
 import { StockRail } from "@/components/system/stock-rail"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
 import type { InventoryVehicle } from "@/lib/inventory/types"
-import { SectionHead, TIGHT_BAND } from "./section-head"
+import { SectionHead, StoreBand } from "./section-head"
 
 /**
  * Live stock — the one band on this page whose contents change without anyone
@@ -33,7 +32,7 @@ export function Stock({
   const available = !degraded && vehicles.length > 0
 
   return (
-    <Band ground="ground-2" labelledBy="stock-title" id="stock" className={TIGHT_BAND}>
+    <StoreBand ground="ground-2" labelledBy="stock-title" id="stock">
       <SectionHead
         id="stock-title"
         title={available ? "Just arrived" : "Used cars in stock"}
@@ -51,9 +50,10 @@ export function Stock({
 
             {bestValue.length > 0 && (
               <div className="mt-9 md:mt-12">
-                <h3 className="mb-5 font-display text-h2 uppercase text-ink">
+                {/* An h2: it heads its own list of cars, whose titles are h3. */}
+                <h2 className="mb-5 font-display text-h2 uppercase text-ink">
                   Lowest priced today
-                </h3>
+                </h2>
                 <StockRail
                   vehicles={bestValue}
                   sourceLabel="home-value-rail"
@@ -64,7 +64,7 @@ export function Stock({
 
             <div className="mt-7 flex flex-wrap items-center gap-3 md:mt-9">
               <Button asChild variant="primary" size="lg">
-                <Link href="/inventory">See all {total} cars</Link>
+                <Link href="/inventory">See all {total} cars in stock</Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
                 <Link href="/used-cars/jammu">Used cars in Jammu</Link>
@@ -107,6 +107,6 @@ export function Stock({
           </div>
         )}
       </div>
-    </Band>
+    </StoreBand>
   )
 }

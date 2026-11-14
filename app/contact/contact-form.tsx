@@ -1,16 +1,26 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChatGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
 import { Field, Input, Textarea, Checkbox } from "@/components/ui/field"
 import { Alert, Spinner } from "@/components/ui/feedback"
 import { submitLead } from "@/lib/leads/actions"
+import { CONSENT_TEXT } from "@/lib/leads/types"
 import { pushEvent } from "@/lib/analytics/gtm"
+import { attributionParams, getAttribution } from "@/lib/analytics/attribution"
 import { whatsappUrl, PRIMARY_LOCATION } from "@/lib/locations"
 
 const EMPTY = { name: "", email: "", phone: "", message: "", consent: false, companyWebsite: "" }
+
+/** Sent with every event from this form, so it lines up with the modal's. */
+const FORM = {
+  form_id: "contact-page",
+  lead_intent: "General",
+  lead_source_label: "contact-page",
+} as const
 
 /**
  * The contact form.
@@ -18,6 +28,11 @@ const EMPTY = { name: "", email: "", phone: "", message: "", consent: false, com
  * This previously had no onSubmit and no name attributes at all, so clicking
  * "Send Message" performed a native GET, reloaded the page and cleared the
  * fields — which reads to the visitor as success while nothing was ever sent.
+ *
+ * Consent: the tick box is optional and is recorded exactly as ticked or not.
+ * Its wording (CONSENT_TEXT.marketing) covers offers and service updates, so
+ * an unticked box still gets the enquiry answered and nothing else; the line
+ * under the button says that.
  */
 export function ContactForm() {
   const pathname = usePathname()
@@ -25,6 +40,16 @@ export function ContactForm() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+
+  // First field touched: the step between "saw the form" and "sent it".
+  const startedRef = useRef(false)
+  const reportStart = (e: React.FocusEvent<HTMLFormElement>) => {
+    // A field, not the buttons and links that also sit inside the form.
+    if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
+    if (startedRef.current) return
+    startedRef.current = true
+    pushEvent("form_start", { ...FORM, lead_source_path: pathname })
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,12 +65,15 @@ export function ContactForm() {
         sourcePath: pathname,
         sourceLabel: "contact-page",
         consent: form.consent,
+        consentScope: "marketing",
+        attribution: getAttribution(),
         companyWebsite: form.companyWebsite,
       })
 
       if (!result.ok) {
         pushEvent("form_error", {
-          form_id: "contact-page",
+          ...FORM,
+          lead_source_path: pathname,
           error_message: result.error,
           error_code: result.code,
           error_type: "server",
@@ -58,17 +86,15 @@ export function ContactForm() {
       // generate_lead sources reconcile against the admin lead table.
       if (result.data.id !== "ignored" && !result.data.duplicate) {
         pushEvent("generate_lead", {
+          ...FORM,
           currency: "INR",
           value: 0,
-          lead_id: result.data.id,
-          lead_intent: "General",
-          lead_source_label: "contact-page",
           lead_source_path: pathname,
-          form_id: "contact-page",
           has_vehicle: false,
           consent: form.consent,
           has_message: Boolean(form.message),
           has_email: Boolean(form.email),
+          ...attributionParams(),
         })
       }
 
@@ -76,8 +102,10 @@ export function ContactForm() {
       setSent(true)
     } catch {
       pushEvent("form_error", {
-        form_id: "contact-page",
+        ...FORM,
+        lead_source_path: pathname,
         error_message: "network_exception",
+        error_code: "exception",
         error_type: "exception",
       })
       setError(`Something went wrong. Please call us on ${PRIMARY_LOCATION.phone}.`)
@@ -91,7 +119,7 @@ export function ContactForm() {
       <div className="border border-line bg-surface p-6 text-center md:p-10">
         <h3 className="font-display text-h2 uppercase text-ink">Message received</h3>
         <p className="mx-auto mt-3 max-w-md text-body text-ink-2">
-          Thanks for getting in touch. Our team will call you back within one working day.
+          Thanks for getting in touch. Our team will call you back.
           For anything urgent, call us on{" "}
           <a
             href={`tel:${PRIMARY_LOCATION.phoneE164}`}
@@ -126,6 +154,10 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
+      onFocusCapture={reportStart}
+      // Clarity never records typed input; this blanks the whole form in a
+      // replay as well, whatever masking mode the Clarity project uses.
+      data-clarity-mask="true"
       className="space-y-6 border border-line bg-surface p-6 md:p-10"
     >
       {/* Offer the faster channel first — for most J&K buyers WhatsApp beats a
@@ -203,7 +235,7 @@ export function ContactForm() {
       </div>
 
       <Checkbox
-        label="I agree to be contacted by AM Group via Call, SMS, WhatsApp, RCS, and Email regarding my inquiry, offers, and service updates. I understand that I can opt out at any time."
+        label={CONSENT_TEXT.marketing}
         checked={form.consent}
         onChange={(e) => setForm({ ...form, consent: e.target.checked })}
       />
@@ -219,6 +251,17 @@ export function ContactForm() {
           "Send Message"
         )}
       </Button>
+
+      {/* What happens to the details whether or not the box is ticked. */}
+      <p className="text-small text-ink-2">
+        We use these details to reply to your enquiry.{" "}
+        <Link
+          href="/privacy-policy"
+          className="text-accent-text-light underline underline-offset-2"
+        >
+          Privacy policy
+        </Link>
+      </p>
     </form>
   )
 }

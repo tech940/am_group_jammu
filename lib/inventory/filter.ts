@@ -124,9 +124,11 @@ export function filtersFromSearchParams(
   const condition = matchAgainst('condition', get('condition'))
   if (condition) out.condition = condition
 
-  // budget=<lakhs> is what the hero search form emits.
+  // budget=<lakhs> is what the hero search form emits. "Under 5 lakh" means
+  // strictly less than 5,00,000 - the same rule as the landing pages and the
+  // listing page - so the range stops one rupee short.
   const budget = Number.parseFloat(get('budget'))
-  if (Number.isFinite(budget) && budget > 0) out.priceRange = [0, budget * 100_000]
+  if (Number.isFinite(budget) && budget > 0) out.priceRange = [0, budget * 100_000 - 1]
 
   // year=2024 -> exactly that model year (used by the footer/SEO link graph).
   const year = Number.parseInt(get('year'), 10)
@@ -148,4 +150,20 @@ export function filtersFromSearchParams(
   }
 
   return out
+}
+
+/** A card's photo strip shows at most this many photos (components/ui/vehicle-card.tsx). */
+export const CARD_PHOTO_LIMIT = 8
+
+/**
+ * A vehicle as a list card needs it.
+ *
+ * A card is a client component, so the whole object handed to it is written
+ * into the page as data. Cars carry up to 49 photo URLs and a card shows 8;
+ * sending all of them added about 150 KB to the homepage for photos no card
+ * can display. `photoCount` is left alone: the "39 photos" badge is the real
+ * total, and the car's own page still loads the full list for its gallery.
+ */
+export function toCardVehicle(v: InventoryVehicle, photos = CARD_PHOTO_LIMIT): InventoryVehicle {
+  return v.images.length > photos ? { ...v, images: v.images.slice(0, photos) } : v
 }

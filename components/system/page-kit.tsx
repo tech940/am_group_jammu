@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import Image from "next/image"
-import { Settle } from "@/components/system/marks"
+import { Settle } from "@/components/system/motion"
 import { RuleDraw } from "@/components/system/rule-draw"
 
 /**
@@ -50,8 +50,11 @@ export function Band({
   children: ReactNode
 }) {
   // One reveal per band, not one per element: the section settles as a unit,
-  // which is the "Reveal" row of DESIGN.md's motion table. Settle renders
-  // statically under prefers-reduced-motion, so there is nothing to opt out of.
+  // which is the "Reveal" row of DESIGN.md's motion table. This is the Settle
+  // from motion.tsx: the server HTML is plain and visible, and the motion is
+  // added by script afterwards. The older one in marks.tsx sent the whole band
+  // as opacity:0, which hid the contact form and the map from any reader that
+  // does not run script. It does nothing under prefers-reduced-motion.
   return (
     <section
       id={id}

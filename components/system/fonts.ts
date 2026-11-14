@@ -14,7 +14,10 @@ import { Archivo, Barlow_Condensed } from "next/font/google"
 export const displayFont = Barlow_Condensed({
   variable: "--font-barlow-condensed",
   subsets: ["latin"],
-  weight: ["500", "600", "700"],
+  // No 500: every use of the display face sets 600 or 700 (the heading
+  // sizes in app/globals.css carry those weights), so the 500 file was
+  // downloaded on every page and drawn nowhere.
+  weight: ["600", "700"],
   display: "swap",
 })
 

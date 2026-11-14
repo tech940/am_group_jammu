@@ -15,8 +15,8 @@
  */
 
 import { getInventory } from '../inventory/server.ts'
-import { formatINRShort, slugify } from '../inventory/adapter.ts'
-import { getAllLandingSlugs, SERVICE_CITY_SLUGS } from './landing.ts'
+import { formatINRShort } from '../inventory/adapter.ts'
+import { getAllLandingSlugs, getLandingHrefResolver, SERVICE_CITY_SLUGS, underBudget } from './landing.ts'
 import { LOCATIONS } from '../locations.ts'
 import { locationHeading } from './locations.ts'
 
@@ -36,22 +36,7 @@ export const SERVICE_CITIES = SERVICE_CITY_SLUGS.map((slug) => ({
   label: slug.charAt(0).toUpperCase() + slug.slice(1),
 }))
 
-const CITY = 'jammu'
-
-/** Resolve to a landing page when one was generated, else the filter URL. */
-function link(
-  valid: Set<string>,
-  landingSlug: string,
-  fallbackHref: string,
-  label: string,
-  count?: number,
-): SeoLink {
-  return {
-    label,
-    count,
-    href: valid.has(landingSlug) ? `/used-cars/${landingSlug}` : fallbackHref,
-  }
-}
+const filterUrl = (param: string, value: string) => `/inventory?${param}=${encodeURIComponent(value)}`
 
 export interface SeoLinks {
   groups: SeoLinkGroup[]
@@ -79,38 +64,51 @@ export async function getSeoLinks(): Promise<SeoLinks> {
   }))
 
   try {
-    const [{ facets, total, vehicles }, slugs] = await Promise.all([
+    const [{ facets, total, vehicles }, slugs, landingHref] = await Promise.all([
       getInventory(),
       getAllLandingSlugs(),
+      getLandingHrefResolver(),
     ])
-    const valid = new Set(slugs.map((s) => s.slug))
 
     const makeOf = (model: string) => vehicles.find((v) => v.model === model)?.make ?? null
+
+    // Every link goes to the indexable page for its facet when one exists
+    // (lib/seo/landing.ts decides), and to the filter URL only when none does.
 
     // Brands keep their dedicated /brands/<make> pages.
     const makes: SeoLink[] = facets.makes.map((m) => ({
       label: `Used ${m.label} Cars`,
-      href: `/brands/${slugify(m.value)}`,
+      href: landingHref({ kind: 'make', value: m.value }) ?? filterUrl('make', m.value),
       count: m.count,
     }))
 
-    const models: SeoLink[] = facets.models.slice(0, 14).map((m) => {
+    const models: SeoLink[] = facets.models.map((m) => {
       const make = makeOf(m.value)
-      const slug = `${make ? `${slugify(make)}-` : ''}${slugify(m.value)}-in-${CITY}`
-      return link(valid, slug, `/inventory?model=${encodeURIComponent(m.value)}`, m.label, m.count)
+      return {
+        // "Hyundai Creta", not "Creta": the link text is what the page is about.
+        label: make ? `${make} ${m.label}` : m.label,
+        href: landingHref({ kind: 'model', value: m.value }) ?? filterUrl('model', m.value),
+        count: m.count,
+      }
     })
 
-    const bodyTypes: SeoLink[] = facets.bodyTypes.map((b) =>
-      link(valid, `${slugify(b.value)}-in-${CITY}`, `/inventory?bodyType=${encodeURIComponent(b.value)}`, b.label, b.count),
-    )
+    const bodyTypes: SeoLink[] = facets.bodyTypes.map((b) => ({
+      label: b.label,
+      href: landingHref({ kind: 'body', value: b.value }) ?? filterUrl('bodyType', b.value),
+      count: b.count,
+    }))
 
-    const fuels: SeoLink[] = facets.fuels.map((f) =>
-      link(valid, `${slugify(f.value)}-cars-in-${CITY}`, `/inventory?fuel=${encodeURIComponent(f.value)}`, `${f.label} Cars`, f.count),
-    )
+    const fuels: SeoLink[] = facets.fuels.map((f) => ({
+      label: `${f.label} Cars`,
+      href: landingHref({ kind: 'fuel', value: f.value }) ?? filterUrl('fuel', f.value),
+      count: f.count,
+    }))
 
-    const transmissions: SeoLink[] = facets.transmissions.map((t) =>
-      link(valid, `${slugify(t.value)}-cars-in-${CITY}`, `/inventory?transmission=${encodeURIComponent(t.value)}`, `${t.label} Cars`, t.count),
-    )
+    const transmissions: SeoLink[] = facets.transmissions.map((t) => ({
+      label: `${t.label} Cars`,
+      href: landingHref({ kind: 'transmission', value: t.value }) ?? filterUrl('transmission', t.value),
+      count: t.count,
+    }))
 
     // Budget bands come straight from the generated landing slugs, so the labels
     // and the pages can never drift apart.
@@ -122,17 +120,14 @@ export async function getSeoLinks(): Promise<SeoLinks> {
         return {
           label: `Under ₹${lakhs} Lakh`,
           href: `/used-cars/${s.slug}`,
-          count: vehicles.filter((v) => v.price !== null && v.price <= ceiling).length,
+          // The same "less than" rule that picks the page's cars.
+          count: vehicles.filter((v) => underBudget(v, ceiling)).length,
         }
       })
       .sort((a, b) => (a.count ?? 0) - (b.count ?? 0))
 
-    const years: SeoLink[] = facets.years.slice(0, 10).map((y) => ({
-      label: `${y.label} Models`,
-      href: `/inventory?year=${y.value}`,
-      count: y.count,
-    }))
-
+    // There is no "by year" group: a model year has no landing page, so those
+    // links could only go to filter URLs, which are kept out of the index.
     const groups: SeoLinkGroup[] = [
       { title: 'Used Cars by Brand', links: makes },
       { title: 'Used Cars by Model', links: models },
@@ -141,7 +136,6 @@ export async function getSeoLinks(): Promise<SeoLinks> {
       { title: 'Used Cars by Body Type', links: bodyTypes },
       { title: 'Used Cars by Fuel', links: fuels },
       { title: 'Used Cars by Transmission', links: transmissions },
-      { title: 'Used Cars by Year', links: years },
     ].filter((g) => g.links.length > 0)
 
     return {
@@ -182,53 +176,57 @@ export async function getSeoLinks(): Promise<SeoLinks> {
  */
 export async function getFrequentSearches(limit = 40): Promise<SeoLink[]> {
   try {
-    const [{ vehicles, facets }, slugs] = await Promise.all([getInventory(), getAllLandingSlugs()])
-    const valid = new Set(slugs.map((s) => s.slug))
+    const [{ vehicles, facets }, slugs, landingHref] = await Promise.all([
+      getInventory(),
+      getAllLandingSlugs(),
+      getLandingHrefResolver(),
+    ])
     const out: SeoLink[] = []
     const seen = new Set<string>()
 
-    const push = (label: string, href: string) => {
-      if (seen.has(href) || out.length >= limit) return
+    // One link per page. A second phrasing of the same search pointing at the
+    // same URL is dropped here, which is why each page is named once.
+    const push = (label: string, href: string | null) => {
+      if (!href || seen.has(href) || out.length >= limit) return
       seen.add(href)
       out.push({ label, href })
     }
 
-    // Budget queries first — the highest-volume shape after brand.
+    // The head term first.
+    for (const city of SERVICE_CITIES) {
+      push(`Used cars in ${city.label}`, `/used-cars/${city.slug}`)
+    }
+
+    // Budget queries — the highest-volume shape after brand.
     for (const s of slugs.filter((x) => x.kind === 'budget')) {
       const lakhs = s.slug.match(/^under-([\d.]+)-lakh/)?.[1] ?? ''
       push(`Used cars under ${lakhs} lakh in Jammu`, `/used-cars/${s.slug}`)
-      push(`Second hand cars under ${lakhs} lakh Jammu`, `/used-cars/${s.slug}`)
-    }
-
-    // Model-level queries.
-    for (const model of facets.models.slice(0, 10)) {
-      const make = vehicles.find((v) => v.model === model.value)?.make ?? null
-      const slug = `${make ? `${slugify(make)}-` : ''}${slugify(model.value)}-in-jammu`
-      const href = valid.has(slug) ? `/used-cars/${slug}` : `/inventory?model=${encodeURIComponent(model.value)}`
-      push(`Second hand ${make ? `${make} ` : ''}${model.label} in Jammu`, href)
     }
 
     // Brand queries.
     for (const make of facets.makes) {
-      push(`Used ${make.label} cars in Jammu`, `/brands/${slugify(make.value)}`)
+      push(`Used ${make.label} cars in Jammu`, landingHref({ kind: 'make', value: make.value }))
+    }
+
+    // Model-level queries. Only models with a page of their own: a filter URL
+    // is not a destination worth naming in a list of searches.
+    for (const model of facets.models) {
+      const make = vehicles.find((v) => v.model === model.value)?.make ?? null
+      push(
+        `Second hand ${make ? `${make} ` : ''}${model.label} in Jammu`,
+        landingHref({ kind: 'model', value: model.value }),
+      )
     }
 
     // Body / fuel / transmission.
     for (const b of facets.bodyTypes) {
-      const slug = `${slugify(b.value)}-in-jammu`
-      if (valid.has(slug)) push(`Used ${b.label} in Jammu`, `/used-cars/${slug}`)
+      push(`Used ${/s$/i.test(b.label) ? b.label : `${b.label}s`} in Jammu`, landingHref({ kind: 'body', value: b.value }))
     }
     for (const f of facets.fuels) {
-      const slug = `${slugify(f.value)}-cars-in-jammu`
-      if (valid.has(slug)) push(`${f.label} used cars in Jammu`, `/used-cars/${slug}`)
+      push(`${f.label} used cars in Jammu`, landingHref({ kind: 'fuel', value: f.value }))
     }
     for (const t of facets.transmissions) {
-      const slug = `${slugify(t.value)}-cars-in-jammu`
-      if (valid.has(slug)) push(`${t.label} used cars in Jammu`, `/used-cars/${slug}`)
-    }
-
-    for (const city of SERVICE_CITIES) {
-      push(`Second hand cars in ${city.label}`, `/used-cars/${city.slug}`)
+      push(`${t.label} used cars in Jammu`, landingHref({ kind: 'transmission', value: t.value }))
     }
 
     return out

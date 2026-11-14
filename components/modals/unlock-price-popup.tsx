@@ -12,11 +12,13 @@ import { ChevronGlyph } from "@/components/system/marks"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import { submitLead } from "@/lib/leads/actions"
 import { validateLead } from "@/lib/leads/validation"
+import { CONSENT_TEXT } from "@/lib/leads/types"
 import type { CreateLeadInput, LeadIntent } from "@/lib/leads/types"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { useToast } from "@/hooks/use-toast"
 import { useInventoryStore } from "@/store/use-inventory-store"
-import { pushEvent, vehicleParams } from "@/lib/analytics/gtm"
+import { leadVehicleParams, pushEvent } from "@/lib/analytics/gtm"
+import { attributionParams, getAttribution } from "@/lib/analytics/attribution"
 
 /**
  * The enquiry modal — every lead opened from a button comes through this file.
@@ -35,6 +37,18 @@ import { pushEvent, vehicleParams } from "@/lib/analytics/gtm"
  *
  * The submission contract is unchanged: submitLead's input shape, the
  * `companyWebsite` honeypot, duplicate handling, toasts and analytics events.
+ *
+ * Consent: the form has no tick box. The sentence under the send button
+ * (CONSENT_TEXT.enquiry) is the whole agreement, it covers being called or
+ * messaged about this one enquiry, and that is all the lead records. It used
+ * to store a bare `consent: true` that the admin read as a ticked marketing
+ * box, which no visitor had been shown.
+ *
+ * Funnel events, in order: enquiry_modal_open (hooks/use-enquiry-modal.ts),
+ * form_start (first field touched), form_error, generate_lead, and
+ * enquiry_modal_close when the sheet is closed without an enquiry.
+ *
+ * This file is loaded on demand by ./enquiry-host.tsx, not by the root layout.
  */
 
 /* -------------------------------------------------------------------------- */
@@ -221,7 +235,10 @@ function EnquiryDialog({
         intent,
         sourcePath: pathname,
         sourceLabel,
+        // What the sentence at the send button says, and no more than that.
         consent: true,
+        consentScope: "enquiry",
+        attribution: getAttribution(),
         companyWebsite: String(fd.get("companyWebsite") ?? ""),
         vehicle: vehicle
           ? {
@@ -282,6 +299,46 @@ function EnquiryDialog({
   const reportedRef = useRef<string | null>(null)
   const reportedErrorRef = useRef<SubmitState | null>(null)
 
+  // The middle of the funnel. `form_start` is the first time a field is
+  // touched in this opening of the sheet; without it "opened" and "sent" are
+  // all there is, and a form nobody starts looks the same as one nobody
+  // finishes.
+  const startedRef = useRef(false)
+  const reportStart = (e: React.FocusEvent<HTMLFormElement>) => {
+    // A field, not the buttons and links that also sit inside the form.
+    if (!(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) return
+    if (startedRef.current) return
+    startedRef.current = true
+    pushEvent("form_start", {
+      form_id: "enquiry-modal",
+      lead_intent: intent,
+      lead_source_label: sourceLabel,
+      lead_source_path: pathname,
+      item_id: vehicle ? String(vehicle.id) : undefined,
+    })
+  }
+
+  // Closed without an enquiry: the other exit from the funnel. This component
+  // stays mounted after the sheet closes (the key only changes on the next
+  // open), so the change of `open` is seen here.
+  const wasOpenRef = useRef(false)
+  useEffect(() => {
+    if (open) {
+      wasOpenRef.current = true
+      return
+    }
+    if (!wasOpenRef.current) return
+    wasOpenRef.current = false
+    if (isSuccess) return
+    pushEvent("enquiry_modal_close", {
+      lead_intent: intent,
+      lead_source_label: sourceLabel,
+      lead_source_path: pathname,
+      form_started: startedRef.current,
+      item_id: vehicle ? String(vehicle.id) : undefined,
+    })
+  }, [open, isSuccess, intent, sourceLabel, pathname, vehicle])
+
   // Side effects belong here, not in the action reducer.
   useEffect(() => {
     if (state.status === "error") {
@@ -321,18 +378,21 @@ function EnquiryDialog({
     // admin lead table.
     const isRealNewLead = state.leadId !== "ignored" && !state.duplicate
     if (isRealNewLead) {
+      // The lead's row id is deliberately not sent: it would tie the analytics
+      // record, and the session recording, to a named person in the lead
+      // table. The lead itself already stores its source and attribution.
       pushEvent("generate_lead", {
-        currency: "INR",
-        lead_id: state.leadId,
         lead_intent: intent,
         lead_source_label: sourceLabel,
         lead_source_path: pathname,
         form_id: "enquiry-modal",
-        ...vehicleParams(vehicle),
+        // value 0, with the car's price as listing_price: an enquiry is not
+        // a sale, and GA4 would add the asking prices up as revenue.
+        ...leadVehicleParams(vehicle),
+        ...attributionParams(),
       })
     } else if (state.duplicate) {
       pushEvent("generate_lead_duplicate", {
-        lead_id: state.leadId,
         lead_intent: intent,
         lead_source_label: sourceLabel,
         form_id: "enquiry-modal",
@@ -365,9 +425,25 @@ function EnquiryDialog({
           copy.submit
         )}
       </Button>
+      {/* The consent wording, at the button that gives it. Both documents
+          open in a new tab so a half-filled form is not thrown away. */}
       <p className="mt-2.5 text-caption text-ink-2">
-        By submitting, you agree that AM Group may call or text you about this enquiry.{" "}
-        <a href="/terms" className="text-accent-text-light underline underline-offset-2">
+        {CONSENT_TEXT.enquiry}{" "}
+        <a
+          href="/privacy-policy"
+          target="_blank"
+          rel="noopener"
+          className="text-accent-text-light underline underline-offset-2"
+        >
+          Privacy policy
+        </a>
+        {" · "}
+        <a
+          href="/terms"
+          target="_blank"
+          rel="noopener"
+          className="text-accent-text-light underline underline-offset-2"
+        >
           Terms of use
         </a>
       </p>
@@ -422,7 +498,18 @@ function EnquiryDialog({
             </div>
           )}
 
-          <form id={formId} className="grid gap-4" action={formAction} noValidate>
+          <form
+            id={formId}
+            className="grid gap-4"
+            action={formAction}
+            noValidate
+            onFocusCapture={reportStart}
+            // Clarity never records what is typed into an input, in any of
+            // its modes. This also blanks the rest of the form in a replay
+            // (error text can repeat what was typed), whatever masking mode
+            // the Clarity project is later set to.
+            data-clarity-mask="true"
+          >
             {formError && <Alert tone="danger">{formError}</Alert>}
 
             <Field label="Name" required error={fields.name}>

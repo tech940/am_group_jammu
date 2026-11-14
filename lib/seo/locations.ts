@@ -55,11 +55,39 @@ export function locationAddressLine(location: Location): string {
   return locationAddressLines(location).join(', ')
 }
 
-/** "AM Business Park, Nanak Nagar and AM Auto Square, Gangyal" → joined for prose. */
+/**
+ * "AM Business Park, Nanak Nagar and AM Auto Square, Gangyal", joined for prose.
+ *
+ * Each site by its own short name, the same form the page headings, footer and
+ * structured data use. (The Gangyal site used to appear here as plain
+ * "Gangyal" and everywhere else as "AM Auto Square, Gangyal".)
+ */
 export function locationNames(): string {
-  const names = LOCATIONS.map((l) => (l.addressConfirmed ? l.shortName : locationPlace(l)))
+  const names = LOCATIONS.map((l) => l.shortName)
   if (names.length <= 1) return names[0] ?? PRIMARY_LOCATION.shortName
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`
+}
+
+/**
+ * A service name as it may be shown and marked up.
+ *
+ * lib/locations.ts lists "Certified pre-owned car sales". Nothing on record
+ * says who certifies the cars or what the check covers, so until the company
+ * answers that the service is described as what it certainly is: used car
+ * sales. Everything else passes through unchanged.
+ */
+export function serviceLabel(service: string): string {
+  return /certified/i.test(service) ? 'Used car sales' : service
+}
+
+/**
+ * The address as one search string, for a map embed or a directions link.
+ * Null for a site whose address is not confirmed: a map of a guessed place is
+ * worse than no map.
+ */
+export function locationMapQuery(location: Location): string | null {
+  if (!location.addressConfirmed) return null
+  return [location.streetAddress, location.city, location.postalCode].filter(Boolean).join(', ')
 }
 
 /** True when the published hours include no Sunday. */

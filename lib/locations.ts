@@ -11,6 +11,16 @@
  * with the exact pin from each Google Business Profile listing before launch.
  * Wrong coordinates are worse than none: they contradict your GBP and can send
  * a customer to the wrong side of town.
+ *
+ * WHAT READS THIS FILE, AND WHAT EACH FLAG SWITCHES ON
+ *   addressConfirmed: true   street, PIN, landmark, map embed, directions link,
+ *                            opening hours and served localities in structured
+ *                            data (lib/seo-schemas.ts, lib/seo/locations.ts)
+ *   geo.verified: true       coordinates in structured data
+ *   photos: [...]            the site's image in structured data
+ * While a flag is false the pages say "call for exact directions" and the
+ * structured data gives the locality only. Setting a flag is how a fact gets
+ * published; never set one to make a page look fuller.
  */
 
 export interface Location {
@@ -36,6 +46,12 @@ export interface Location {
   geo: { latitude: number; longitude: number; verified: boolean }
   /** Google Maps directions link. */
   mapUrl: string
+  /**
+   * Real photographs of this site (frontage, yard), as site paths or absolute
+   * URLs. Optional and empty today: none has been supplied. Structured data
+   * uses these as the site's image and falls back to nothing, never the logo.
+   */
+  photos?: string[]
   hours: { days: string[]; opens: string; closes: string }[]
   /** What this branch actually does. */
   services: string[]
@@ -60,8 +76,11 @@ const STANDARD_HOURS = [
 const MAIN_PHONE = '+91 94842 00000'
 const MAIN_PHONE_E164 = '+919484200000'
 
+// "Used car sales", not "Certified pre-owned car sales": nothing on record
+// says who certifies the cars or against what checklist, and this label is
+// printed on pages and in structured data for every site.
 const USED_CAR_SERVICES = [
-  'Certified pre-owned car sales',
+  'Used car sales',
   'Test drives',
   'Sell or exchange your car',
   'Car finance assistance',

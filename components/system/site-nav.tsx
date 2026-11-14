@@ -55,7 +55,10 @@ function Logo({ className = "" }: { className?: string }) {
       alt="AM Group"
       width={169}
       height={112}
-      priority
+      // No `priority` and no loading="eager": either one puts a preload for
+      // the logo in every page's head, where it competed with the one image
+      // that matters for first paint, the car photograph on a car page. The
+      // logo is in the header, so the default (lazy) still loads it at once.
       className={`w-auto object-contain ${className}`}
     />
   )

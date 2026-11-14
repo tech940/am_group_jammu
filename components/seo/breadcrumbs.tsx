@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { SITE_URL } from "@/lib/seo/site"
+import { jsonLdString } from "@/lib/seo-schemas"
 
 export interface Crumb {
   label: string
@@ -37,7 +38,9 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // Crumb labels include car titles typed in the admin panel, so "<" is
+        // escaped.
+        dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }}
       />
       <nav
         aria-label="Breadcrumb"

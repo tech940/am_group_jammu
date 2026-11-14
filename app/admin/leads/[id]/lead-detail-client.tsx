@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import {
   adminAddNote, adminAssign, adminLogContact, adminScheduleFollowUp, adminUpdateStatus,
 } from "@/lib/leads/actions"
-import { LEAD_STATUSES } from "@/lib/leads/types"
+import { LEAD_STATUSES, consentSummary } from "@/lib/leads/types"
 import type { Lead, LeadActivity, LeadStatus } from "@/lib/leads/types"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
@@ -155,9 +155,13 @@ export function LeadDetailClient({
                 <dt className="text-meta uppercase text-ink-2">Source page</dt>
                 <dd className="text-body text-ink-2 truncate max-w-[220px]">{lead.sourcePath ?? "—"}</dd>
               </div>
-              <div className="flex justify-between border-b border-line py-2">
+              <div className="flex justify-between gap-4 border-b border-line py-2">
                 <dt className="text-meta uppercase text-ink-2">Consent</dt>
-                <dd className="text-body text-ink-2">{lead.consent ? "Given" : "Not recorded"}</dd>
+                {/* Not a bare "Given": the modal's consent covers this enquiry
+                    only, the contact form's tick box also covers offers. */}
+                <dd className="text-right text-body text-ink-2">
+                  {consentSummary(lead.consent, activities.map((a) => a.body))}
+                </dd>
               </div>
             </dl>
 

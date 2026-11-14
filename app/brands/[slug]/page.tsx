@@ -12,10 +12,11 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
 import { RelatedLinks } from "@/components/seo/related-links"
+import { toCardVehicle } from "@/lib/inventory/filter"
 import { getFrequentSearches, getSeoLinks, type SeoLink } from "@/lib/seo/links"
-import { getAllLandingSlugs } from "@/lib/seo/landing"
+import { getLandingHrefResolver, resolveSoldOutBrand } from "@/lib/seo/landing"
 import { locationNames } from "@/lib/seo/locations"
-import { generateVehicleListSchema } from "@/lib/seo-schemas"
+import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
 import { pageSocial } from "@/lib/seo/site"
 
 /**
@@ -24,6 +25,9 @@ import { pageSocial } from "@/lib/seo/site"
  * Everything quoted here is counted from live stock. The page makes no claim
  * about being an authorised dealer for the make: this is a used-car site, and
  * a used Maruti on the forecourt does not make us a Maruti dealership.
+ *
+ * A make the dealer has sold out of keeps its page (see SoldOutBrand below)
+ * instead of turning into a 404 the day the last car goes.
  */
 
 type Props = {
@@ -64,16 +68,36 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const brand = await resolveBrand(slug)
 
-  if (!brand) return { title: "Brand Not Found", robots: "noindex" }
+  if (!brand) {
+    const soldOut = await resolveSoldOutBrand(slug)
+    if (!soldOut) return { title: "Brand Not Found", robots: "noindex" }
+    const title = `Used ${soldOut.brandName} Cars in Jammu`
+    const description =
+      `No used ${soldOut.brandName} car is in stock at AM Group in Jammu today. ` +
+      `Tell us you are looking for one and we will call you when one arrives.`
+    const path = `/brands/${soldOut.slug}`
+    return {
+      title,
+      description,
+      alternates: { canonical: path },
+      // Nothing of this make to show, so the page is not offered to the index.
+      robots: { index: false, follow: true },
+      ...pageSocial({ title, description, path }),
+    }
+  }
 
-  const title = `Used ${brand.brandName} Cars in Jammu | ${brand.count} in Stock`
+  // The layout appends " | AM Group"; past about 49 characters the count goes.
+  const withCount = `Used ${brand.brandName} Cars in Jammu | ${brand.count} in Stock`
+  const title = withCount.length <= 49 ? withCount : `Used ${brand.brandName} Cars in Jammu`
   const description =
     `${brand.count} used ${brand.brandName} ${brand.count === 1 ? "car" : "cars"} for sale in Jammu at AM Group` +
     (brand.models.length ? ` — ${list(brand.models)}` : "") +
     (brand.priceLow !== null && brand.priceHigh !== null
-      ? `. Priced ${formatINR(brand.priceLow)} to ${formatINR(brand.priceHigh)}`
+      ? brand.priceLow === brand.priceHigh
+        ? `. Priced at ${formatINR(brand.priceLow)}`
+        : `. Priced ${formatINR(brand.priceLow)} to ${formatINR(brand.priceHigh)}`
       : "") +
-    `. Real photos, recorded kilometres, finance and exchange.`
+    `. Real photos, odometer readings, finance and exchange.`
   const path = `/brands/${brand.slug}`
 
   return {
@@ -89,16 +113,22 @@ export default async function BrandPage({ params }: Props) {
   const { slug } = await params
   const brand = await resolveBrand(slug)
 
-  if (!brand) notFound()
+  if (!brand) {
+    // No car of this make in stock. If we have sold one, say so honestly and
+    // offer to call; a make we have never had is a 404.
+    const soldOut = await resolveSoldOutBrand(slug)
+    if (!soldOut) notFound()
+    return <SoldOutBrand brandName={soldOut.brandName} path={`/brands/${soldOut.slug}`} />
+  }
 
   const { brandName, vehicles: brandVehicles, count, models } = brand
   const path = `/brands/${brand.slug}`
   const cars = count === 1 ? "car" : "cars"
 
-  const [frequentSearches, seoLinks, landingSlugs] = await Promise.all([
+  const [frequentSearches, seoLinks, landingHref] = await Promise.all([
     getFrequentSearches(30),
     getSeoLinks(),
-    getAllLandingSlugs(),
+    getLandingHrefResolver(),
   ])
 
   const priceRange =
@@ -113,20 +143,19 @@ export default async function BrandPage({ params }: Props) {
         ? String(brand.yearLow)
         : `${brand.yearLow} to ${brand.yearHigh}`
       : null
+  // One year reads "model year 2016"; a span reads "model years 2016 to 2024".
+  const oneYear = brand.yearLow !== null && brand.yearLow === brand.yearHigh
 
-  // Model pages for this make, linked only where the landing page exists.
-  const validLandings = new Set(landingSlugs.map((s) => s.slug))
+  // Model pages for this make. When the make has a single model in stock,
+  // that model's page shows the same cars as this one and points here as its
+  // canonical, so there is nothing to link to and the group is left out.
   const modelLinks: SeoLink[] = models
-    .map((model) => {
-      const landingSlug = `${brand.slug}-${slugify(model)}-in-jammu`
-      return {
-        label: `Used ${brandName} ${model}`,
-        href: validLandings.has(landingSlug)
-          ? `/used-cars/${landingSlug}`
-          : `/inventory?model=${encodeURIComponent(model)}`,
-        count: brandVehicles.filter((v) => v.model === model).length,
-      }
-    })
+    .map((model) => ({
+      label: `Used ${brandName} ${model}`,
+      href: landingHref({ kind: "model", value: model }) ?? `/inventory?model=${encodeURIComponent(model)}`,
+      count: brandVehicles.filter((v) => v.model === model).length,
+    }))
+    .filter((l) => l.href !== path)
 
   const brandFaqs = [
     {
@@ -146,13 +175,13 @@ export default async function BrandPage({ params }: Props) {
     ...(yearRange
       ? [{
           question: `Which ${brandName} model years do you have?`,
-          answer: `Model years in stock right now: ${yearRange}. Each listing shows its exact year and kilometres.`,
+          answer: `${oneYear ? "Model year" : "Model years"} in stock right now: ${yearRange}. Each listing shows its exact year and kilometres.`,
         }]
       : []),
     {
       question: `Do you offer finance and exchange on used ${brandName} cars?`,
       answer:
-        "Yes. We arrange finance through nationalised and private banks, value your present car for exchange, " +
+        "Yes. We can help arrange finance, value your present car for exchange, " +
         "and handle the RC and insurance transfer.",
     },
     {
@@ -174,18 +203,10 @@ export default async function BrandPage({ params }: Props) {
   return (
     <div className="min-h-screen bg-ground">
       {count > 0 && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
       )}
 
-      <Breadcrumbs
-        items={[
-          { label: "Used Cars in Jammu", href: "/inventory" },
-          { label: `Used ${brandName} Cars` },
-        ]}
-      />
+      <Breadcrumbs items={[{ label: "Used cars by make", href: "/brands" }, { label: `Used ${brandName} Cars` }]} />
 
       <section className="border-b border-line bg-ground-2">
         <div className="container mx-auto px-4 py-10 md:px-8 md:py-14">
@@ -197,12 +218,12 @@ export default async function BrandPage({ params }: Props) {
             <p className="text-body text-ink-2">
               AM Group has {count} used {brandName} {cars} for sale in Jammu right now
               {priceRange ? `, priced ${priceRange}` : ""}
-              {yearRange ? `, with model years ${yearRange}` : ""}.
+              {yearRange ? (oneYear ? `, model year ${yearRange}` : `, with model years ${yearRange}`) : ""}.
               {models.length > 0 && ` Models in stock: ${list(models)}.`}
             </p>
             <p className="text-body text-ink-2">
-              Every listing below is a car in our stock, with its own photographs and the kilometres
-              recorded when it came in. The cars are kept at our {LOCATIONS.length} Jammu locations —
+              Every listing below is a car in our stock, with its own photographs and the odometer
+              reading shown on each listing. The cars are kept at our {LOCATIONS.length} Jammu locations —
               call before you travel and we will tell you which site a car is at.
             </p>
           </div>
@@ -232,11 +253,15 @@ export default async function BrandPage({ params }: Props) {
       </section>
 
       <FeaturedInventory
-        vehicles={brandVehicles}
-        title={`Used ${brandName} cars in stock`}
-        subtitle={`${count} ${cars} at AM Group, Jammu`}
+        // Each card is handed only the photos it can show.
+        vehicles={brandVehicles.map((v) => toCardVehicle(v))}
+        title={`${count} used ${brandName} ${cars} in stock today`}
+        subtitle={`At AM Group, Jammu`}
         emptyMessage={`We have no ${brandName} cars in stock at the moment.`}
         className="bg-ground py-12 md:py-16"
+        sourceLabel="brand-grid"
+        listId={`brand-${brand.slug}`}
+        listName={`Used ${brandName} cars`}
       />
 
       <section className="border-t border-line bg-ground-2 py-16">
@@ -256,8 +281,8 @@ export default async function BrandPage({ params }: Props) {
           <article>
             <h2 className="mb-3 font-display text-h2 text-ink">Paperwork, finance and exchange</h2>
             <p className="text-body text-ink-2">
-              We handle the RC transfer and insurance transfer, and arrange finance through nationalised
-              and private banks. If you want to exchange your present car, bring it with its RC and
+              We handle the RC transfer and insurance transfer, and can help arrange finance. If you
+              want to exchange your present car, bring it with its RC and
               insurance and we will value it — or start on the{" "}
               <Link
                 href="/sell-your-car"
@@ -288,6 +313,61 @@ export default async function BrandPage({ params }: Props) {
       />
 
       <FaqSection items={brandFaqs} title={`Used ${brandName} in Jammu — FAQs`} />
+
+      <FrequentSearches searches={frequentSearches} />
+    </div>
+  )
+}
+
+/**
+ * A make with no car in stock today that the dealer has sold before.
+ *
+ * It says exactly that, and offers the one useful thing: a call when one
+ * arrives. It promises nothing about sourcing a car or how long that takes.
+ * Other makes in stock are linked so the reader is not left at a dead end.
+ */
+async function SoldOutBrand({ brandName, path }: { brandName: string; path: string }) {
+  const [frequentSearches, seoLinks] = await Promise.all([getFrequentSearches(30), getSeoLinks()])
+
+  return (
+    <div className="min-h-screen bg-ground">
+      <Breadcrumbs items={[{ label: "Used cars by make", href: "/brands" }, { label: `Used ${brandName} Cars` }]} />
+
+      <section className="border-b border-line bg-ground-2">
+        <div className="container mx-auto px-4 py-10 md:px-8 md:py-14">
+          <h1 className="mb-5 max-w-4xl font-display text-h1 text-ink">Used {brandName} Cars in Jammu</h1>
+
+          <div className="max-w-3xl space-y-3">
+            <p className="text-body text-ink-2">
+              We have no used {brandName} car in stock in Jammu today. The last one we listed has been
+              sold.
+            </p>
+            <p className="text-body text-ink-2">
+              Tell us you are looking for a {brandName} and we will call you when one arrives. You can
+              also ring {PRIMARY_LOCATION.phone} and ask what is due in.
+            </p>
+          </div>
+
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            {/* The enquiry records the page it came from, which names the make. */}
+            <EnquireCta label="Call me when one arrives" intent="Vehicle Enquiry" sourceLabel="brand-sold-out" />
+            <Button asChild variant="secondary" size="lg">
+              <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="brand-hero">
+                <PhoneGlyph /> {PRIMARY_LOCATION.phone}
+              </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <RelatedLinks
+        title="Used cars in stock today"
+        groups={[
+          { title: "Makes in stock", links: seoLinks.makes.filter((l) => l.href !== path) },
+          { title: "By budget", links: seoLinks.budgets },
+          { title: "By body type", links: seoLinks.bodyTypes },
+        ]}
+      />
 
       <FrequentSearches searches={frequentSearches} />
     </div>

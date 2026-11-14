@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ChevronGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
 import type { InventoryVehicle } from "@/lib/inventory/types"
+import { trackGalleryInteract } from "@/lib/analytics/events"
 
 /**
  * Renders one real listing.
@@ -19,6 +20,14 @@ const MAX_PHOTOS = 8
 
 /** The first photo of the first few cards is above the fold on a phone. */
 const EAGER_CARDS = 3
+
+/**
+ * How wide a card's photo is drawn, for the browser's choice of image file.
+ * This default is the three-column grid (/inventory, landing and brand pages):
+ * full width on a phone, half from 768px, a third from 1024px. A caller that
+ * draws cards at a fixed width (the sideways rails) passes its own value.
+ */
+const GRID_SIZES = "(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
 
 const ARROW =
   "pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full border border-line bg-surface/90 text-ink " +
@@ -46,15 +55,21 @@ const DRAG_THRESHOLD = 6
 function ImageArea({
   vehicle,
   eager,
+  sizes,
   className,
 }: {
   vehicle: InventoryVehicle
   eager: boolean
+  sizes: string
   className: string
 }) {
   const images = vehicle.images.slice(0, MAX_PHOTOS)
   const count = images.length
   const href = `/inventory/${vehicle.slug}`
+  // Says which car this is. The bare title ("Kia Seltos") was the same text
+  // on four different cars; the year and colour tell them apart.
+  const photoName =
+    `${vehicle.year ? `${vehicle.year} ` : ""}${vehicle.title}` + (vehicle.colour ? `, ${vehicle.colour}` : "")
 
   const stripRef = useRef<HTMLDivElement>(null)
   const frame = useRef(0)
@@ -97,6 +112,9 @@ function ImageArea({
     // photo and the second would do nothing.
     const from = el.dataset.dragging ? target.current : Math.round(el.scrollLeft / el.clientWidth)
     settle((from + dir + count) % count)
+    // Measurement only, after the move has started. It sends once per car per
+    // page however many times the arrows are pressed.
+    trackGalleryInteract(vehicle.id, "arrow", "card")
   }
 
   /* Move the strip to a photo, animating the scroll position by hand.
@@ -234,9 +252,9 @@ function ImageArea({
                 {i <= reached + 1 && (
                   <Image
                     src={src}
-                    alt={i === 0 ? vehicle.title : ""}
+                    alt={i === 0 ? photoName : `${photoName}, photo ${i + 1}`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes={sizes}
                     loading={i === 0 && eager ? "eager" : "lazy"}
                     draggable={false}
                     className="object-cover"
@@ -396,15 +414,27 @@ export function VehicleCard({
   index = 0,
   onEnquire,
   viewType = "grid",
+  sizes = GRID_SIZES,
+  eager = index < EAGER_CARDS,
 }: {
   vehicle: InventoryVehicle
-  /** Position in its list. The first few cards load their first photo eagerly. */
+  /**
+   * Position in its list, counted from 0. It is written on the card as
+   * data-track-index, which is how a click on the card is reported with its
+   * position (components/analytics/link-tracker.tsx).
+   */
   index?: number
   onEnquire?: (v: InventoryVehicle) => void
   viewType?: "grid" | "list"
+  /** The `sizes` of the photo, when the card is not in the three-column grid. */
+  sizes?: string
+  /**
+   * Whether the first photo loads straight away. By default the first few
+   * cards of a list do. A list that sits far down its page passes false.
+   */
+  eager?: boolean
 }) {
   const href = `/inventory/${vehicle.slug}`
-  const eager = index < EAGER_CARDS
 
   /* Spec pills, built only from fields this listing actually has. */
   const specs = [
@@ -417,10 +447,12 @@ export function VehicleCard({
   /* ── LIST VIEW ─────────────────────────────────────────── */
   if (viewType === "list") {
     return (
-      <div className="group bg-surface border border-line rounded-md overflow-hidden transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col sm:flex-row">
+      <div data-track-index={index} className="group bg-surface border border-line rounded-md overflow-hidden transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col sm:flex-row">
         <ImageArea
           vehicle={vehicle}
           eager={eager}
+          // The list row's photo is the full width on a phone and 288px beside the text.
+          sizes="(max-width: 639px) 100vw, 288px"
           className="h-52 sm:h-auto sm:min-h-52 sm:w-72 flex-shrink-0"
         />
 
@@ -441,10 +473,11 @@ export function VehicleCard({
 
   /* ── GRID VIEW ─────────────────────────────────────────── */
   return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-md border border-line bg-surface transition-colors duration-(--duration-1) hover:border-line-strong">
+    <div data-track-index={index} className="group flex h-full flex-col overflow-hidden rounded-md border border-line bg-surface transition-colors duration-(--duration-1) hover:border-line-strong">
       <ImageArea
         vehicle={vehicle}
         eager={eager}
+        sizes={sizes}
         className="h-[220px] sm:h-[240px] flex-shrink-0"
       />
 

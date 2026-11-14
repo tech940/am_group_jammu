@@ -25,6 +25,10 @@
  *   count      cars in this response
  *   facets     filter options for the WHOLE stock, as on the listing page
  *
+ * Each car also carries `variant`, `owners`, `registration` (the series only),
+ * `locationSlug`, `description` and `updatedAt`. The first five are null until
+ * staff enter them in the admin; see ./public-vehicle.ts.
+ *
  * 503 when the stock cannot be read. No auth: every field is already public.
  */
 

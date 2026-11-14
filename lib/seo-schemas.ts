@@ -1,28 +1,65 @@
-import { VehicleSEO } from "@/types/seo"
-import { H_PROMISE, LOCATIONS, PRIMARY_LOCATION, type Location } from "@/lib/locations"
-import { SITE_URL, SITE_NAME } from "@/lib/seo/site"
-import { locationNames } from "@/lib/seo/locations"
+import { H_PROMISE, LOCATIONS, PRIMARY_LOCATION, getLocation, type Location } from "@/lib/locations"
+import { DEALER_NAME, SITE_NAME, SITE_URL } from "@/lib/seo/site"
+import { locationNames, serviceLabel } from "@/lib/seo/locations"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 
-// Served by this app, not hot-linked from the old WordPress site. Absolute
-// because schema.org consumers do not resolve relative paths.
-const LOGO = `${SITE_URL}/logo-am-group.png`
+/**
+ * The dealer, described once.
+ *
+ * Every page's structured data points at the same three kinds of thing, by id:
+ *
+ *   <origin>/#dealer                    the business (AutoDealer)
+ *   <origin>/#website                   this website
+ *   <origin>/locations/<slug>#dealer    one of its sites (AutoDealer)
+ *
+ * The ids are a contract: the car pages name the seller with dealerId() and
+ * will name the site a car is at with siteDealerId(slug). Do not change the
+ * scheme, and do not describe the dealer inline anywhere else. A second
+ * description with a slightly different name or street is what search engines
+ * read as two businesses.
+ */
 
-const ORGANIZATION_ID = `${SITE_URL}#organization`
-const WEBSITE_ID = `${SITE_URL}#website`
+// A square mark on the blue ground. Absolute, because readers of structured
+// data do not resolve relative paths.
+const LOGO = `${SITE_URL}/logo-am-group-square.png`
 
-/** Stable @id per location so the Organization can reference them. */
+/** @id of the business. */
+export function dealerId(): string {
+  return `${SITE_URL}/#dealer`
+}
+
+/** @id of the website. */
+export function websiteId(): string {
+  return `${SITE_URL}/#website`
+}
+
+/** @id of one site, by its slug in lib/locations.ts ("jammu", "nanak-nagar", "gangyal"). */
+export function siteDealerId(slug: string): string {
+  return `${SITE_URL}/locations/${slug}#dealer`
+}
+
+/** Same id, from a Location. Kept for callers that already hold one. */
 export function locationId(location: Location): string {
-  return `${SITE_URL}/locations/${location.slug}#dealer`
+  return siteDealerId(location.slug)
 }
 
 /**
- * Postal address using only what the company has confirmed.
+ * JSON for a <script type="application/ld+json"> block.
  *
- * Locality, region and country are always known. Street and PIN are emitted
- * only when `addressConfirmed` is true — a guessed street in structured data
- * would contradict the Google Business Profile, which is worse than leaving
- * the field out. A PostalAddress without streetAddress is still valid.
+ * "<" is written as < so text typed in the admin panel (a car title, a
+ * colour) can never close the script element early. Every JSON-LD block on the
+ * site should go through this.
+ */
+export function jsonLdString(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, "\\u003c")
+}
+
+/**
+ * Postal address from confirmed facts only.
+ *
+ * Locality, region and country are known for every site. Street and PIN are
+ * written only when `addressConfirmed` is true: a guessed street would
+ * contradict the Google Business Profile, which is worse than leaving it out.
  */
 function postalAddress(location: Location) {
   return {
@@ -36,27 +73,37 @@ function postalAddress(location: Location) {
 }
 
 /**
- * AutoDealer (a LocalBusiness subtype) for one used-car location.
+ * One site.
  *
- * `geo` and `hasMap` are omitted until the pin is verified against the Google
- * Business Profile: the coordinates on file are locality centres, and a wrong
- * pin sends a buyer to the wrong side of town.
+ * A site whose address the company has not confirmed gets its name, locality,
+ * region, country and the shared phone, and nothing else: no street, map link,
+ * opening hours, served localities or list of services. Those would be
+ * statements about a place we only know the neighbourhood of.
  *
- * Deliberately no `aggregateRating`: inventing review counts is a
- * structured-data violation. Add it only from real, verifiable reviews.
+ * `geo` needs a pin checked against the Google Business Profile; none of the
+ * three has one yet, so no site emits coordinates today.
+ *
+ * No aggregateRating or review anywhere. They may only come from real,
+ * attributable reviews.
  */
-export function generateDealerNode(location: Location) {
-  return {
+export function siteDealerNode(location: Location) {
+  const base = {
     "@type": "AutoDealer",
-    "@id": locationId(location),
+    "@id": siteDealerId(location.slug),
     name: location.name,
-    image: LOGO,
-    logo: LOGO,
     url: `${SITE_URL}/locations/${location.slug}`,
     telephone: location.phoneE164,
+    address: postalAddress(location),
+    parentOrganization: { "@id": dealerId() },
+  }
+  if (!location.addressConfirmed) return base
+
+  return {
+    ...base,
     email: location.email,
     currenciesAccepted: "INR",
-    address: postalAddress(location),
+    // Real photographs of the site only. The logo is not a picture of a place.
+    ...(location.photos && location.photos.length > 0 ? { image: location.photos } : {}),
     ...(location.geo.verified
       ? {
           geo: {
@@ -66,50 +113,61 @@ export function generateDealerNode(location: Location) {
           },
         }
       : {}),
-    ...(location.addressConfirmed ? { hasMap: location.mapUrl } : {}),
+    hasMap: location.mapUrl,
     areaServed: [
       { "@type": "City", name: location.city },
       ...location.areasServed.map((a) => ({ "@type": "Place", name: a })),
     ],
-    openingHoursSpecification: location.hours.map((h) => ({
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: h.days,
-      opens: h.opens,
-      closes: h.closes,
-    })),
+    ...(location.hours.length > 0
+      ? {
+          openingHoursSpecification: location.hours.map((h) => ({
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: h.days,
+            opens: h.opens,
+            closes: h.closes,
+          })),
+        }
+      : {}),
     makesOffer: location.services.map((s) => ({
       "@type": "Offer",
-      itemOffered: { "@type": "Service", name: s },
+      itemOffered: { "@type": "Service", name: serviceLabel(s) },
     })),
-    parentOrganization: { "@id": ORGANIZATION_ID },
   }
 }
 
-/** Standalone (with @context) AutoDealer document for one location. */
-export function generateDealerSchema(location: Location) {
-  return { "@context": "https://schema.org", ...generateDealerNode(location) }
-}
-
-function organizationNode() {
+/**
+ * The business itself.
+ *
+ * Left out on purpose until the company supplies them: legalName, founder,
+ * sameAs (Google Business Profile and social profiles) and foundingDate. 1968
+ * is the year the group began selling fuel, not the year this business began
+ * selling used cars, so it is not a founding date for a car dealer.
+ */
+function dealerNode() {
   return {
-    "@type": "Organization",
-    "@id": ORGANIZATION_ID,
-    name: SITE_NAME,
-    alternateName: "AM Group Used Cars Jammu",
+    "@type": "AutoDealer",
+    "@id": dealerId(),
+    name: DEALER_NAME,
+    alternateName: SITE_NAME,
     url: SITE_URL,
     logo: LOGO,
     image: LOGO,
     description:
-      `Used car dealer in Jammu. Buy inspected second hand cars or sell your car at ` +
-      `${LOCATIONS.length} Jammu locations: ${locationNames()}.`,
+      `Used car dealer in Jammu. Buy a second hand car or sell your car at ` +
+      `${LOCATIONS.length} sites in Jammu city: ${locationNames()}.`,
+    telephone: PRIMARY_LOCATION.phoneE164,
+    email: PRIMARY_LOCATION.email,
+    // The one site with a confirmed street address.
     address: postalAddress(PRIMARY_LOCATION),
+    areaServed: { "@type": "City", name: PRIMARY_LOCATION.city },
     contactPoint: [
       {
         "@type": "ContactPoint",
         telephone: PRIMARY_LOCATION.phoneE164,
+        // No areaServed and no availableLanguage here. Neither is on record:
+        // "IN" (all of India) contradicted the dealer's own areaServed of
+        // Jammu just above, and nobody has said which languages are spoken.
         contactType: "sales",
-        areaServed: "IN",
-        availableLanguage: ["en", "hi"],
       },
       // Rendered only once the company supplies the number (lib/locations.ts).
       ...(H_PROMISE
@@ -118,23 +176,21 @@ function organizationNode() {
             name: "H Promise (Hyundai certified used cars)",
             telephone: H_PROMISE.phoneE164,
             contactType: "sales",
-            areaServed: "IN",
           }]
         : []),
     ],
-    subOrganization: LOCATIONS.map((l) => ({ "@id": locationId(l) })),
-    // TODO: add "sameAs" with the real social profile URLs once confirmed.
+    subOrganization: LOCATIONS.map((l) => ({ "@id": siteDealerId(l.slug) })),
   }
 }
 
 function webSiteNode() {
   return {
     "@type": "WebSite",
-    "@id": WEBSITE_ID,
+    "@id": websiteId(),
     url: SITE_URL,
-    name: `${SITE_NAME} Used Cars`,
+    name: DEALER_NAME,
     inLanguage: "en-IN",
-    publisher: { "@id": ORGANIZATION_ID },
+    publisher: { "@id": dealerId() },
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -147,87 +203,139 @@ function webSiteNode() {
 }
 
 /**
- * The site-wide graph, rendered once in the root layout: the Organization, the
- * WebSite (with its search action) and one AutoDealer per used-car location.
- * Location pages therefore do not emit their own copy — the same @id twice on
- * a page is noise.
+ * The site-wide graph, rendered once by the root layout: the business, the
+ * website and one node per site. Pages refer to these by id and never repeat
+ * them.
  */
-export function generateSiteSchema() {
+export function dealerGraph() {
   return {
     "@context": "https://schema.org",
-    "@graph": [organizationNode(), webSiteNode(), ...LOCATIONS.map(generateDealerNode)],
+    "@graph": [dealerNode(), webSiteNode(), ...LOCATIONS.map(siteDealerNode)],
   }
 }
 
-export function generateOrganizationSchema() {
-  return { "@context": "https://schema.org", ...organizationNode() }
+/** The name the root layout imports. Same graph. */
+export const generateSiteSchema = dealerGraph
+
+/**
+ * A page-level node that says what a page is about, by id.
+ *
+ *   /locations/<slug>  WebPage      mainEntity: that site
+ *   /locations         WebPage      about: the business
+ *   /contact           ContactPage  mainEntity: the business
+ */
+export function pageSchema({
+  type = "WebPage",
+  path,
+  name,
+  description,
+  mainEntityId,
+  aboutId,
+}: {
+  type?: "WebPage" | "ContactPage" | "AboutPage"
+  /** Site path, e.g. "/contact". */
+  path: string
+  name: string
+  description?: string
+  mainEntityId?: string
+  aboutId?: string
+}) {
+  const url = `${SITE_URL}${path}`
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
+    "@id": `${url}#webpage`,
+    url,
+    name,
+    ...(description ? { description } : {}),
+    inLanguage: "en-IN",
+    isPartOf: { "@id": websiteId() },
+    ...(mainEntityId ? { mainEntity: { "@id": mainEntityId } } : {}),
+    ...(aboutId ? { about: { "@id": aboutId } } : {}),
+  }
 }
 
-/** Back-compat name for the site-wide schema. */
-export function generateLocalBusinessSchema() {
-  return generateSiteSchema()
+/** WebPage for one site's page, tied to that site's node. */
+export function locationPageSchema(slug: string, name: string, description?: string) {
+  const location = getLocation(slug)
+  return pageSchema({
+    path: `/locations/${slug}`,
+    name,
+    description,
+    mainEntityId: location ? siteDealerId(location.slug) : dealerId(),
+  })
 }
 
 /**
- * CollectionPage + ItemList for a page that lists cars (landing and brand
- * pages). Only cars actually rendered on the page are listed.
+ * The "sell or exchange your car" service, offered by the business. No price
+ * and no promise: the page it sits on makes none.
+ */
+export function sellServiceSchema(path: string, description: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": `${SITE_URL}${path}#service`,
+    name: "Sell or exchange your car",
+    serviceType: "Used car buying",
+    description,
+    url: `${SITE_URL}${path}`,
+    provider: { "@id": dealerId() },
+    areaServed: { "@type": "City", name: PRIMARY_LOCATION.city },
+  }
+}
+
+/** Newest "last changed" date among some cars, as an ISO string, or null. */
+export function newestStockDate(vehicles: InventoryVehicle[]): string | null {
+  let newest = 0
+  for (const v of vehicles) {
+    // When the row was last edited; a car imported before that was recorded
+    // only has the day it was listed.
+    const raw = v.updatedAt ?? v.postedAt
+    const t = raw ? Date.parse(raw) : NaN
+    if (Number.isFinite(t) && t > newest) newest = t
+  }
+  return newest > 0 ? new Date(newest).toISOString() : null
+}
+
+/**
+ * CollectionPage + ItemList for a page that lists cars. Only the cars actually
+ * rendered on the page are listed, and numberOfItems counts those entries (a
+ * count larger than the list reads as an error).
+ *
+ * `startPosition` lets page 2 of a paged list number on from page 1.
  */
 export function generateVehicleListSchema({
   name,
   description,
   path,
   vehicles,
+  startPosition = 1,
 }: {
   name: string
   description: string
   /** Site path of the page, e.g. "/used-cars/suv-in-jammu". */
   path: string
   vehicles: InventoryVehicle[]
+  startPosition?: number
 }) {
+  const dateModified = newestStockDate(vehicles)
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name,
     description,
     url: `${SITE_URL}${path}`,
-    isPartOf: { "@id": WEBSITE_ID },
+    isPartOf: { "@id": websiteId() },
+    ...(dateModified ? { dateModified } : {}),
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: vehicles.length,
       itemListElement: vehicles.map((v, i) => ({
         "@type": "ListItem",
-        position: i + 1,
+        position: startPosition + i,
         url: `${SITE_URL}/inventory/${v.slug}`,
         name: `${v.year ?? ""} ${v.title}`.trim(),
       })),
-    },
-  }
-}
-
-export function generateVehicleSchema(vehicle: VehicleSEO) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Car",
-    name: vehicle.name,
-    description: vehicle.description,
-    brand: {
-      "@type": "Brand",
-      name: vehicle.brand,
-    },
-    model: vehicle.model,
-    vehicleEngine: {
-      "@type": "EngineSpecification",
-      name: vehicle.engine,
-    },
-    fuelType: vehicle.fuelType,
-    image: vehicle.image,
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "INR",
-      price: vehicle.priceValue,
-      itemCondition: "https://schema.org/UsedCondition",
-      availability: "https://schema.org/InStock",
-      seller: { "@id": locationId(PRIMARY_LOCATION) },
     },
   }
 }

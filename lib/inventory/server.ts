@@ -15,6 +15,7 @@ import { carRowToInventoryVehicle } from '../cars/mapper.ts'
 import { readAllCars } from '../cars/store.ts'
 import { INVENTORY_CACHE_TAG } from '../cars/types.ts'
 import { buildFacets, idFromSlug, toInventoryVehicle } from './adapter.ts'
+import { toCardVehicle } from './filter.ts'
 import type { InventoryFacets, InventorySnapshot, InventoryVehicle } from './types.ts'
 
 const EMPTY_FACETS: InventoryFacets = {
@@ -59,7 +60,31 @@ function defaultSort(a: InventoryVehicle, b: InventoryVehicle): number {
  */
 const DB_REVALIDATE_SECONDS = 300
 
-type DbStock = { source: 'database'; vehicles: InventoryVehicle[]; fetchedAt: string } | { source: 'none' }
+/**
+ * How long a sold car's own page stays up, marked "Sold", before it goes back
+ * to being a 404. Counted from the row's `updated_at`, which the database
+ * moves whenever the row changes, so marking a car sold starts the clock (and
+ * editing a sold car afterwards restarts it).
+ *
+ * THE OWNER CAN CHANGE THIS NUMBER. Thirty days is a common choice, not a
+ * rule: long enough that someone following a shared link or a search result
+ * sees "sold, here are similar cars" instead of an error, short enough that
+ * the site is not full of cars nobody can buy.
+ *
+ * Only a car whose status is "sold" gets this. A car DELETED in the admin
+ * leaves no row behind, so its page is a 404 at once.
+ */
+export const SOLD_PAGE_RETENTION_DAYS = 30
+
+type DbStock =
+  | {
+      source: 'database'
+      vehicles: InventoryVehicle[]
+      /** Sold cars, for their own "Sold" page only. Never listed anywhere. */
+      sold: InventoryVehicle[]
+      fetchedAt: string
+    }
+  | { source: 'none' }
 
 const cachedDbStock = unstable_cache(
   async (): Promise<DbStock> => {
@@ -68,10 +93,13 @@ const cachedDbStock = unstable_cache(
     return {
       source: 'database',
       vehicles: all.rows.filter((r) => r.status === 'published').map(carRowToInventoryVehicle),
+      sold: all.rows.filter((r) => r.status === 'sold').map(carRowToInventoryVehicle),
       fetchedAt: new Date().toISOString(),
     }
   },
-  ['used-cars-db-v1'],
+  // v2: the cached value gained `sold` and the per-car optional facts. A new
+  // key stops a copy cached in the old shape from being read as the new one.
+  ['used-cars-db-v2'],
   { revalidate: DB_REVALIDATE_SECONDS, tags: [INVENTORY_CACHE_TAG] },
 )
 
@@ -141,8 +169,56 @@ export interface VehicleNeighbour {
   priceLabel: string
 }
 
+/**
+ * Up to three cars on sale that are closest to this one: same make first, then
+ * same body type, then anything else, so the section never renders half-empty.
+ *
+ * Each comes back with only the photos a card can show. A car has up to 49,
+ * and all of them were being written into every car page for three cards that
+ * use eight each. `photoCount` still holds the real total.
+ */
+function pickSimilar(vehicle: InventoryVehicle, onSale: InventoryVehicle[]): InventoryVehicle[] {
+  const others = onSale.filter((v) => v.id !== vehicle.id)
+  const sameMake = others.filter((v) => v.make && v.make === vehicle.make)
+  const sameBody = others.filter(
+    (v) => !sameMake.includes(v) && v.bodyType && v.bodyType === vehicle.bodyType,
+  )
+  const rest = others.filter((v) => !sameMake.includes(v) && !sameBody.includes(v))
+  return [...sameMake, ...sameBody, ...rest].slice(0, 3).map((v) => toCardVehicle(v))
+}
+
+/**
+ * The sold car with this id, if it was sold recently enough to still have a
+ * page (see SOLD_PAGE_RETENTION_DAYS). Null for a draft, for a car that was
+ * never there, for one sold longer ago than that, and whenever the stock is
+ * being read from WordPress, which keeps no record of what was sold.
+ */
+async function findRecentlySold(id: number): Promise<InventoryVehicle | null> {
+  let db: DbStock
+  try {
+    db = await cachedDbStock()
+  } catch {
+    return null
+  }
+  if (db.source !== 'database') return null
+  const car = db.sold.find((v) => v.id === id)
+  if (!car) return null
+
+  const soldAt = Date.parse(car.updatedAt ?? '')
+  // No readable date means the age cannot be shown to be inside the window.
+  if (!Number.isFinite(soldAt)) return null
+  const ageDays = (Date.now() - soldAt) / 86_400_000
+  return ageDays <= SOLD_PAGE_RETENTION_DAYS ? car : null
+}
+
 export async function getVehicleBySlug(slug: string): Promise<{
+  /** A car ON SALE. Null for a sold car: nothing that lists stock may show one. */
   vehicle: InventoryVehicle | null
+  /**
+   * Set instead of `vehicle` when the car is sold and still inside its
+   * retention window. Only the car's own page reads this.
+   */
+  soldVehicle: InventoryVehicle | null
   similar: InventoryVehicle[]
   canonicalSlug: string | null
   /** Position in the full listing, for "car 4 of 27" style pagination. */
@@ -157,7 +233,17 @@ export async function getVehicleBySlug(slug: string): Promise<{
   const vehicle = index >= 0 ? vehicles[index] : null
 
   if (!vehicle) {
-    return { vehicle: null, similar: [], canonicalSlug: null, position: 0, total: vehicles.length, prev: null, next: null }
+    const soldVehicle = id !== null ? await findRecentlySold(id) : null
+    return {
+      vehicle: null,
+      soldVehicle,
+      similar: soldVehicle ? pickSimilar(soldVehicle, vehicles) : [],
+      canonicalSlug: soldVehicle ? soldVehicle.slug : null,
+      position: 0,
+      total: vehicles.length,
+      prev: null,
+      next: null,
+    }
   }
 
   const toNeighbour = (v: InventoryVehicle): VehicleNeighbour => ({
@@ -167,18 +253,11 @@ export async function getVehicleBySlug(slug: string): Promise<{
     priceLabel: v.priceLabel,
   })
 
-  // Prefer same make, then same body type, then anything else — always filling
-  // up to three so the section never renders half-empty.
-  const others = vehicles.filter((v) => v.id !== vehicle.id)
-  const sameMake = others.filter((v) => v.make && v.make === vehicle.make)
-  const sameBody = others.filter(
-    (v) => !sameMake.includes(v) && v.bodyType && v.bodyType === vehicle.bodyType,
-  )
-  const rest = others.filter((v) => !sameMake.includes(v) && !sameBody.includes(v))
-  const similar = [...sameMake, ...sameBody, ...rest].slice(0, 3)
+  const similar = pickSimilar(vehicle, vehicles)
 
   return {
     vehicle,
+    soldVehicle: null,
     similar,
     canonicalSlug: vehicle.slug,
     position: index + 1,
@@ -189,9 +268,16 @@ export async function getVehicleBySlug(slug: string): Promise<{
 }
 
 /** All slugs, for generateStaticParams and the sitemap. */
-export async function getAllVehicleSlugs(): Promise<{ slug: string; postedAt: string | null }[]> {
+export async function getAllVehicleSlugs(): Promise<
+  { slug: string; postedAt: string | null; updatedAt: string | null }[]
+> {
   const { vehicles } = await getInventory()
-  return vehicles.map((v) => ({ slug: v.slug, postedAt: v.postedAt }))
+  return vehicles.map((v) => ({
+    slug: v.slug,
+    postedAt: v.postedAt,
+    // When the row last changed; the listing date for a car that has none.
+    updatedAt: v.updatedAt ?? v.postedAt,
+  }))
 }
 
 export interface HomeInventory {

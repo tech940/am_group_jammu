@@ -2,15 +2,15 @@ import Link from "next/link"
 import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
 
 /**
- * "Frequent Searches Leading to This Page" — a crawlable block of long-tail
- * internal links.
+ * "Popular used-car searches in Jammu" — a crawlable block of internal links,
+ * one per landing page, worded the way the search is typed.
  *
  * Server-rendered so the anchors are in the served HTML. Every href points at a
  * facet that has stock behind it, so none of these are dead ends.
  */
 export function FrequentSearches({
   searches,
-  title = "Frequent Searches Leading to This Page",
+  title = "Popular used-car searches in Jammu",
 }: {
   searches: SeoLink[]
   title?: string

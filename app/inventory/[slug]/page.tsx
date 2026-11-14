@@ -1,199 +1,244 @@
 import type { Metadata } from "next"
-import { notFound, redirect } from "next/navigation"
-import { getAllVehicleSlugs, getVehicleBySlug } from "@/lib/inventory/server"
+import { notFound, permanentRedirect } from "next/navigation"
+import { getAllVehicleSlugs, getInventory, getVehicleBySlug } from "@/lib/inventory/server"
 import { idFromSlug } from "@/lib/inventory/adapter"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { buildSellerNotes, buildVehicleFaqs } from "@/lib/seo/content"
-import { getFrequentSearches, getSeoLinks } from "@/lib/seo/links"
-import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
+import { getLandingHrefResolver } from "@/lib/seo/landing"
+import { getFrequentSearches } from "@/lib/seo/links"
+import { getLocation, PRIMARY_LOCATION } from "@/lib/locations"
+import { dealerId, jsonLdString, siteDealerId, websiteId } from "@/lib/seo-schemas"
+import { DEALER_NAME, OG_IMAGE, SITE_URL } from "@/lib/seo/site"
+import {
+  carFactFaqs,
+  carGraph,
+  carHeading,
+  carMetaDescription,
+  carSummary,
+  carTitle,
+  descriptionParagraphs,
+  soldCarTitle,
+} from "./car-facts"
 import VehicleClient from "./vehicle-client"
-import { SITE_URL } from "@/lib/seo/site"
-
-const SITE = SITE_URL
+import type { CarLink } from "./vehicle-client"
 
 type Props = {
   params: Promise<{ slug: string }>
 }
 
+const PHONE = PRIMARY_LOCATION.phone
+
+/** Only cars on sale are built ahead of time. A sold car's page is made on request. */
 export async function generateStaticParams() {
   const slugs = await getAllVehicleSlugs()
   return slugs.map(({ slug }) => ({ slug }))
 }
 
-/** "2021 Hyundai Creta SX Diesel" — year and fuel added only when the title lacks them. */
-function vehicleName(v: InventoryVehicle): string {
-  const lower = v.title.toLowerCase()
-  const year = v.year !== null && !lower.includes(String(v.year)) ? `${v.year} ` : ""
-  const fuel = v.fuel && !lower.includes(v.fuel.toLowerCase()) ? ` ${v.fuel}` : ""
-  return `${year}${v.title}${fuel}`
-}
-
 /**
- * The shared copy builders in lib/seo/content.ts still carry two facts that are
- * no longer true: the retired placeholder phone number, and the claim that every
- * car is kept at AM Business Park. Stock is spread over three Jammu sites. Until
- * that file is corrected, this page corrects what it renders (and what it puts
- * in FAQPage schema) so a buyer is never sent to the wrong number or the wrong
- * site. Both corrections are no-ops once the source text is fixed.
+ * The site a car is kept at, when the stock record names one that
+ * lib/locations.ts knows. A slug that matches no site is treated as "not
+ * recorded", so a typing slip in the admin can never invent a location.
  */
-const RETIRED_PHONE = /\+91[\s-]?94191[\s-]?00000/g
-const fixPhone = (text: string) => text.replace(RETIRED_PHONE, PRIMARY_LOCATION.phone)
-
-const SITE_NAMES = LOCATIONS.map((l) => l.shortName).join(", ")
-const WHERE_TO_SEE =
-  `Yes. Our used cars are kept at our Jammu sites (${SITE_NAMES}). ` +
-  `Call ${PRIMARY_LOCATION.phone} before you come and we will confirm which location this car is at. ` +
-  `You are welcome to bring your own mechanic, and we will arrange a test drive on request.`
+function siteOf(v: InventoryVehicle) {
+  return v.locationSlug ? getLocation(v.locationSlug) : null
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const { vehicle } = await getVehicleBySlug(slug)
+  const { vehicle, soldVehicle } = await getVehicleBySlug(slug)
+  const car = vehicle ?? soldVehicle
 
-  if (!vehicle) return { title: "Vehicle Not Found", robots: "noindex" }
+  if (!car) return { title: "Vehicle Not Found", robots: "noindex" }
 
-  const name = vehicleName(vehicle)
-  // `absolute` so the root "%s | AM Group Jammu" template is not appended to a
-  // title that already ends in the site name.
-  const title =
-    `${name}${vehicle.price !== null ? ` — ${vehicle.priceShort}` : ""} | Used car in Jammu | AM Group`
-
-  const facts = [
-    vehicle.mileage !== null ? vehicle.mileageLabel : null,
-    vehicle.fuel,
-    vehicle.transmission,
-  ].filter(Boolean)
-
-  const description = [
-    `Used ${vehicle.year !== null ? `${vehicle.year} ` : ""}${vehicle.title} for sale in Jammu` +
-      `${facts.length ? `: ${facts.join(", ")}` : ""}.`,
-    vehicle.price !== null ? `Price ${vehicle.priceLabel}.` : "Call for price.",
-    `See the photos and ask AM Group for the best price, or call ${PRIMARY_LOCATION.phone}.`,
-  ].join(" ")
-
-  const url = `/inventory/${vehicle.slug}`
+  const sold = vehicle === null
+  const onSale = (await getInventory()).vehicles
+  const name = carHeading(car, onSale)
+  // `absolute` so the root "%s | AM Group" template is not appended to a title
+  // that already ends in the site name.
+  const title = sold ? soldCarTitle(car) : carTitle(car, onSale)
+  const description = carMetaDescription(car, { phone: PHONE, sold })
+  const url = `/inventory/${car.slug}`
+  // A car with no photograph still needs a share image; the site's default
+  // stands in rather than leaving the tag out.
+  const photo = car.primaryImage
 
   return {
     title: { absolute: title },
     description,
     alternates: { canonical: url },
+    // A sold car's page stays in the index for as long as it is served (see
+    // SOLD_PAGE_RETENTION_DAYS); after that the address is a 404.
+    robots: { index: true, follow: true },
     openGraph: {
       type: "website",
       url,
-      siteName: "AM Group Used Cars",
+      siteName: DEALER_NAME,
       locale: "en_IN",
       title,
       description,
-      images: vehicle.primaryImage ? [{ url: vehicle.primaryImage, alt: name }] : undefined,
+      images: photo ? [{ url: photo, alt: name }] : [OG_IMAGE],
     },
     twitter: {
-      card: vehicle.primaryImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title,
       description,
-      images: vehicle.primaryImage ? [vehicle.primaryImage] : undefined,
+      images: [photo ?? OG_IMAGE.url],
     },
+  }
+}
+
+/** "SUV" -> "SUVs", "Hatchback" -> "Hatchbacks". */
+const plural = (label: string) => (/s$/i.test(label) ? label : `${label}s`)
+
+/**
+ * Where this car's page links up to.
+ *
+ * lib/seo/landing.ts decides which pages exist: its resolver is asked for the
+ * page for this car's make, model, body, fuel and gearbox, and answers with
+ * the address that is indexed for those cars, or nothing. A filter address
+ * such as /inventory?make=Hyundai is never used here: those are marked
+ * noindex, so a link to one passes nothing on. A page that does not exist is
+ * left out rather than pointed at a search.
+ */
+async function linksUp(v: InventoryVehicle): Promise<{
+  /** The page for "used cars in Jammu", the top of the trail. */
+  head: string
+  brand: CarLink | null
+  model: CarLink | null
+  more: CarLink[]
+}> {
+  const hrefFor = await getLandingHrefResolver()
+  type Facet = Parameters<typeof hrefFor>[0]
+  const link = (value: string | null, kind: Exclude<Facet["kind"], "budget" | "city">, label: string): CarLink | null => {
+    const href = value ? hrefFor({ kind, value }) : null
+    return href ? { label, href } : null
+  }
+
+  const brand = link(v.make, "make", `Used ${v.make} cars in Jammu`)
+  const model = link(v.model, "model", `Used ${[v.make, v.model].filter(Boolean).join(" ")} in Jammu`)
+  const more = [
+    link(v.bodyType, "body", `Used ${plural(v.bodyType ?? "")} in Jammu`),
+    link(v.fuel, "fuel", `Used ${(v.fuel ?? "").toLowerCase()} cars in Jammu`),
+    link(v.transmission, "transmission", `Used ${(v.transmission ?? "").toLowerCase()} cars in Jammu`),
+  ].filter((l): l is CarLink => l !== null)
+
+  // When a make has one model in stock, the two share one indexed page (the
+  // resolver hands back the same address for both). It is then listed once.
+  const taken = new Set<string>(brand ? [brand.href] : [])
+  const once = (l: CarLink | null) => (l && !taken.has(l.href) ? (taken.add(l.href), l) : null)
+
+  return {
+    head: hrefFor({ kind: "city" }) ?? "/inventory",
+    brand,
+    model: once(model),
+    more: more.map(once).filter((l): l is CarLink => l !== null),
   }
 }
 
 export default async function VehiclePage({ params }: Props) {
   const { slug } = await params
-  const { vehicle, similar, canonicalSlug, position, total, prev, next } =
+  const { vehicle, soldVehicle, similar, canonicalSlug, position, total, prev, next } =
     await getVehicleBySlug(slug)
 
-  if (!vehicle) notFound()
+  // On sale, or sold recently enough to still have a page. Anything else (a
+  // draft, a deleted car, one sold long ago, a number that never existed) is
+  // a real 404.
+  const car = vehicle ?? soldVehicle
+  if (!car) notFound()
+  const sold = vehicle === null
 
-  // Keep one canonical URL per listing: a stale or hand-typed slug that still
-  // carries the right ID redirects instead of serving duplicate content.
-  if (canonicalSlug && canonicalSlug !== slug && idFromSlug(slug) === vehicle.id) {
-    redirect(`/inventory/${canonicalSlug}`)
+  // One address per car, for good: a stale or hand-typed slug that still ends
+  // in the right stock number is sent to the current one with a permanent
+  // redirect (308), so search engines move what they know to it.
+  if (canonicalSlug && canonicalSlug !== slug && idFromSlug(slug) === car.id) {
+    permanentRedirect(`/inventory/${canonicalSlug}`)
   }
 
-  const sellerNotes = buildSellerNotes(vehicle).map(fixPhone)
-  const faqs = buildVehicleFaqs(vehicle).map((faq) => ({
-    question: faq.question,
-    answer: faq.answer.includes("AM Business Park") ? WHERE_TO_SEE : fixPhone(faq.answer),
-  }))
-  const [frequentSearches, seoLinks] = await Promise.all([getFrequentSearches(30), getSeoLinks()])
+  const site = siteOf(car)
+  const pageUrl = `${SITE_URL}/inventory/${car.slug}`
 
-  const pageUrl = `${SITE}/inventory/${vehicle.slug}`
+  const [frequentSearches, up, { vehicles: onSale }] = await Promise.all([
+    getFrequentSearches(30),
+    linksUp(car),
+    getInventory(),
+  ])
 
-  /* Car + Offer. Every property is conditional on the listing actually having
-     the value; the seller block comes from lib/locations so it cannot drift
-     from the NAP shown elsewhere. BreadcrumbList is emitted by <Breadcrumbs>
-     and FAQPage by <FaqSection>, both in the server-rendered HTML. */
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Car",
-    "@id": `${pageUrl}#car`,
-    name: vehicleName(vehicle),
-    url: pageUrl,
-    sku: String(vehicle.id),
-    description: sellerNotes[0],
-    ...(vehicle.make ? { brand: { "@type": "Brand", name: vehicle.make } } : {}),
-    ...(vehicle.make ? { manufacturer: { "@type": "Organization", name: vehicle.make } } : {}),
-    ...(vehicle.model ? { model: vehicle.model } : {}),
-    ...(vehicle.year
-      ? { productionDate: String(vehicle.year), vehicleModelDate: String(vehicle.year) }
-      : {}),
-    ...(vehicle.fuel ? { fuelType: vehicle.fuel } : {}),
-    ...(vehicle.transmission ? { vehicleTransmission: vehicle.transmission } : {}),
-    ...(vehicle.drivetrain ? { driveWheelConfiguration: vehicle.drivetrain } : {}),
-    ...(vehicle.bodyType ? { bodyType: vehicle.bodyType } : {}),
-    ...(vehicle.colour ? { color: vehicle.colour } : {}),
-    ...(vehicle.engine ? { vehicleEngine: { "@type": "EngineSpecification", name: vehicle.engine } } : {}),
-    ...(vehicle.mileage !== null
-      ? {
-          mileageFromOdometer: {
-            "@type": "QuantitativeValue",
-            value: vehicle.mileage,
-            unitCode: "KMT",
-          },
-        }
-      : {}),
-    ...(vehicle.images.length > 0 ? { image: vehicle.images } : {}),
-    itemCondition: "https://schema.org/UsedCondition",
-    ...(vehicle.price !== null
-      ? {
-          offers: {
-            "@type": "Offer",
-            priceCurrency: "INR",
-            price: vehicle.price,
-            availability: "https://schema.org/InStock",
-            itemCondition: "https://schema.org/UsedCondition",
-            url: pageUrl,
-            seller: {
-              "@type": "AutoDealer",
-              name: PRIMARY_LOCATION.name,
-              url: SITE,
-              telephone: PRIMARY_LOCATION.phoneE164,
-              email: PRIMARY_LOCATION.email,
-              areaServed: PRIMARY_LOCATION.city,
-              address: {
-                "@type": "PostalAddress",
-                streetAddress: `${PRIMARY_LOCATION.streetAddress}, ${PRIMARY_LOCATION.landmark}`,
-                addressLocality: PRIMARY_LOCATION.city,
-                addressRegion: PRIMARY_LOCATION.region,
-                ...(PRIMARY_LOCATION.postalCode ? { postalCode: PRIMARY_LOCATION.postalCode } : {}),
-                addressCountry: "IN",
-              },
-            },
-          },
-        }
-      : {}),
-  }
+  // The heading, the last crumb and the structured data's name: the car's
+  // name, plus a recorded fact or two when another car on sale has the same
+  // name (see carHeading). Sentences about the car keep the plain name.
+  const name = carHeading(car, onSale)
+
+  const summary = carSummary(car, { site, dealer: DEALER_NAME, phone: PHONE, sold })
+  const dealerNotes = descriptionParagraphs(car.description)
+
+  // The generated notes and questions describe a car that is for sale ("is
+  // available now", "if it is shown here it has not been sold"). On a sold
+  // car's page every one of those would be false, so none is rendered.
+  const sellerNotes = sold ? [] : buildSellerNotes(car)
+  const faqs = sold
+    ? []
+    : // The site is handed in, so the "can I see it" answer names it when the
+      // record does (lib/seo/content.ts).
+      [...buildVehicleFaqs(car, site), ...carFactFaqs(car, { site, phone: PHONE })]
+
+  // The visible trail. <Breadcrumbs> writes the BreadcrumbList from these same
+  // items, so the structured data cannot name a page the trail does not.
+  const crumbs = [
+    { label: "Used Cars in Jammu", href: up.head },
+    ...(up.brand && car.make ? [{ label: `Used ${car.make} Cars`, href: up.brand.href }] : []),
+    ...(up.model && car.model ? [{ label: [car.make, car.model].filter(Boolean).join(" "), href: up.model.href }] : []),
+    { label: name },
+  ]
+
+  const browseLinks: CarLink[] = [
+    ...(up.brand ? [up.brand] : []),
+    ...(up.model ? [up.model] : []),
+    ...up.more,
+    { label: "All used cars in stock", href: "/inventory" },
+  ]
+
+  const graph = carGraph({
+    vehicle: car,
+    name,
+    pageUrl,
+    // The dealer's own words, when there are any, follow the plain summary.
+    description: [summary, ...dealerNotes].join(" "),
+    site,
+    sold,
+    ids: { dealer: dealerId(), website: websiteId(), site: siteDealerId },
+  })
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* jsonLdString escapes "<", so a "</script>" typed into a car's
+          description in the admin panel cannot end this element early. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(graph) }} />
       <VehicleClient
-        vehicle={vehicle}
-        similar={similar}
+        vehicle={car}
+        name={name}
+        sold={sold}
+        summary={summary}
+        dealerNotes={dealerNotes}
         sellerNotes={sellerNotes}
         faqs={faqs}
+        crumbs={crumbs}
+        browseLinks={browseLinks}
+        // Where "See similar cars" goes on a sold car's page: the closest
+        // page that still has cars on it.
+        upLink={up.model ?? up.brand ?? { label: "All used cars in stock", href: "/inventory" }}
+        site={
+          site
+            ? {
+                slug: site.slug,
+                shortName: site.shortName,
+                city: site.city,
+                // A street is shown only for a site whose address is confirmed.
+                address: site.addressConfirmed ? `${site.streetAddress}, ${site.landmark}` : null,
+              }
+            : null
+        }
+        similar={similar}
         frequentSearches={frequentSearches}
-        seoGroups={seoLinks.groups}
         position={position}
         total={total}
         prev={prev}

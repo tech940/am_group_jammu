@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { LegalDocument, type LegalSection } from "@/components/sections/legal-document"
+import { pageSocial } from "@/lib/seo/site"
 
 /**
  * Carried over from the /terms/ page of the previous site so the legacy URL
@@ -14,11 +15,17 @@ import { LegalDocument, type LegalSection } from "@/components/sections/legal-do
  * confirm the revised section 1.
  */
 
+const title = "Terms and Conditions"
+const description =
+  "Terms and Conditions for the AM Group used-car website — vehicle information and pricing, bookings, test drives, finance, and limitation of liability."
+
 export const metadata: Metadata = {
-  title: "Terms and Conditions",
-  description:
-    "Terms and Conditions for the AM Group used-car website — vehicle information and pricing, bookings, test drives, finance, and limitation of liability.",
+  title,
+  description,
   alternates: { canonical: "/terms" },
+  // Without its own block the page inherited the root layout's, whose og:url
+  // is the homepage, so a shared link to /terms pointed at "/".
+  ...pageSocial({ title, description, path: "/terms" }),
 }
 
 const SECTIONS: LegalSection[] = [

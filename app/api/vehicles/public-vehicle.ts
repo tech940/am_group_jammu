@@ -12,7 +12,26 @@
 import type { InventorySnapshot, InventoryVehicle } from '@/lib/inventory/types'
 import { absoluteUrl } from '@/lib/seo/site'
 
-export type PublicVehicle = Omit<InventoryVehicle, 'sourceUrl'> & {
+/**
+ * Facts the stock record may or may not hold. In the API each is ALWAYS
+ * present and is `null` when staff have not entered it, so a consumer can tell
+ * "not recorded" from "this field does not exist" without guessing.
+ */
+type OptionalFacts = 'variant' | 'owners' | 'registration' | 'locationSlug' | 'description' | 'updatedAt'
+
+export type PublicVehicle = Omit<InventoryVehicle, 'sourceUrl' | OptionalFacts> & {
+  /** Trim level as the dealer wrote it. */
+  variant: string | null
+  /** Number of owners, counting the present one. */
+  owners: number | null
+  /** Registration series only ("JK02"), never the full plate. */
+  registration: string | null
+  /** Which site the car is kept at: "jammu", "nanak-nagar" or "gangyal". */
+  locationSlug: string | null
+  /** The dealer's own words about the car. Plain text. */
+  description: string | null
+  /** When the record last changed (price, photos). Falls back to the listing date. */
+  updatedAt: string | null
   /** The car's page on this site. */
   url: string
 }
@@ -21,7 +40,13 @@ export function toPublicVehicle(vehicle: InventoryVehicle): PublicVehicle {
   const copy: Partial<InventoryVehicle> = { ...vehicle }
   delete copy.sourceUrl
   return {
-    ...(copy as Omit<InventoryVehicle, 'sourceUrl'>),
+    ...(copy as Omit<InventoryVehicle, 'sourceUrl' | OptionalFacts>),
+    variant: vehicle.variant ?? null,
+    owners: vehicle.owners ?? null,
+    registration: vehicle.registration ?? null,
+    locationSlug: vehicle.locationSlug ?? null,
+    description: vehicle.description ?? null,
+    updatedAt: vehicle.updatedAt ?? vehicle.postedAt ?? null,
     url: absoluteUrl(`/inventory/${vehicle.slug}`),
   }
 }

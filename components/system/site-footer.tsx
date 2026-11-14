@@ -44,9 +44,11 @@ function LinkColumn({
   if (links.length === 0) return null
   return (
     <nav aria-label={title}>
-      {/* h2, not h3: the footer is a top-level landmark and its column titles
-          are peers of the page's own section headings. */}
-      <h2 className="border-b border-line-on-deep pb-2 text-label text-on-deep">{title}</h2>
+      {/* A paragraph, not a heading. These five titles used to be h2s, so
+          every page's outline ended with "Buy a used car", "By budget" and so
+          on as if they were sections of that page. The <nav aria-label> above
+          already names the block for assistive technology. */}
+      <p className="border-b border-line-on-deep pb-2 text-label text-on-deep">{title}</p>
       <ul className="mt-1">
         {links.map((l) => (
           <li key={l.href}>
@@ -137,9 +139,11 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
 
         {/* The three locations — NAP */}
         <section aria-labelledby="footer-locations" className="mt-10 border-t border-line-on-deep pt-10">
-          <h2 id="footer-locations" className="text-label text-on-deep">
+          {/* Not a heading, for the same reason as the link columns; the id
+              still names the section. */}
+          <p id="footer-locations" className="text-label text-on-deep">
             Used-car locations in Jammu
-          </h2>
+          </p>
           <ul className="mt-5 grid grid-cols-1 gap-8 md:grid-cols-3">
             {LOCATIONS.map((l) => (
               <li key={l.slug}>

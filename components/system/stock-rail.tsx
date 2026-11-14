@@ -3,6 +3,11 @@
 import { VehicleCard } from "@/components/ui/vehicle-card"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import type { InventoryVehicle } from "@/lib/inventory/types"
+import { listItems } from "@/lib/analytics/events"
+import { ListView } from "@/components/analytics/list-view"
+
+/** A rail card is drawn at a fixed width: 300px on a phone, 340px from 640px. */
+const RAIL_SIZES = "(max-width: 639px) 300px, 340px"
 
 /**
  * The stock rail: the one client leaf on every page that shows live cars.
@@ -18,7 +23,8 @@ import type { InventoryVehicle } from "@/lib/inventory/types"
 export function StockRail({
   vehicles,
   sourceLabel = "stock-rail",
-  label = "Certified used cars currently in stock",
+  // Not "Certified used cars": that would call every car in the rail certified.
+  label = "Used cars currently in stock",
 }: {
   vehicles: InventoryVehicle[]
   sourceLabel?: string
@@ -32,13 +38,19 @@ export function StockRail({
       role="region"
       aria-label={label}
       tabIndex={0}
+      // Names the rail for measurement: a click on one of its cards is
+      // reported against the list that <ListView> below reports as shown.
+      data-track-list={sourceLabel}
+      data-track-list-name={label}
       className="no-scrollbar overscroll-x-contain -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pb-2 md:-mx-10 md:px-10"
     >
+      <ListView listId={sourceLabel} listName={label} items={listItems(vehicles)} />
       {vehicles.map((vehicle, index) => (
         <div key={vehicle.id} className="w-[300px] shrink-0 snap-start sm:w-[340px]">
           <VehicleCard
             vehicle={vehicle}
             index={index}
+            sizes={RAIL_SIZES}
             onEnquire={(v) =>
               onOpen(v, { intent: "Vehicle Enquiry", sourceLabel })
             }

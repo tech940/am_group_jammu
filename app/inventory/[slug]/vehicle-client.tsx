@@ -11,12 +11,31 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import type { FaqItem } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
-import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
+import type { SeoLink } from "@/lib/seo/links"
 import type { VehicleNeighbour } from "@/lib/inventory/server"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { pushEvent, vehicleParams } from "@/lib/analytics/gtm"
+import { listItems } from "@/lib/analytics/events"
+import { ListView } from "@/components/analytics/list-view"
 import { whatsappUrl, H_PROMISE, LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
+import { ownersLabel } from "./car-facts"
 import { VehicleGallery } from "./vehicle-gallery"
+
+/** A link the server has already checked leads to a live, indexable page. */
+export interface CarLink {
+  label: string
+  href: string
+}
+
+/** The one site a car is kept at, when the stock record names it. */
+export interface CarSite {
+  slug: string
+  shortName: string
+  city: string
+  /** Null for a site whose street address is not confirmed. */
+  address: string | null
+}
+
 
 const pagerLink =
   "h-11 px-3 rounded-sm border border-line-strong flex items-center text-meta uppercase text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
@@ -27,9 +46,17 @@ const contactLink =
 
 export default function VehicleClient({
   vehicle,
-  similar,
+  name,
+  sold,
+  summary,
+  dealerNotes,
   sellerNotes,
   faqs,
+  crumbs,
+  browseLinks,
+  upLink,
+  site,
+  similar,
   frequentSearches,
   position,
   total,
@@ -37,11 +64,31 @@ export default function VehicleClient({
   next,
 }: {
   vehicle: InventoryVehicle
-  similar: InventoryVehicle[]
+  /**
+   * The heading, the last crumb and the schema name: "2021 Hyundai Creta SX",
+   * or with a fact added when another car on sale shares that name
+   * ("2024 Kia Carens Petrol Automatic, 2,603 km").
+   */
+  name: string
+  /**
+   * True for a car that has been sold and still has a page. The page then
+   * says so, drops every way of enquiring about THIS car, and points at
+   * similar cars instead.
+   */
+  sold: boolean
+  /** The car in a few plain sentences; see carSummary(). */
+  summary: string
+  /** The dealer's own description, one entry per paragraph. Often empty. */
+  dealerNotes: string[]
   sellerNotes: string[]
   faqs: FaqItem[]
+  crumbs: { label: string; href?: string }[]
+  browseLinks: CarLink[]
+  /** The closest page with cars on it, for the sold state. */
+  upLink: CarLink
+  site: CarSite | null
+  similar: InventoryVehicle[]
   frequentSearches: SeoLink[]
-  seoGroups: SeoLinkGroup[]
   position: number
   total: number
   prev: VehicleNeighbour | null
@@ -52,7 +99,11 @@ export default function VehicleClient({
   /* Every spec is conditional — this listing only shows what it actually has. */
   const specs = [
     vehicle.year !== null && { label: "Year", value: String(vehicle.year) },
+    vehicle.variant && { label: "Variant", value: vehicle.variant },
     vehicle.mileage !== null && { label: "KMs Driven", value: vehicle.mileageLabel },
+    vehicle.owners && { label: "Owners", value: ownersLabel(vehicle.owners) },
+    // The series only ("JK02"). The full number plate is never stored or shown.
+    vehicle.registration && { label: "Registration", value: vehicle.registration },
     vehicle.fuel && { label: "Fuel", value: vehicle.fuel },
     vehicle.transmission && { label: "Transmission", value: vehicle.transmission },
     vehicle.drivetrain && { label: "Drivetrain", value: vehicle.drivetrain },
@@ -71,14 +122,18 @@ export default function VehicleClient({
   // Keyed on the vehicle, not []: the prev/next links swap the vehicle without
   // remounting this component, so an empty dep array would miss those views.
   useEffect(() => {
+    // A sold car cannot be bought, so looking at its page is not a product view.
+    if (sold) return
     pushEvent("view_item", {
       ...vehicleParams(vehicle),
       listing_position: position,
       listing_total: total,
     })
-  }, [vehicle, position, total])
+  }, [vehicle, position, total, sold])
 
-  const heading = `${vehicle.year ? `${vehicle.year} ` : ""}${vehicle.title}`
+  // One name for the heading, the photo alt text, the WhatsApp message and
+  // the phone bar, so they cannot drift apart.
+  const heading = name
 
   const whatsappHref = whatsappUrl(
     `Hi AM Group, I'm interested in the ${heading}` +
@@ -90,15 +145,10 @@ export default function VehicleClient({
 
   return (
     <div className="min-h-screen bg-ground">
-      <Breadcrumbs
-        items={[
-          { label: "Used Cars in Jammu", href: "/inventory" },
-          ...(vehicle.make
-            ? [{ label: vehicle.make, href: `/inventory?make=${encodeURIComponent(vehicle.make)}` }]
-            : []),
-          { label: heading },
-        ]}
-      />
+      {/* The trail is resolved on the server (page.tsx) so that every level
+          is a page that exists and may be indexed: the brand page and the
+          model page, never a filtered search. */}
+      <Breadcrumbs items={crumbs} />
 
       <div className="container mx-auto flex flex-col px-6 md:px-12">
         {/* Back link + prev/next through the full listing. On a phone this row
@@ -113,6 +163,8 @@ export default function VehicleClient({
             All used cars
           </Link>
 
+          {/* A sold car has no place in the list of cars on sale. */}
+          {!sold && (
           <nav aria-label="Vehicle pagination" className="flex items-center gap-2">
             {prev ? (
               <Link
@@ -144,12 +196,13 @@ export default function VehicleClient({
               <span className={pagerOff}>Next</span>
             )}
           </nav>
+          )}
         </div>
 
         <div className="order-1 grid grid-cols-1 gap-x-12 gap-y-5 pt-2 pb-8 md:order-none md:gap-y-10 md:py-4 lg:grid-cols-5">
           {/* PHOTOS — keyed so moving to the next car starts at its first photo. */}
           <div className="min-w-0 lg:col-span-3 lg:row-start-1">
-            <VehicleGallery key={vehicle.id} images={vehicle.images} heading={heading} />
+            <VehicleGallery key={vehicle.id} images={vehicle.images} heading={heading} vehicleId={vehicle.id} />
           </div>
 
           {/* SUMMARY — title, price and the enquiry actions. Directly under the
@@ -161,10 +214,19 @@ export default function VehicleClient({
                   {[vehicle.year, vehicle.make].filter(Boolean).join(" • ")}
                 </span>
               )}
-              {vehicle.condition && <Badge tone="info">{vehicle.condition}</Badge>}
+              {sold ? (
+                <Badge tone="neutral">Sold</Badge>
+              ) : (
+                vehicle.condition && <Badge tone="info">{vehicle.condition}</Badge>
+              )}
             </div>
 
-            <h1 className="mt-2 font-display text-h2 text-ink md:mt-3 md:text-h1">{vehicle.title}</h1>
+            {/* Year, make, model and variant in the heading itself: this line
+                is what a search result or an assistant quotes as the car. */}
+            <h1 className="mt-2 font-display text-h2 text-ink md:mt-3 md:text-h1">
+              {heading}
+              {sold && " (sold)"}
+            </h1>
 
             {keyFacts.length > 0 && (
               <p className="mt-1 text-body text-ink-2 md:mt-2" data-num>
@@ -172,6 +234,31 @@ export default function VehicleClient({
               </p>
             )}
 
+            {sold ? (
+              /* SOLD. No price to act on and no way to enquire about this
+                 car: the one loud control goes to cars that can be bought. */
+              <div className="mt-3 md:mt-6 md:border md:border-line md:bg-surface md:p-8">
+                <p className="font-display text-h1 text-ink">Sold</p>
+                <p className="mt-1 text-body text-ink-2">
+                  This car has been sold and is no longer available.
+                </p>
+                <div className="mt-3 space-y-2 md:mt-6 md:space-y-3">
+                  <Button asChild variant="primary" size="lg" full>
+                    <Link href={upLink.href}>See similar cars</Link>
+                  </Button>
+                  <Button asChild variant="secondary" size="md" full>
+                    <a
+                      href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                      data-track-location="vdp-sold"
+                      aria-label={`Call ${PRIMARY_LOCATION.phone}`}
+                    >
+                      <PhoneGlyph />
+                      Call
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            ) : (
             <div className="mt-3 md:mt-6 md:border md:border-line md:bg-surface md:p-8">
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="sr-only">{vehicle.price === null ? "Price" : "Asking price"}</span>
@@ -240,6 +327,14 @@ export default function VehicleClient({
                 </Button>
               </div>
             </div>
+            )}
+
+            {/* The whole car in plain sentences: what it is, what it costs,
+                where it is and the number to ring. Built on the server only
+                from facts the stock record holds. Under the buttons so that
+                on a phone the photo, price and enquiry stay on the first
+                screen. */}
+            <p className="mt-4 text-body text-ink-2 md:mt-6">{summary}</p>
           </div>
 
           {/* DETAILS */}
@@ -262,7 +357,15 @@ export default function VehicleClient({
 
             <section>
               <h2 className="mb-4 font-display text-h2 text-ink">About this car</h2>
+              {/* What the dealer wrote about this car comes first: it is the
+                  only text on the page a person wrote about this one car.
+                  Nothing is shown in its place when they have written none. */}
               <div className="space-y-4">
+                {dealerNotes.map((para, i) => (
+                  <p key={`dealer-${i}`} className="text-body text-ink">
+                    {para}
+                  </p>
+                ))}
                 {sellerNotes.map((para, i) => (
                   <p key={i} className="text-body text-ink-2">
                     {para}
@@ -273,7 +376,7 @@ export default function VehicleClient({
               <dl className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
                   { k: "Listing ID", v: `#${vehicle.id}` },
-                  { k: "Condition", v: vehicle.condition ?? "Used" },
+                  { k: "Condition", v: sold ? "Sold" : (vehicle.condition ?? "Used") },
                   { k: "Photos", v: String(vehicle.photoCount) },
                   {
                     k: "Listed",
@@ -300,16 +403,34 @@ export default function VehicleClient({
 
           {/* SIDE COLUMN */}
           <aside className="min-w-0 space-y-6 lg:col-span-2 lg:col-start-4 lg:row-start-2">
-            {/* Where the car is, and who to ring. Stock is spread across three
-                sites, so the page does not claim a location for this car. */}
+            {/* Where the car is, and who to ring. When the stock record names
+                the site, that one site is shown. When it does not, the page
+                lists all three and asks the buyer to ring: it never claims a
+                location it has not been told. A sold car is nowhere to be
+                seen, so the heading changes and only the sites are listed. */}
             <section className="border border-line bg-surface p-6">
-              <h2 className="mb-2 font-display text-h3 text-ink">Where to see this car</h2>
+              <h2 className="mb-2 font-display text-h3 text-ink">
+                {sold ? "Our Jammu sites" : "Where to see this car"}
+              </h2>
               <p className="text-body text-ink-2">
-                Available at our Jammu sites — call to confirm which location this car is at.
+                {sold
+                  ? "Similar cars are kept at our Jammu sites. Call and we will tell you what is in stock."
+                  : site
+                    ? `This car is kept at our ${site.shortName} site in ${site.city}. Call before you travel so it is ready for you.`
+                    : "Available at our Jammu sites — call to confirm which location this car is at."}
               </p>
 
               <ul className="mt-4 border-t border-line">
-                {LOCATIONS.map((loc) => (
+                {(!sold && site
+                  ? [{ slug: site.slug, shortName: site.shortName, line: site.address ?? "Exact address on request, call for directions" }]
+                  : LOCATIONS.map((loc) => ({
+                      slug: loc.slug,
+                      shortName: loc.shortName,
+                      line: loc.addressConfirmed
+                        ? `${loc.streetAddress}, ${loc.landmark}`
+                        : `${loc.landmark} — exact address on request, call for directions`,
+                    }))
+                ).map((loc) => (
                   <li key={loc.slug} className="border-b border-line">
                     <Link
                       href={`/locations/${loc.slug}`}
@@ -319,11 +440,7 @@ export default function VehicleClient({
                         <span className="block text-body font-semibold text-ink transition-colors duration-(--duration-1) group-hover:text-accent-text-light">
                           {loc.shortName}
                         </span>
-                        <span className="block text-small text-ink-2">
-                          {loc.addressConfirmed
-                            ? `${loc.streetAddress}, ${loc.landmark}`
-                            : `${loc.landmark} — exact address on request, call for directions`}
-                        </span>
+                        <span className="block text-small text-ink-2">{loc.line}</span>
                       </span>
                       <ChevronGlyph className="text-ink-3" />
                     </Link>
@@ -361,10 +478,11 @@ export default function VehicleClient({
 
             <section className="border border-line bg-surface p-6">
               <h2 className="mb-4 font-display text-h3 text-ink">Why buy from us</h2>
+              {/* Two lines about verified history and a multi-point inspection
+                  were removed: nothing on record describes either. The line
+                  left is a service every site lists in lib/locations.ts. */}
               <ul className="border-t border-line">
                 {[
-                  "Verified documentation & history",
-                  "Multi-point inspection before sale",
                   "Finance & exchange assistance",
                 ].map((text) => (
                   <li key={text} className="border-b border-line py-3 text-body text-ink-2">
@@ -374,20 +492,14 @@ export default function VehicleClient({
               </ul>
             </section>
 
-            {/* Related browse links keep this page connected to the wider site */}
+            {/* Links up to the brand, model, body, fuel and gearbox pages.
+                The server chose them (page.tsx): each is a real page that may
+                be indexed, with link text that says what is on it, so a car
+                page passes its weight to the page for its make and model. */}
             <section className="border border-line bg-surface p-6">
               <h2 className="mb-4 font-display text-h3 text-ink">Browse similar</h2>
               <div className="flex flex-wrap gap-2">
-                {(
-                  [
-                    vehicle.make && { label: `All ${vehicle.make}`, href: `/inventory?make=${encodeURIComponent(vehicle.make)}` },
-                    vehicle.model && { label: `All ${vehicle.model}`, href: `/inventory?model=${encodeURIComponent(vehicle.model)}` },
-                    vehicle.bodyType && { label: `${vehicle.bodyType}s`, href: `/inventory?bodyType=${encodeURIComponent(vehicle.bodyType)}` },
-                    vehicle.fuel && { label: `${vehicle.fuel} cars`, href: `/inventory?fuel=${encodeURIComponent(vehicle.fuel)}` },
-                    vehicle.transmission && { label: `${vehicle.transmission} cars`, href: `/inventory?transmission=${encodeURIComponent(vehicle.transmission)}` },
-                    vehicle.year && { label: `${vehicle.year} models`, href: `/inventory?year=${vehicle.year}` },
-                  ].filter(Boolean) as { label: string; href: string }[]
-                ).map((link) => (
+                {browseLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -406,13 +518,21 @@ export default function VehicleClient({
       {similar.length > 0 && (
         <div className="container mx-auto px-6 md:px-12 pb-16">
           <div className="border-t border-line pt-12">
-            <h2 className="font-display text-h2 text-ink mb-8">Similar cars</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <h2 className="font-display text-h2 text-ink mb-8">
+              {sold ? "Similar cars in stock" : "Similar cars"}
+            </h2>
+            {/* Reports the row as a list, and names it for a click on a card. */}
+            <ListView listId="vdp-similar" listName="Similar cars" items={listItems(similar)} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8" data-track-list="vdp-similar" data-track-list-name="Similar cars">
               {similar.map((v, index) => (
                 <VehicleCard
                   key={v.id}
                   vehicle={v}
                   index={index}
+                  // These sit below a full gallery, so none of them loads its
+                  // photo ahead of time: the car's own first photo is the only
+                  // image the browser is asked to hurry.
+                  eager={false}
                   onEnquire={(x) => onOpen(x, { intent: "Vehicle Enquiry", sourceLabel: "vdp-similar" })}
                   viewType="grid"
                 />
@@ -422,11 +542,14 @@ export default function VehicleClient({
         </div>
       )}
 
-      <FaqSection
-        items={faqs}
-        title={`${heading} — Questions & Answers`}
-        intro={`Common questions about this specific car. Call ${PRIMARY_LOCATION.phone} if anything is not covered here.`}
-      />
+      {/* The questions are about buying this car, so a sold car has none. */}
+      {faqs.length > 0 && (
+        <FaqSection
+          items={faqs}
+          title={`${heading} — Questions & Answers`}
+          intro={`Common questions about this specific car. Call ${PRIMARY_LOCATION.phone} if anything is not covered here.`}
+        />
+      )}
 
       <FrequentSearches searches={frequentSearches} />
 
@@ -434,7 +557,9 @@ export default function VehicleClient({
           site-wide tab bar (4rem + the home-indicator inset) for the whole car
           page, then comes to rest at the end of the page instead of covering
           the footer — so it takes its own space and no extra padding is needed.
-          Hidden from md up, where the price panel is already on screen. */}
+          Hidden from md up, where the price panel is already on screen.
+          Not shown for a sold car: there is nothing to ask the price of. */}
+      {!sold && (
       <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-surface md:hidden">
         <div className="flex items-center justify-between gap-4 px-6 py-2">
           <div className="min-w-0">
@@ -454,6 +579,7 @@ export default function VehicleClient({
           </Button>
         </div>
       </div>
+      )}
     </div>
   )
 }

@@ -6,8 +6,10 @@
  * publicly-invocable server action.
  */
 
-import type { CreateLeadInput, LeadIntent } from './types.ts'
-import { LEAD_INTENTS } from './types.ts'
+import type { ConsentScope, CreateLeadInput, LeadIntent } from './types.ts'
+import { CONSENT_TEXT, LEAD_INTENTS } from './types.ts'
+import { sanitizeAttribution } from './attribution.ts'
+import type { LeadAttribution } from './attribution.ts'
 
 export interface ValidationResult {
   ok: boolean
@@ -22,6 +24,10 @@ export interface ValidationResult {
     sourcePath: string | null
     sourceLabel: string | null
     consent: boolean
+    /** Which wording the consent answers; null if the form did not say. */
+    consentScope: ConsentScope | null
+    /** Cleaned campaign and referrer details, or null when none were sent. */
+    attribution: LeadAttribution | null
   }
 }
 
@@ -98,6 +104,13 @@ export function validateLead(input: CreateLeadInput): ValidationResult {
       sourcePath: (input.sourcePath ?? '').slice(0, MAX.path) || null,
       sourceLabel: (input.sourceLabel ?? '').slice(0, MAX.label) || null,
       consent: Boolean(input.consent),
+      consentScope:
+        typeof input.consentScope === 'string' && Object.keys(CONSENT_TEXT).includes(input.consentScope)
+          ? input.consentScope
+          : null,
+      // Sent by the browser, so treated like any other typed-in field: known
+      // keys only, plain short strings only. See lib/leads/attribution.ts.
+      attribution: sanitizeAttribution(input.attribution),
     },
   }
 }

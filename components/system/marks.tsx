@@ -355,28 +355,12 @@ export function Stamp({ year, className = "" }: { year: number; className?: stri
 /* lines around it have drawn. Reduced motion renders statically.      */
 /* ------------------------------------------------------------------ */
 
-export function Settle({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: ReactNode
-  delay?: number
-  className?: string
-}) {
-  const reduce = useReducedMotionSafe()
-  return (
-    <motion.div
-      className={className}
-      initial={reduce ? false : { opacity: 0, y: 8 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
-    >
-      {children}
-    </motion.div>
-  )
-}
+// The reveal itself now lives in motion.tsx. The one that used to be here was
+// built on framer-motion and wrote opacity:0 into the server HTML, so a block
+// stayed invisible to any reader that did not run script. It is re-exported
+// under the same name so that every existing import of `Settle` from this
+// file gets the visible-first version without being edited.
+export { Settle } from "@/components/system/motion"
 
 /* ------------------------------------------------------------------ */
 /* Glyph set, continued.                                               */

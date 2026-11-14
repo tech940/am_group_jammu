@@ -1,32 +1,39 @@
 import type { NextConfig } from "next";
+import { SITE_HOST, SITE_URL_IS_EXPLICIT } from "./lib/seo/site";
 
 /**
  * WordPress -> Next.js migration redirects.
  *
  * amgroupind.com is a live WordPress site with ~196 URLs in Google's index. When
- * DNS moves to this app, every legacy URL that is not mapped here becomes a 404
- * and the ranking it holds is lost. The map was built by fetching each live URL
- * and classifying what it actually contains — not by guessing from the slug,
- * which would have been wrong at least once: /amg-autocraft-jammu/ reads like a
+ * DNS moves to this app, every legacy URL that is not handled becomes a 404 and
+ * the ranking it holds is lost. The map was built by fetching each live URL and
+ * classifying what it actually contains — not by guessing from the slug, which
+ * would have been wrong at least once: /amg-autocraft-jammu/ reads like a
  * bodyshop and is in fact an MG Motor dealership.
+ *
+ * WHERE EACH KIND OF OLD URL IS HANDLED
+ *   here                  an old page with a true equivalent on this site that
+ *                         always exists (contact, the Jammu stock page, about)
+ *   proxy.ts              (a) old pages with no home here: 410 Gone, not a
+ *                         redirect to the homepage, which Google treats as a
+ *                         soft 404; (b) old URLs whose destination only exists
+ *                         while a matching car is in stock (/hyundai,
+ *                         /?taxonomy=make&term=kia): checked against the live
+ *                         site at request time, and redirected without the old
+ *                         query string, which a rule in this file cannot do
+ *   app/listings/[...slug] individual cars (/listings/<slug>/), matched
+ *                         against live stock
+ *
+ * Redirects here run BEFORE proxy.ts. Do not list a URL in both.
  *
  * Sources are written WITHOUT a trailing slash. Next normalises `/about-us/` to
  * `/about-us` before redirect matching (trailingSlash defaults to false), so the
  * slashed WordPress form is covered by the unslashed rule.
- *
- * Individual vehicle URLs (/listings/<slug>/) are NOT here — they are resolved
- * dynamically against live stock in app/listings/[...slug]/route.ts, because a
- * static map of today's 27 cars is wrong the first time one sells.
- *
- * Dead Motors-plugin utility pages (compare, add-car, authorization, …) are NOT
- * here either — they get a 410 from proxy.ts, which tells Google to drop them
- * outright rather than passing them equity they never had.
  */
 
 interface LegacyRedirect {
   source: string
   destination: string
-  has?: { type: 'query'; key: string; value?: string }[]
   /**
    * Emit 302 instead of 301. Used only for pages whose real replacement has not
    * been built yet — a 301 would permanently reassign that URL's ranking to a
@@ -37,9 +44,10 @@ interface LegacyRedirect {
 
 const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   /* Company ------------------------------------------------------------- */
-  { source: '/about-us', destination: '/' },
-  // Thin divisions hub; /about carries the same group-level story.
-  { source: '/our-businesses', destination: '/' },
+  // The "About AM Group Used Cars" section on /locations is the one place this
+  // site says who the dealer is, so the old company-profile URLs go there.
+  { source: '/about-us', destination: '/locations#about' },
+  { source: '/about', destination: '/locations#about' },
 
   /* Contact ------------------------------------------------------------- */
   { source: '/contact-us', destination: '/contact' },
@@ -50,18 +58,6 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   { source: '/used-cars-in-jammu', destination: '/used-cars/jammu' },
   // Two more renders of the identical Motors listings archive.
   { source: '/listings', destination: '/inventory' },
-
-  /* Editorial ------------------------------------------------------------ */
-  { source: '/news-updates', destination: '/' },
-  { source: '/category/news', destination: '/' },
-  { source: '/category/uncategorized', destination: '/' },
-  // The four real news posts. There are no individual post pages in this app
-  // yet, so these land on the index. See MIGRATION.md — they are the clearest
-  // case for content that should be rebuilt rather than folded away.
-  { source: '/am-hyundai-bags-two-prestigious-awards', destination: '/' },
-  { source: '/am-hyundai-inaugurates-smart-car-care-clinic', destination: '/' },
-  { source: '/am-hyundai-launches-indias-first-fully-electric-suv-kona-electric', destination: '/' },
-  { source: '/am-hyundai-launches-all-new-i20', destination: '/' },
 
   /* Enquiry forms -------------------------------------------------------- */
   // Elementor lead-capture templates, one per franchise. The product differs
@@ -77,47 +73,21 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   { source: '/triumph-enquiry', destination: '/contact' },
 
   /* ------------------------------------------------------------------------
-   * TEMPORARY (302) — business AM Group really operates that this site does
-   * not yet cover.
-   *
-   * The WordPress site sells new cars and motorcycles, distributes genuine
-   * spare parts, books servicing, brokers insurance, buys cars, and runs two
-   * cafés. None of that exists here yet, so none of these has an honest
-   * permanent home. They are 302 rather than 301 deliberately: a 302 keeps the
-   * original URL in Google's index instead of handing its ranking to a
-   * stand-in page, so nothing is lost when the real page ships.
-   *
-   * Replace each with a 301 to its proper page as that page is built.
+   * TEMPORARY (302) — things AM Group really does that this site does not
+   * cover, where the visitor's next step is still an enquiry and /contact can
+   * take it. 302 rather than 301: it keeps the original URL in Google's index
+   * instead of handing its ranking to a stand-in, so nothing is lost if the
+   * group gives these a proper page somewhere.
    * ---------------------------------------------------------------------- */
-
-  // The seven franchise showroom URLs are GONE from this list on purpose:
-  // app/[brand] now serves real pages at those exact slugs (/hyundai,
-  // /am-kia, /am-tata, /amg-autocraft-jammu, /ktm-jammu, /honda-two-wheeler,
-  // /am-bajaj-jammu). Redirects run before routing, so an entry here would
-  // shadow the page it was holding the URL for.
-
-  // B2B genuine-parts distribution — a different customer entirely, so the
-  // vehicle hub would be as wrong as the used-car pages.
+  // B2B genuine-parts distribution.
   { source: '/am-hyundai-mobis', destination: '/contact', temporary: true },
-
-  // Service actions. Each is an enquiry, which /contact can genuinely take.
+  // Service actions.
   { source: '/book-service', destination: '/contact', temporary: true },
   { source: '/insurance-solutions', destination: '/contact', temporary: true },
   // /sell-your-car is a real page now (app/sell-your-car), so it has no
   // redirect — an entry here would shadow it.
 
-  // Hospitality. Nothing on this site is close; /about is the group hub and is
-  // the least-wrong holding position until these are rebuilt.
-  { source: '/milele', destination: '/', temporary: true },
-  { source: '/mocha', destination: '/', temporary: true },
-
-  /* ------------------------------------------------------------------------
-   * Pages this site used to have. It is a used-car site only now: the company
-   * profile, the divisions, news, gallery and the new-vehicle showroom pages
-   * were removed on 2026-11-14. Each old URL lands on the closest live page
-   * rather than a 404. Temporary, because the group may give these a home on
-   * its own company site later.
-   * ---------------------------------------------------------------------- */
+  /* Renamed or retired pages of this site -------------------------------- */
   // The fuel landing page was named after the feed's word for petrol.
   { source: '/used-cars/gasoline-cars-in-jammu', destination: '/used-cars/petrol-cars-in-jammu' },
   // City pages and the Srinagar location were retired with the move to three
@@ -126,81 +96,13 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   { source: '/used-cars/kathua', destination: '/used-cars/jammu' },
   { source: '/used-cars/udhampur', destination: '/used-cars/jammu' },
   { source: '/locations/srinagar', destination: '/locations' },
-  { source: '/about', destination: '/', temporary: true },
-  { source: '/automobile', destination: '/inventory', temporary: true },
-  { source: '/hp-indian-oil', destination: '/', temporary: true },
-  { source: '/real-estate', destination: '/', temporary: true },
-  { source: '/s-mega-mart', destination: '/', temporary: true },
-  { source: '/blog', destination: '/', temporary: true },
-  { source: '/gallery', destination: '/inventory', temporary: true },
-  { source: '/hyundai', destination: '/inventory', temporary: true },
-  { source: '/am-tata', destination: '/inventory', temporary: true },
-  { source: '/am-kia', destination: '/inventory', temporary: true },
-  { source: '/amg-autocraft-jammu', destination: '/inventory', temporary: true },
-  { source: '/honda-two-wheeler', destination: '/inventory', temporary: true },
-  { source: '/ktm-jammu', destination: '/inventory', temporary: true },
-  { source: '/am-bajaj-jammu', destination: '/inventory', temporary: true },
-]
 
-/**
- * Motors taxonomy archives, published as query strings on `/`
- * (e.g. /?taxonomy=make&term=kia). Thin faceted pages, but AIOSEO put all 96 in
- * the sitemap so Google knows them.
- *
- * Terms are enumerated rather than captured with a wildcard for two reasons:
- * an unknown term would redirect into a 404, and the WordPress vocabulary does
- * not match ours — WP says `petrol` where our stock says `gasoline`, so
- * /used-cars/petrol-cars-in-jammu does not exist.
- *
- * Anything not enumerated falls through to the catch-all at the end.
- */
-const TAXONOMY_MAP: Record<string, Record<string, string>> = {
-  make: {
-    hyundai: '/brands/hyundai',
-    kia: '/brands/kia',
-    'maruti-suzuki': '/brands/maruti-suzuki',
-    chevrolet: '/brands/chevrolet',
-  },
-  body: {
-    suv: '/used-cars/suv-in-jammu',
-    hatchback: '/used-cars/hatchback-in-jammu',
-    sedan: '/used-cars/sedan-in-jammu',
-    mpv: '/used-cars/mpv-in-jammu',
-    'compact-suv': '/used-cars/compact-suv-in-jammu',
-    'premium-hatchback': '/used-cars/premium-hatchback-in-jammu',
-    'premium-suv': '/used-cars/premium-suv-in-jammu',
-  },
-  fuel: {
-    petrol: '/used-cars/petrol-cars-in-jammu',
-    diesel: '/used-cars/diesel-cars-in-jammu',
-  },
-  transmission: {
-    manual: '/used-cars/manual-cars-in-jammu',
-    automatic: '/used-cars/automatic-cars-in-jammu',
-  },
-}
-
-const LEGACY_TAXONOMY_REDIRECTS: LegacyRedirect[] = [
-  ...Object.entries(TAXONOMY_MAP).flatMap(([taxonomy, terms]) =>
-    Object.entries(terms).map(([term, destination]) => ({
-      source: '/',
-      has: [
-        { type: 'query' as const, key: 'taxonomy', value: taxonomy },
-        { type: 'query' as const, key: 'term', value: term },
-      ],
-      destination,
-    })),
-  ),
-  // Everything else — price bands, mileage bands, model years, engine sizes,
-  // exterior colours, condition, drive, and every model (`serie`) term. Those
-  // destinations are all stock-derived and vanish when the last matching car
-  // sells, so pointing at them would trade a 404 today for a 404 next month.
-  // MUST stay last: `has` rules are evaluated in order.
-  {
-    source: '/',
-    has: [{ type: 'query' as const, key: 'taxonomy' }],
-    destination: '/inventory',
-  },
+  // NOT HERE ON PURPOSE (all handled in proxy.ts):
+  //   the news index and posts, /blog, /gallery, /our-businesses, /automobile,
+  //   /hp-indian-oil, /real-estate, /s-mega-mart, /milele, /mocha, and the MG,
+  //   Honda, KTM and Bajaj showroom URLs  -> 410 Gone
+  //   /hyundai, /am-kia, /am-tata          -> that make's used cars, while in stock
+  //   /?taxonomy=...&term=...              -> the matching landing page, while in stock
 ]
 
 /**
@@ -264,7 +166,10 @@ const nextConfig: NextConfig = {
         pathname: "/**",
       },
     ],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    // Nothing wider than 1920: car photographs are stored at 1280 to 1600px,
+    // so 2048 and 3840 only made every srcset longer and asked the optimiser
+    // to upscale.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     // Next 16 rejects any `quality` prop not listed here and silently serves the
     // default 75 instead — which is what was happening to the hero's
@@ -284,16 +189,52 @@ const nextConfig: NextConfig = {
   },
 
   async redirects() {
-    return [...LEGACY_PAGE_REDIRECTS, ...LEGACY_TAXONOMY_REDIRECTS].map(
-      ({ temporary, ...rule }) => ({
-        ...rule,
-        // `permanent: true` emits 308. Google treats 301 and 308 identically,
-        // but 301 is what every SEO auditor, log analyser and legacy crawler
-        // expects on a content migration, and these are all GET page requests,
-        // so there is no request method to preserve.
-        statusCode: temporary ? (302 as const) : (301 as const),
-      }),
-    )
+    return LEGACY_PAGE_REDIRECTS.map(({ temporary, ...rule }) => ({
+      ...rule,
+      // `permanent: true` emits 308. Google treats 301 and 308 identically,
+      // but 301 is what every SEO auditor, log analyser and legacy crawler
+      // expects on a content migration, and these are all GET page requests,
+      // so there is no request method to preserve.
+      statusCode: temporary ? (302 as const) : (301 as const),
+    }))
+  },
+
+  /**
+   * Keep copies of the site on other hostnames out of search results.
+   *
+   * Once the real domain is live, the same pages are still reachable at the
+   * project's vercel.app address and at every preview deployment. Each page's
+   * canonical tag already points at the real domain, but a canonical is a
+   * hint; "X-Robots-Tag: noindex" is an instruction. So every response served
+   * on a host OTHER than the one in NEXT_PUBLIC_SITE_URL carries it.
+   *
+   * The guard matters more than the rule. While NEXT_PUBLIC_SITE_URL is unset,
+   * lib/seo/site.ts falls back to the old WordPress domain, which this app
+   * does not serve yet. Applying the rule then would mark the only live copy
+   * of the site (the vercel.app one) noindex and remove it from Google. So
+   * with the variable unset this returns nothing, and today's site is left
+   * exactly as it is.
+   *
+   * Setting the variable is therefore the switch. Set it to the address
+   * visitors really use: to the vercel.app URL while that is the public
+   * address, to the custom domain on the day the domain points here. Setting
+   * it to a domain that does not serve this app yet would noindex the copy
+   * that does.
+   *
+   * A "www." or non-"www." twin of the chosen host is treated as another host.
+   * That is right as long as the twin redirects to the chosen one, which is
+   * how Vercel sets up a domain pair.
+   */
+  async headers() {
+    if (!SITE_URL_IS_EXPLICIT) return []
+    return [
+      {
+        source: '/:path*',
+        // `value` is read as a regular expression, so the dots are escaped.
+        missing: [{ type: 'host' as const, value: SITE_HOST.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') }],
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      },
+    ]
   },
 };
 

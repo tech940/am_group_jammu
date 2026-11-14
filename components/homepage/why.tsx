@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { ArrowGlyph } from "@/components/system/marks"
 import { IlloChoose, IlloDrive, IlloPapers } from "@/components/system/illustrations"
-import { FOUNDED, YEARS_TRADING } from "@/components/home/content"
+import { GROUP_ORIGIN } from "@/app/locations/about-facts"
 import { LOCATIONS } from "@/lib/locations"
 import { SectionHead } from "./section-head"
 
@@ -10,8 +10,16 @@ import { SectionHead } from "./section-head"
  *
  * Four reasons a stranger can check, then the steps of buying. Everything is
  * about used cars in Jammu: the three sites come from lib/locations.ts, the
- * founding year from content.ts, and the in-house services are the ones every
- * location lists (test drives, finance, exchange, RC and insurance transfer).
+ * 1968 sentence from app/locations/about-facts.ts, and the in-house services
+ * are the ones every location lists (test drives, finance assistance,
+ * exchange, RC and insurance transfer), in that file's words: no bank, no new
+ * insurance policy and no promise about the future is named.
+ *
+ * WHAT 1968 IS. The year the GROUP started, as a fuel retailer. It is not the
+ * year it began selling cars (the first car franchise came decades later, and
+ * the used-car business later still). GROUP_ORIGIN says exactly that, and is
+ * the same text /inventory, /locations and llms.txt print. Add the
+ * car-dealing year only when the company supplies it.
  *
  * WHAT IS NOT HERE ANY MORE. The old band named the group's other cities, its
  * new-car franchises and its service workshops, and printed content.ts's
@@ -23,16 +31,16 @@ const SITES = LOCATIONS.map((l) => l.shortName)
 
 const REASONS = [
   {
-    title: `A dealer since ${FOUNDED}`,
-    body: `${YEARS_TRADING} years trading in Jammu & Kashmir. The business will still be here when the car needs something.`,
+    title: "Part of AM Group",
+    body: GROUP_ORIGIN,
   },
   {
     title: "The facts are on the listing",
-    body: "Listings carry our own photographs, the recorded odometer reading and the asking price, so you know the car before you call anyone.",
+    body: "Listings carry our own photographs, the odometer reading and the asking price, so you know the car before you call anyone.",
   },
   {
     title: "Paperwork done in-house",
-    body: "Bank finance, motor insurance and RC transfer are arranged at the dealership, so buying does not mean visiting three offices.",
+    body: "Finance help and the RC and insurance transfer are handled at the dealership, so buying does not mean visiting three offices.",
   },
   {
     title: `${SITES.length} sites in Jammu`,
@@ -54,7 +62,7 @@ const STEPS = [
   {
     Illo: IlloPapers,
     label: "We do the paperwork",
-    detail: "Exchange valuation, bank finance, insurance and RC transfer, all at the dealership.",
+    detail: "Exchange valuation, finance help, and the RC and insurance transfer, all at the dealership.",
   },
 ]
 
@@ -89,13 +97,14 @@ export function Why() {
           ))}
         </ol>
 
-        <h3 className="mt-12 font-display text-h2 uppercase text-ink md:mt-20">
+        {/* An h2, not an h3 under "How buying works": it opens its own list. */}
+        <h2 className="mt-12 font-display text-h2 uppercase text-ink md:mt-20">
           Bought from a dealer, not a stranger
-        </h3>
+        </h2>
         <ul className="mt-6 grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line-strong pt-6 sm:grid-cols-2 lg:grid-cols-4">
           {REASONS.map((r) => (
             <li key={r.title}>
-              <h4 className="text-h4 text-ink">{r.title}</h4>
+              <h3 className="text-h4 text-ink">{r.title}</h3>
               <p className="mt-1.5 text-body text-ink-2">{r.body}</p>
             </li>
           ))}

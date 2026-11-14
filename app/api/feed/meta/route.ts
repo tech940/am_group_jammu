@@ -37,6 +37,7 @@
 import type { NextRequest } from 'next/server'
 import { getInventory } from '@/lib/inventory/server'
 import { buildMetaFeed, toCsv } from '@/lib/feed/meta'
+import { SITE_URL, SITE_URL_IS_EXPLICIT } from '@/lib/seo/site'
 
 export const maxDuration = 30
 
@@ -44,10 +45,16 @@ const CACHE_OK = 'public, s-maxage=1800, stale-while-revalidate=3600'
 /** Seconds Meta (or a CDN) should wait before retrying after a failed build. */
 const RETRY_AFTER_SECONDS = 600
 
+/**
+ * Where each car's link in the feed points.
+ *
+ * The site's origin has one definition, lib/seo/site.ts. When the owner has
+ * set it, that is used. Until then SITE_URL is only a guess (the old WordPress
+ * domain), and an ad that sent buyers there would land on the wrong site, so
+ * the address this request came in on is used instead.
+ */
 function siteOrigin(request: NextRequest): string {
-  const configured = (process.env.NEXT_PUBLIC_SITE_URL ?? '').trim().replace(/\/+$/, '')
-  if (/^https?:\/\//i.test(configured)) return configured
-  return request.nextUrl.origin
+  return SITE_URL_IS_EXPLICIT ? SITE_URL : request.nextUrl.origin
 }
 
 /**

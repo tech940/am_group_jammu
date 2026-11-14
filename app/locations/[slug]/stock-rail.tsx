@@ -39,14 +39,14 @@ export function StockRail({
           tone="print"
           label={`Stock manifest — ${total} cars`}
           heading={<span id="stock-title">Cars you can see in {city}</span>}
-          lede="Certified pre-owned stock is held centrally in Jammu. The photographs are of that exact car and the kilometres are the intake reading."
+          lede="Stock is held in Jammu. The photographs are of that exact car and the kilometres are the odometer reading."
         />
       </div>
 
       <div
         className="no-scrollbar mt-12 overflow-x-auto overscroll-x-contain"
         role="region"
-        aria-label="Certified pre-owned stock, horizontally scrollable"
+        aria-label="Used cars in stock, horizontally scrollable"
         tabIndex={0}
       >
         <ul className="flex w-max gap-px bg-line-on-deep px-5 md:px-10">

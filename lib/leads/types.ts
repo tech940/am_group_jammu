@@ -8,6 +8,8 @@
  * are now first-class fields.
  */
 
+import type { LeadAttribution } from './attribution.ts'
+
 export const LEAD_STATUSES = [
   'New',
   'Contacted',
@@ -31,6 +33,81 @@ export const LEAD_INTENTS = [
   'General',
 ] as const
 export type LeadIntent = (typeof LEAD_INTENTS)[number]
+
+/**
+ * What the visitor agreed to, word for word.
+ *
+ * The lead row has ONE consent column, and the site has two forms that mean
+ * different things by it. Both wordings live here so the text on screen and
+ * the text written into the lead's history are the same string:
+ *
+ *  - 'enquiry'   the enquiry modal. The sentence is shown at the submit
+ *                button, and pressing the button is the agreement. It covers
+ *                being called or messaged about THIS enquiry and nothing else.
+ *  - 'marketing' the contact page's optional tick box, which also covers
+ *                offers and service updates. Unticked means not given.
+ */
+export const CONSENT_TEXT = {
+  enquiry:
+    'By sending this, you agree that AM Group may call or message you about this enquiry.',
+  marketing:
+    'I agree to be contacted by AM Group via Call, SMS, WhatsApp, RCS, and Email regarding my inquiry, offers, and service updates. I understand that I can opt out at any time.',
+} as const
+export type ConsentScope = keyof typeof CONSENT_TEXT
+
+/**
+ * The sentences written into a lead's history, one per thing a visitor can
+ * have agreed to. Kept as named constants because the admin lead page reads
+ * them back (consentSummary below) to say which one applies.
+ */
+const CONSENT_RECORD = {
+  enquiry:
+    'agreed to be called or messaged about this enquiry only (notice shown at the send button; no marketing consent was asked for)',
+  marketing:
+    'ticked the box agreeing to calls, SMS, WhatsApp, RCS and email about the enquiry, offers and service updates',
+  marketingDeclined:
+    'left the marketing box unticked, so reply to this enquiry only: no offers or updates',
+} as const
+
+/** Starts the history note for a second submission folded into an existing lead. */
+export const REPEAT_NOTE_PREFIX = 'Repeat submission'
+
+/** One sentence for the lead's history and the lead email. */
+export function consentRecord(consent: boolean, scope: ConsentScope | null): string {
+  if (scope === 'enquiry') return consent ? CONSENT_RECORD.enquiry : 'not recorded'
+  if (scope === 'marketing') {
+    return consent ? CONSENT_RECORD.marketing : CONSENT_RECORD.marketingDeclined
+  }
+  return consent ? 'given (the form did not say which wording)' : 'not recorded'
+}
+
+/**
+ * A few words for the "Consent" row of the admin lead page.
+ *
+ * The row's single yes/no cannot tell "may be called about this enquiry" from
+ * "ticked the box for offers and updates", and printing "Given" for both
+ * invites staff to send offers to someone who never agreed to them. The exact
+ * wording is in the note written with the lead, so it is read back from there.
+ *
+ * `noteBodies` is the text of the lead's history entries, in any order. Notes
+ * for a repeat submission are skipped: they describe a later form, and are
+ * shown in full in the history itself.
+ */
+export function consentSummary(consent: boolean, noteBodies: (string | null)[]): string {
+  const original = noteBodies.find(
+    (body) => body && body.includes('Consent: ') && !body.startsWith(REPEAT_NOTE_PREFIX),
+  )
+  if (original) {
+    if (original.includes(CONSENT_RECORD.enquiry)) return 'This enquiry only; no offers'
+    if (original.includes(CONSENT_RECORD.marketingDeclined)) {
+      return 'This enquiry only; offers box left unticked'
+    }
+    if (original.includes(CONSENT_RECORD.marketing)) return 'Enquiry, offers and updates'
+  }
+  // A lead from before the wording was recorded, or one whose note failed to
+  // save: say what is known and no more.
+  return consent ? 'Given; wording not recorded' : 'Not recorded'
+}
 
 export interface LeadVehicleRef {
   /** WordPress listing ID — numeric, not the Supabase vehicles UUID. */
@@ -58,7 +135,13 @@ export interface Lead {
 
   assignedTo: string | null
   nextFollowUpAt: string | null
-  /** Whether the visitor ticked the contact-consent box. */
+  /**
+   * True when the visitor agreed to be contacted. WHAT they agreed to depends
+   * on the form (see CONSENT_TEXT): the modal's notice covers this enquiry
+   * only, the contact page's tick box also covers offers. The exact wording is
+   * written into the lead's first history note, because this column cannot
+   * hold it.
+   */
   consent: boolean
 
   createdAt: string
@@ -99,6 +182,10 @@ export interface CreateLeadInput {
   sourceLabel?: string | null
   vehicle?: Partial<LeadVehicleRef> | null
   consent?: boolean
+  /** Which wording `consent` answers. See CONSENT_TEXT. */
+  consentScope?: ConsentScope
+  /** How the visitor found the site, from lib/analytics/attribution.ts. */
+  attribution?: LeadAttribution | null
   /** Hidden field; a real user never fills this in. */
   companyWebsite?: string
 }

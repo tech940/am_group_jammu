@@ -45,3 +45,8 @@ next-env.d.ts
 
 # Local lead fallback store (used when Supabase is unconfigured)
 .data/
+
+# Exports with customer or stock data, and tool logs. Never commit.
+/AM-Group-*.xlsx
+/AM-Group-*.csv
+/.playwright-mcp/

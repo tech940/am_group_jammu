@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { Band } from "@/components/system/page-kit"
 import { Button } from "@/components/ui/button"
 import { ArrowGlyph } from "@/components/system/marks"
 import {
@@ -9,8 +8,7 @@ import {
   formatHours,
   whatsappUrl,
 } from "@/lib/locations"
-import type { Ground } from "@/components/system/page-kit"
-import { SectionHead, TIGHT_BAND } from "./section-head"
+import { SectionHead, StoreBand } from "./section-head"
 
 /**
  * The three used-car sites in Jammu.
@@ -45,10 +43,10 @@ export function Visit({
   lede?: string
   /** Prefix for data-track-location. */
   source?: string
-  ground?: Ground
+  ground?: "ground" | "ground-2"
 }) {
   return (
-    <Band ground={ground} labelledBy="visit-title" id="visit" className={TIGHT_BAND}>
+    <StoreBand ground={ground} labelledBy="visit-title" id="visit">
       <SectionHead id="visit-title" title={title} lede={lede} />
 
       <ul className="mt-7 grid grid-cols-1 border-t border-line-strong md:mt-10 md:grid-cols-3 md:gap-x-10">
@@ -147,6 +145,6 @@ export function Visit({
           <ArrowGlyph />
         </Link>
       </div>
-    </Band>
+    </StoreBand>
   )
 }

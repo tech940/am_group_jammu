@@ -6,12 +6,15 @@ import { ClosingCall } from "@/components/system/closing-call"
 import { EnquireCta } from "@/components/system/enquire-cta"
 import { ArrowGlyph } from "@/components/system/marks"
 import { IlloPapers, IlloSell, IlloShowroom } from "@/components/system/illustrations"
-import { FaqSection, type FaqItem } from "@/components/seo/faq-section"
+import { FaqSection } from "@/components/seo/faq-section"
+import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { PhotoHero } from "@/components/homepage/photo-hero"
 import { SectionHead, TIGHT_BAND } from "@/components/homepage/section-head"
 import { Visit } from "@/components/homepage/visit"
-import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
-import { SITE_URL } from "@/lib/seo/site"
+import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
+import { pageSocial } from "@/lib/seo/site"
+import { jsonLdString, sellServiceSchema } from "@/lib/seo-schemas"
+import { SELL_FAQS, SELL_SITE_NAMES, SELL_STEPS } from "./content"
 
 /**
  * Sell your car — the second of the two things this site is for.
@@ -27,15 +30,12 @@ import { SITE_URL } from "@/lib/seo/site"
  * Server-rendered throughout; the only client code is the enquiry button.
  */
 
-const SITE = SITE_URL
-const SITE_NAMES = LOCATIONS.map((l) => l.shortName)
-const HOURS = formatHours(PRIMARY_LOCATION)
+const SITE_NAMES = SELL_SITE_NAMES
 
 const TITLE = "Sell Your Car in Jammu | Free Valuation | AM Group"
 const DESCRIPTION =
-  `Sell or exchange your car at AM Group in Jammu. Free valuation while you wait at ${SITE_NAMES.length} sites ` +
-  `(${SITE_NAMES.join(", ")}). Payment and RC transfer handled in-house. Call ${PRIMARY_LOCATION.phone}.`
-const OG_IMAGE = "/inventory_hero_bg.png"
+  `Sell or exchange your car at AM Group in Jammu. Free valuation while you wait at ${SITE_NAMES.length} sites. ` +
+  `Payment and RC transfer handled in-house. Call ${PRIMARY_LOCATION.phone}.`
 
 export function generateMetadata(): Metadata {
   return {
@@ -44,85 +44,26 @@ export function generateMetadata(): Metadata {
     title: { absolute: TITLE },
     description: DESCRIPTION,
     alternates: { canonical: "/sell-your-car" },
-    openGraph: {
-      type: "website",
-      locale: "en_IN",
-      url: "/sell-your-car",
-      siteName: "AM Group Used Cars",
-      title: TITLE,
-      description: DESCRIPTION,
-      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "AM Group Used Cars, Jammu" }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: TITLE,
-      description: DESCRIPTION,
-      images: [OG_IMAGE],
-    },
+    ...pageSocial({ title: TITLE, description: DESCRIPTION, path: "/sell-your-car" }),
   }
 }
 
-const STEPS = [
-  {
-    Illo: IlloShowroom,
-    title: "Bring the car",
-    body: `Come to any of our ${SITE_NAMES.length} sites in Jammu during opening hours (${HOURS}). Bring the registration certificate and the insurance. Calling first means someone is ready for you.`,
-  },
-  {
-    Illo: IlloSell,
-    title: "Inspection and offer",
-    body: "We look the car over while you wait and tell you what we would pay for it. The valuation is free, and whether you sell is up to you.",
-  },
-  {
-    Illo: IlloPapers,
-    title: "Payment and RC transfer",
-    body: "If you accept, payment and the RC transfer are handled in-house. You can also put the value towards a car from our stock instead.",
-  },
-]
-
-const FAQS: FaqItem[] = [
-  {
-    question: "What does a valuation cost?",
-    answer: `Nothing. We value your car free of charge at any of our ${SITE_NAMES.length} sites in Jammu: ${SITE_NAMES.join(", ")}.`,
-  },
-  {
-    question: "Do I need an appointment?",
-    answer: `No. You can walk in during opening hours (${HOURS}). We still suggest calling ${PRIMARY_LOCATION.phone} first, so we can tell you which site to come to and give you directions.`,
-  },
-  {
-    question: "What should I bring?",
-    answer:
-      "The car, its registration certificate and its insurance. Service records help if you have them.",
-  },
-  {
-    question: "Can I exchange my car for one of yours?",
-    answer:
-      "Yes. We value your car and you can put that amount towards any used car in our stock. Finance for the balance can be arranged at the dealership.",
-  },
-  {
-    question: "Can you give me a price over the phone?",
-    answer:
-      "Not a firm one. An honest figure depends on seeing the car, so the offer is made after the inspection. You are welcome to call or WhatsApp first with the make, model, year and kilometres.",
-  },
-]
+// The words are in content.ts (shared with /llms-full.txt); the drawings are
+// matched to them here, in order.
+const STEP_ILLOS = [IlloShowroom, IlloSell, IlloPapers]
+const STEPS = SELL_STEPS.map((step, i) => ({ ...step, Illo: STEP_ILLOS[i] }))
+const FAQS = SELL_FAQS
 
 export default function SellYourCarPage() {
-  const breadcrumbs = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE },
-      { "@type": "ListItem", position: 2, name: "Sell your car", item: `${SITE}/sell-your-car` },
-    ],
-  }
-
   return (
     <>
-      {/* Structured data only. The visible trail comes from the layout's
-          path-derived breadcrumbs, which emit no BreadcrumbList of their own. */}
+      {/* The service this page is about, tied to the dealer by id. It states
+          no price and no promise, because the page states none. */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{
+          __html: jsonLdString(sellServiceSchema("/sell-your-car", DESCRIPTION)),
+        }}
       />
 
       <PhotoHero labelledBy="sell-title">
@@ -147,6 +88,12 @@ export default function SellYourCarPage() {
           </Button>
         </div>
       </PhotoHero>
+
+      {/* Under the hero so the photograph stays full-bleed at the top. This
+          one component draws the trail and writes the matching BreadcrumbList,
+          so the two cannot disagree (the page used to emit the list with no
+          visible trail at all). */}
+      <Breadcrumbs items={[{ label: "Sell your car" }]} />
 
       <Band ground="ground" labelledBy="valuation-title" id="valuation" className={TIGHT_BAND}>
         <SectionHead

@@ -43,10 +43,26 @@ export function carRowToInventoryVehicle(row: CarRow): InventoryVehicle {
     taxonomies: {},
   }
 
+  // A blank left in the admin form is "not known", the same as null, so a
+  // page never prints an empty row or an empty sentence for it.
+  const text = (value: string | null | undefined) => {
+    const trimmed = (value ?? '').trim()
+    return trimmed === '' ? null : trimmed
+  }
+  const owners = Number(row.owners)
+
   return {
     ...toInventoryVehicle(asMotors),
     bodyType: row.body_type,
     colour: row.colour,
     engine: row.engine,
+    // Facts that exist only in our own table. Each stays null until staff
+    // enter it; the pages show nothing in that case.
+    variant: text(row.variant),
+    owners: row.owners !== null && Number.isInteger(owners) && owners > 0 ? owners : null,
+    registration: text(row.registration),
+    locationSlug: text(row.location_slug),
+    description: text(row.description),
+    updatedAt: row.updated_at ?? row.posted_at ?? null,
   }
 }

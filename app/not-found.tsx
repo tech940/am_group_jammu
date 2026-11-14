@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import Link from "next/link"
 import { PRIMARY_LOCATION } from "@/lib/locations"
 import Image from "next/image"
@@ -5,6 +6,11 @@ import { getInventory } from "@/lib/inventory/server"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/feedback"
 import { ArrowGlyph, ChevronGlyph } from "@/components/system/marks"
+import { NotFoundBeacon } from "@/components/analytics/not-found-beacon"
+
+// Without this a missing page was served under the site's default title,
+// "Used Cars in Jammu | ...", which is the title of a page that exists.
+export const metadata: Metadata = { title: "Page not found" }
 
 
 export default async function NotFound() {
@@ -27,6 +33,9 @@ export default async function NotFound() {
 
   return (
     <div className="min-h-screen bg-ground">
+      {/* Reports which missing address was asked for, so the owner can see
+          the old links and mistyped addresses people arrive on. Draws nothing. */}
+      <NotFoundBeacon />
 
       {/* ── HERO SECTION ── */}
       <section data-ground="deep" className="bg-deep-2 pt-32 pb-24 px-5 md:px-10">

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { Settle } from "@/components/system/motion"
 
 /**
  * The storefront's section opener: a heading and, optionally, one sentence.
@@ -35,3 +36,37 @@ export function SectionHead({
  * order, not by the order they are written in `className`.
  */
 export const TIGHT_BAND = "py-12! md:py-20!"
+
+const STORE_GROUND = {
+  ground: "bg-ground text-ink",
+  "ground-2": "bg-ground-2 text-ink",
+} as const
+
+/**
+ * A homepage band: page-kit's `Band` with the storefront's padding, and with
+ * its contents in the server HTML as visible markup.
+ *
+ * It is not page-kit's Band because that one wraps its children in a reveal
+ * that ships `opacity:0` and waits for script, which left the car rail, the
+ * browse links and the three sites invisible to anything reading the page
+ * without running it. The reveal used here (components/system/motion.tsx) adds
+ * the same 8px settle only after load and only to bands still below the fold.
+ */
+export function StoreBand({
+  id,
+  ground,
+  labelledBy,
+  children,
+}: {
+  id?: string
+  ground: keyof typeof STORE_GROUND
+  /** id of the band's own heading, so the section is a named landmark. */
+  labelledBy: string
+  children: ReactNode
+}) {
+  return (
+    <section id={id} aria-labelledby={labelledBy} className={`${STORE_GROUND[ground]} py-12 md:py-20`}>
+      <Settle className="relative mx-auto max-w-[1400px] px-5 md:px-10">{children}</Settle>
+    </section>
+  )
+}

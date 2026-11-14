@@ -103,7 +103,15 @@ function CollapsibleSection({
   )
 }
 
-/** Dual-thumb range bounded by the real min/max of the current inventory. */
+/**
+ * Dual-thumb range bounded by the real min/max of the current inventory.
+ *
+ * A DRAG DOES NOT FILTER UNTIL IT ENDS. Each filter change is a navigation
+ * that re-renders /inventory on the server. Calling `onChange` on every tick
+ * of a drag fired dozens of those in a second. While a thumb is moving only
+ * the readout and the bar follow it, from local state; the parent hears once,
+ * when the thumb is let go (pointer up, key up, or the slider losing focus).
+ */
 function RangeSlider({
   value,
   onChange,
@@ -119,8 +127,20 @@ function RangeSlider({
   step: number
   format: (n: number) => string
 }) {
-  const [lo, hi] = value ?? [min, max]
+  // The values being dragged; null when no drag is in progress.
+  const [draft, setDraft] = useState<Range | null>(null)
+  const [lo, hi] = draft ?? value ?? [min, max]
   const span = Math.max(1, max - min)
+
+  const commit = () => {
+    if (!draft) return
+    setDraft(null)
+    const [a, b] = value ?? [min, max]
+    // Let go where it started: nothing to tell the parent.
+    if (draft[0] === a && draft[1] === b) return
+    onChange(draft)
+  }
+  const release = { onPointerUp: commit, onKeyUp: commit, onBlur: commit }
   const leftPct = ((lo - min) / span) * 100
   const widthPct = ((hi - lo) / span) * 100
 
@@ -153,20 +173,16 @@ function RangeSlider({
         <input
           type="range" min={min} max={max} step={step} value={lo}
           aria-label="Minimum"
-          onChange={(e) => {
-            const next = Math.min(Number(e.target.value), hi)
-            onChange([next, hi])
-          }}
+          onChange={(e) => setDraft([Math.min(Number(e.target.value), hi), hi])}
+          {...release}
           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           style={{ zIndex: lo > (min + max) / 2 ? 5 : 4 }}
         />
         <input
           type="range" min={min} max={max} step={step} value={hi}
           aria-label="Maximum"
-          onChange={(e) => {
-            const next = Math.max(Number(e.target.value), lo)
-            onChange([lo, next])
-          }}
+          onChange={(e) => setDraft([lo, Math.max(Number(e.target.value), lo)])}
+          {...release}
           className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
           style={{ zIndex: hi <= (min + max) / 2 ? 5 : 4 }}
         />

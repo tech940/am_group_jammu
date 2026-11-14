@@ -31,7 +31,7 @@ export function RelatedLinks({
               <h3 className="border-b border-line pb-2 text-label text-ink">{group.title}</h3>
               <ul>
                 {group.links.map((l) => (
-                  <li key={l.href}>
+                  <li key={l.label}>
                     <Link
                       href={l.href}
                       className="flex min-h-11 items-center justify-between gap-3 border-b border-line text-body text-ink-2 transition-colors duration-(--duration-1) hover:text-accent-text-light"
@@ -55,6 +55,10 @@ export function RelatedLinks({
               {[
                 { label: "Sell your car in Jammu", href: "/sell-your-car" },
                 { label: "Our used-car locations", href: "/locations" },
+                // One anchor text per page: /used-cars/jammu is "used cars in
+                // Jammu", /inventory is the stock browser.
+                { label: "Used cars in Jammu", href: "/used-cars/jammu" },
+                { label: "Browse by budget, model and type", href: "/used-cars" },
                 { label: "All used cars in stock", href: "/inventory" },
               ].map((l) => (
                 <li key={l.href}>

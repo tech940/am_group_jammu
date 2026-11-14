@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useCallback, useMemo, useState, useTransition } from "react"
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { CloseGlyph, SearchGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
-import { FOUNDED } from "@/components/home/content"
+import { GROUP_ORIGIN } from "@/app/locations/about-facts"
 import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
 import { Input, Select } from "@/components/ui/field"
 import { VehicleCard } from "@/components/ui/vehicle-card"
@@ -22,6 +22,14 @@ import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
 import type { ListingCopy } from "@/lib/seo/content"
 import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
 import { pushEvent } from "@/lib/analytics/gtm"
+import {
+  listItems,
+  trackFilter,
+  trackFilterReset,
+  trackSearchResults,
+  trackSort,
+} from "@/lib/analytics/events"
+import { ListView } from "@/components/analytics/list-view"
 
 const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: "recent", label: "Recently listed" },
@@ -60,6 +68,7 @@ export default function InventoryClient({
   copy,
   faqs,
   frequentSearches,
+  isFiltered,
 }: {
   vehicles: InventoryVehicle[]
   allVehiclesCount: number
@@ -77,6 +86,8 @@ export default function InventoryClient({
   copy: ListingCopy
   faqs: FaqItem[]
   frequentSearches: SeoLink[]
+  /** True when the URL narrows or reorders the list; decided on the server. */
+  isFiltered: boolean
   /**
    * Not rendered here. Still accepted because app/inventory/page.tsx passes it;
    * drop it from both sides together.
@@ -97,8 +108,12 @@ export default function InventoryClient({
     [initialFilters],
   )
 
+  // A filter, chip or sort change REPLACES the address instead of adding a
+  // history entry, and keeps the scroll position: ten filter taps used to be
+  // ten presses of Back to leave the page. A typed search is a new view, so
+  // it still adds an entry (`mode: "push"`).
   const pushParams = useCallback(
-    (patch: Record<string, string | null>) => {
+    (patch: Record<string, string | null>, mode: "replace" | "push" = "replace") => {
       const params = new URLSearchParams()
       for (const [k, v] of Object.entries(searchParams)) {
         if (v === undefined) continue
@@ -110,13 +125,20 @@ export default function InventoryClient({
       }
       params.delete("page") // any filter change returns to page 1
       const qs = params.toString()
-      startTransition(() => router.push(qs ? `/inventory?${qs}` : "/inventory"))
+      const href = qs ? `/inventory?${qs}` : "/inventory"
+      startTransition(() => (mode === "push" ? router.push(href) : router.replace(href, { scroll: false })))
     },
     [router, searchParams],
   )
 
   const setFilter = useCallback(
     <K extends keyof InventoryFilterState>(key: K, value: InventoryFilterState[K]) => {
+      // Measurement only. It is here and not in toggleFilter, which calls this,
+      // so one change is one event. The number of matching cars is not sent:
+      // it is not known until the server has answered.
+      trackFilter(key, Array.isArray(value) ? value.join("-") : ((value as string | null) ?? ""), {
+        activeFilterCount: countActiveFilters({ ...filters, [key]: value }),
+      })
       const param = PARAM_FOR[key]
       if (param) {
         pushParams({ [param]: (value as string) || null })
@@ -137,7 +159,7 @@ export default function InventoryClient({
         pushParams({ kmsMax: r ? String(r[1]) : null })
       }
     },
-    [pushParams],
+    [pushParams, filters],
   )
 
   const toggleFilter = useCallback(
@@ -149,8 +171,16 @@ export default function InventoryClient({
   )
 
   const resetFilters = useCallback(() => {
-    startTransition(() => router.push("/inventory"))
+    trackFilterReset()
+    startTransition(() => router.replace("/inventory", { scroll: false }))
   }, [router])
+
+  // The results of a typed search, once the server has rendered them: the
+  // term and how many cars matched. A search that matched nothing is also
+  // reported under its own name, because it says what stock people wanted.
+  useEffect(() => {
+    if (initialSearch) trackSearchResults(initialSearch, matchedCount)
+  }, [initialSearch, matchedCount])
 
   const activeCount = countActiveFilters(filters)
 
@@ -210,13 +240,20 @@ export default function InventoryClient({
     [searchParams],
   )
 
-  const headingScope = [filters.make, filters.model, filters.bodyType].filter(Boolean).join(" ")
+  // The same five facets, in the same order, as the title built in page.tsx,
+  // so "5 Used Automatic Cars in Stock" is both the title and the heading.
+  const headingScope = [filters.make, filters.model, filters.bodyType, filters.fuel, filters.transmission]
+    .filter(Boolean)
+    .join(" ")
 
   /* One control, two homes: in the sticky row from md up, below it on phones. */
   const sortSelect = (
     <Select
       value={sort}
-      onChange={(e) => pushParams({ sort: e.target.value === "recent" ? null : e.target.value })}
+      onChange={(e) => {
+        trackSort(e.target.value)
+        pushParams({ sort: e.target.value === "recent" ? null : e.target.value })
+      }}
       aria-label="Sort cars"
     >
       {SORT_OPTIONS.map((o) => (
@@ -233,15 +270,15 @@ export default function InventoryClient({
 
   return (
     <div className="min-h-screen bg-ground text-ink">
-      <Breadcrumbs items={[{ label: "Used Cars in Jammu" }]} />
+      <Breadcrumbs items={[{ label: "All used cars in stock" }]} />
 
-      {/* H1 + intro copy. The page previously opened straight into a gallery
-          with almost no readable text for a crawler to index. */}
+      {/* The H1 says what this page is: the whole stock list, to filter.
+          "Used cars in Jammu" is the heading of /used-cars/jammu, not this. */}
       <section className="container mx-auto px-4 md:px-8 pt-2 pb-8">
         <h1 className="font-display text-h1 text-ink mb-1">
-          {matchedCount > 0
-            ? `${matchedCount} Used ${headingScope ? `${headingScope} ` : ""}Cars for Sale in Jammu`
-            : `Used ${headingScope ? `${headingScope} ` : ""}Cars for Sale in Jammu`}
+          {isFiltered
+            ? `${matchedCount > 0 ? `${matchedCount} ` : ""}Used ${headingScope ? `${headingScope} ` : ""}Cars in Stock`
+            : `All ${matchedCount > 0 ? `${matchedCount} ` : ""}Used Cars in Stock`}
         </h1>
       </section>
 
@@ -269,7 +306,7 @@ export default function InventoryClient({
                     page_type: "inventory",
                   })
                 }
-                pushParams({ q: searchDraft || null })
+                pushParams({ q: searchDraft || null }, "push")
               }}
               role="search"
               className="relative min-w-0 flex-1 md:max-w-md"
@@ -401,7 +438,14 @@ export default function InventoryClient({
             </div>
           ) : (
             <>
-              <div className={viewType === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "flex flex-col gap-6"}>
+              {/* Reports the cars shown as a list, again whenever a filter
+                  changes them, and names the list for a click on a card. */}
+              <ListView listId="inventory" listName="All used cars" items={listItems(vehicles)} />
+              <div
+                data-track-list="inventory"
+                data-track-list-name="All used cars"
+                className={viewType === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "flex flex-col gap-6"}
+              >
                 {vehicles.map((vehicle, idx) => (
                   <VehicleCard
                     key={vehicle.id}
@@ -473,12 +517,14 @@ export default function InventoryClient({
           {/* Three facts a buyer can check, not three adjectives. */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <div className="rounded-md border border-line bg-surface p-6 md:p-8">
-              <h3 className="font-display text-h3 text-ink mb-2">
-                In Jammu since <span data-num>{FOUNDED}</span>
-              </h3>
+              {/* The one wording of what 1968 is, shared with the homepage,
+                  /locations and llms.txt (app/locations/about-facts.ts): the
+                  year the group started, in fuel, not the year it began
+                  selling cars. */}
+              <h3 className="font-display text-h3 text-ink mb-2">Part of AM Group</h3>
               <p className="text-body text-ink-2">
-                AM Group has been in business in Jammu since {FOUNDED}. You buy from a dealer you
-                can walk in and meet, not from a stranger in a classified ad.
+                {GROUP_ORIGIN} You buy from a dealer you can walk in and meet, not from a stranger
+                in a classified ad.
               </p>
             </div>
 

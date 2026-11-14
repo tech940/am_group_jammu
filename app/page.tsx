@@ -1,48 +1,50 @@
 import type { Metadata } from "next"
 import { getHomeInventory, getInventory } from "@/lib/inventory/server"
+import { formatINRShort } from "@/lib/inventory/adapter"
+import { toCardVehicle } from "@/lib/inventory/filter"
 import { Homepage } from "@/components/homepage/homepage"
-
-// The same share image the root layout uses; restated because setting
-// `openGraph` on a page replaces the parent object rather than merging into it.
-const OG_IMAGE = "/inventory_hero_bg.png"
+import { getLandingHrefResolver } from "@/lib/seo/landing"
+import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
+import { pageSocial } from "@/lib/seo/site"
 
 export async function generateMetadata(): Promise<Metadata> {
   const { total, facets, degraded } = await getHomeInventory()
-  const makes = facets.makes.map((m) => m.label).join(", ")
   const live = !degraded && total > 0
+  const sites = LOCATIONS.length === 3 ? "three" : String(LOCATIONS.length)
 
-  // A used-car shop's title: what you can do here (buy, sell), and where. It
-  // names the dealer first on purpose — /used-cars/jammu and /inventory already
-  // target "used cars in Jammu" head-on, and three pages chasing the identical
-  // phrase would compete with each other.
+  // ONE PAGE PER SEARCH. Three pages used to chase "used cars in Jammu":
+  //   /                  the dealer, and "buy or sell a used car in Jammu"
+  //   /used-cars/jammu   THE "used cars in Jammu" page
+  //   /inventory         the stock browser, "all used cars in stock"
+  // So this title names the dealer and what you can do here, and the H1
+  // (components/homepage/used-hero.tsx) says the same thing.
   const title = "AM Group Used Cars | Buy or Sell a Used Car in Jammu"
   const description = live
-    ? `${total} used cars in stock in Jammu${makes ? ` — ${makes}` : ""}. Our own photos, recorded odometer readings and asking prices. Sell or exchange your car with a free valuation. Finance, insurance and RC transfer in-house.`
-    : "Buy or sell a used car in Jammu. Our own photos, recorded odometer readings and asking prices, and a free valuation for your car. Finance, insurance and RC transfer in-house."
+    ? `Buy or sell a used car in Jammu at AM Group Used Cars. ${total} ${total === 1 ? "car" : "cars"} in stock today` +
+      `${facets.priceRange.max > 0 ? ` from ${formatINRShort(facets.priceRange.min)}` : ""}, at ${sites} Jammu sites. ` +
+      `Call ${PRIMARY_LOCATION.phone}.`
+    : `Buy or sell a used car in Jammu at AM Group Used Cars, at ${sites} Jammu sites. Call ${PRIMARY_LOCATION.phone}.`
 
-  // openGraph and twitter are set here, not inherited: the root layout's
-  // defaults still describe the group and name another city.
   return {
-    title,
+    // `absolute` because the title already carries the dealer's name; the
+    // layout's template would append "| AM Group" a second time.
+    title: { absolute: title },
     description,
     alternates: { canonical: "/" },
-    openGraph: {
-      type: "website",
-      locale: "en_IN",
-      url: "/",
-      siteName: "AM Group Used Cars",
-      title,
-      description,
-      images: [{ url: OG_IMAGE, width: 1200, height: 630, alt: "AM Group Used Cars, Jammu" }],
-    },
-    twitter: { card: "summary_large_image", title, description, images: [OG_IMAGE] },
+    // Set here, not inherited: a page's `openGraph` replaces the layout's
+    // rather than merging into it.
+    ...pageSocial({ title, description, path: "/" }),
   }
 }
 
 export default async function Page() {
   // Both calls read the same cached snapshot; the second is for whole-stock
   // counts (budget bands), which the home summary does not carry.
-  const [home, all] = await Promise.all([getHomeInventory(), getInventory()])
+  const [home, all, landingHref] = await Promise.all([
+    getHomeInventory(),
+    getInventory(),
+    getLandingHrefResolver(),
+  ])
 
   // The value rail only earns its place if it shows different cars.
   const latestIds = new Set(home.latest.map((v) => v.id))
@@ -51,12 +53,15 @@ export default async function Page() {
   // No <main> here. app/layout.tsx already renders one around every route.
   return (
     <Homepage
-      latest={home.latest}
-      bestValue={bestValue}
+      // The two rails are client components, so what they are given is written
+      // into the page; each card gets only the photos it can show.
+      latest={home.latest.map((v) => toCardVehicle(v))}
+      bestValue={bestValue.map((v) => toCardVehicle(v))}
       vehicles={all.vehicles}
       facets={home.facets}
       total={home.total}
       degraded={home.degraded}
+      landingHref={landingHref}
     />
   )
 }

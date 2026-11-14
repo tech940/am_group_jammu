@@ -10,7 +10,8 @@
  * left out and reported with the reason, never padded with a guess.
  */
 
-import { PRIMARY_LOCATION } from '../locations.ts'
+import { PRIMARY_LOCATION, getLocation } from '../locations.ts'
+import type { Location } from '../locations.ts'
 import type { InventoryVehicle } from '../inventory/types.ts'
 
 export const MAX_IMAGES = 10
@@ -191,20 +192,46 @@ function metaTransmission(transmission: string | null): string {
 }
 
 /**
+ * The address columns for one car, from confirmed facts only.
+ *
+ * WHICH SITE. The car's own site when the stock record names one that
+ * lib/locations.ts knows; otherwise the main site, which is the dealer's
+ * address of record (Meta needs one per row).
+ *
+ * WHAT IS LEFT BLANK, AND WHY.
+ *   - Street and PIN are written only for a site whose address is confirmed
+ *     (`addressConfirmed`). For the other sites the row carries the city,
+ *     region and country, which are known, and no street.
+ *   - Latitude and longitude are written only for a pin that has been checked
+ *     against the Google Business Profile (`geo.verified`). The figures on
+ *     file are approximate, and lib/locations.ts says a wrong pin is worse
+ *     than none: ads would point buyers at the wrong place on the map. No
+ *     site has a verified pin yet, so both columns are empty today.
+ *
+ * The columns themselves stay, in the same order, so the feed Meta already
+ * reads keeps its shape. Filling in a site's real address and pin in
+ * lib/locations.ts is all it takes for them to appear here.
+ */
+function addressColumns(v: InventoryVehicle): MetaFeedRow {
+  const own: Location | null = v.locationSlug ? getLocation(v.locationSlug) : null
+  const loc = own ?? PRIMARY_LOCATION
+  return {
+    'address.addr1': loc.addressConfirmed ? loc.streetAddress : '',
+    'address.city': loc.city,
+    'address.region': loc.region,
+    'address.postal_code': loc.addressConfirmed ? loc.postalCode || '' : '',
+    'address.country': 'IN',
+    latitude: loc.geo.verified ? String(loc.geo.latitude) : '',
+    longitude: loc.geo.verified ? String(loc.geo.longitude) : '',
+  }
+}
+
+/**
  * @param origin  Scheme + host of THIS site, no trailing slash. Each car's
  *                `url` is its page here, so an ad click lands on our lead form.
  */
 export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): MetaFeed {
   const loc = PRIMARY_LOCATION
-  const address: MetaFeedRow = {
-    'address.addr1': loc.streetAddress,
-    'address.city': loc.city,
-    'address.region': loc.region,
-    'address.postal_code': loc.postalCode || '',
-    'address.country': 'IN',
-    latitude: String(loc.geo.latitude),
-    longitude: String(loc.geo.longitude),
-  }
 
   const rows: MetaFeedRow[] = []
   const skipped: MetaFeedSkipped[] = []
@@ -244,11 +271,15 @@ export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): Met
     ].filter(Boolean)
 
     // The hand-run script said every car was "held at AM Business Park" and
-    // could be inspected without an appointment. Stock now sits across three
-    // Jammu sites and the inventory does not say which, so the feed no longer
-    // claims a site per car.
+    // could be inspected without an appointment. Stock sits across three
+    // Jammu sites, so the description names no site.
+    //
+    // It says "Used car", not the listing's condition label. That label is a
+    // stock category ("Used Cars", "Certified Used"): printed here it read
+    // "Used Cars car", and "Certified" is a claim nobody has yet said what
+    // stands behind.
     const description =
-      `${facts.join(' · ')}. ${cleanText(v.condition) || 'Used'} car from AM Group, ${loc.city}. ` +
+      `${facts.join(' · ')}. Used car from AM Group, ${loc.city}. ` +
       'Finance, insurance and RC transfer arranged in-house.'
 
     const row: MetaFeedRow = {
@@ -268,7 +299,7 @@ export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): Met
       transmission: metaTransmission(v.transmission),
       drivetrain: DRIVETRAIN[(v.drivetrain ?? '').trim().toUpperCase()] ?? '',
       exterior_color: colour,
-      ...address,
+      ...addressColumns(v),
     }
     for (let i = 0; i < MAX_IMAGES; i++) {
       row[`image[${i}].url`] = i < images.length ? encodeUrl(absoluteUrl(images[i], origin)) : ''

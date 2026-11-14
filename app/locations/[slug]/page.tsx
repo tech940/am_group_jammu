@@ -1,21 +1,33 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { LOCATIONS, formatHours, getLocation, whatsappUrl } from "@/lib/locations"
+import {
+  LOCATIONS,
+  PRIMARY_LOCATION,
+  formatHours,
+  getLocation,
+  whatsappUrl,
+  type Location,
+} from "@/lib/locations"
 import { getInventory } from "@/lib/inventory/server"
+import { toCardVehicle } from "@/lib/inventory/filter"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
 import { HPromiseLine } from "@/components/seo/h-promise-line"
 import { getFrequentSearches } from "@/lib/seo/links"
 import { pageSocial } from "@/lib/seo/site"
+import { jsonLdString, locationPageSchema } from "@/lib/seo-schemas"
 import {
   closedSundays,
   locationAddressLine,
   locationAddressLines,
   locationHeading,
+  locationMapQuery,
   locationPlace,
+  serviceLabel,
 } from "@/lib/seo/locations"
+import { SiteMap } from "../site-map"
 import { FeaturedInventory } from "@/components/sections/inventory"
 import { Button } from "@/components/ui/button"
 import { PhoneGlyph } from "@/components/system/marks"
@@ -26,12 +38,28 @@ import { PhoneGlyph } from "@/components/system/marks"
  * This is what "near me" needs from a website: a distinct location page with
  * consistent name, phone, hours and service area, so Google can tie it to the
  * Google Business Profile. The AutoDealer structured data for every location
- * is emitted once, site-wide, by the root layout.
+ * is emitted once, site-wide, by the root layout; this page adds one small
+ * WebPage node that says which of those sites it is about.
  *
  * Two of the three sites have only a locality on record. For those the page
  * shows the locality and "call for exact directions" — never a street, a PIN,
- * a map link or a landmark, because any of those would be a guess.
+ * a map or a landmark, because any of those would be a guess. So that the two
+ * are not copies of each other with the name swapped, each says what is
+ * actually known about it (its own name, if it has one, and its locality) and
+ * points to the one site whose address is published.
  */
+
+/** The title and description, shared by the metadata and the page's own node. */
+function describe(loc: Location) {
+  const title = locationHeading(loc)
+  const description = loc.addressConfirmed
+    ? // Phone before hours, and no region or landmark, so the number survives
+      // where a search result cuts the text at about 155 characters.
+      `Buy or sell a used car at AM Group, ${locationMapQuery(loc)}. Call ${loc.phone}. Open ${formatHours(loc)}.`
+    : `Buy or sell a used car with AM Group in ${locationPlace(loc)}, ${loc.city}. Open ${formatHours(loc)}. ` +
+      `Call ${loc.phone} for exact directions.`
+  return { title, description }
+}
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -44,11 +72,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const loc = getLocation(slug)
   if (!loc) return { title: "Location Not Found", robots: "noindex" }
 
-  const title = locationHeading(loc)
-  const description = loc.addressConfirmed
-    ? `Buy or sell a used car at AM Group, ${locationAddressLine(loc)}. Open ${formatHours(loc)}. Call ${loc.phone}.`
-    : `Buy or sell a used car with AM Group in ${locationPlace(loc)}, ${loc.city}. Open ${formatHours(loc)}. ` +
-      `Call ${loc.phone} for exact directions.`
+  const { title, description } = describe(loc)
 
   return {
     title,
@@ -76,6 +100,10 @@ export default async function LocationPage({ params }: Props) {
   const hours = formatHours(loc)
   const sundayNote = closedSundays(loc) ? " We are closed on Sundays." : ""
   const otherLocations = LOCATIONS.filter((l) => l.slug !== loc.slug)
+  const { title, description } = describe(loc)
+  // A site with its own name ("AM Auto Square") as well as a locality.
+  const siteName = loc.shortName.split(",")[0].trim()
+  const hasOwnName = siteName !== place
 
   const faqs = [
     {
@@ -83,12 +111,20 @@ export default async function LocationPage({ params }: Props) {
       answer: loc.addressConfirmed
         ? `${locationAddressLine(loc)}. We are open ${hours}.`
         : `Our used-car location is in ${place}, ${loc.city}. Call ${loc.phone} and we will give you exact ` +
-          `directions. We are open ${hours}.`,
+          `directions.`,
     },
-    {
-      question: `What are the opening hours at ${loc.shortName}?`,
-      answer: `${hours}.${sundayNote} Call ${loc.phone} to check before you travel.`,
-    },
+    // FaqSection writes every answer into FAQPage structured data. Opening
+    // hours are stated there only for a site whose details are confirmed; for
+    // the others the hours stay in the visible details block above, which
+    // reads them from lib/locations.ts, and are not repeated as an answer.
+    ...(loc.addressConfirmed
+      ? [
+          {
+            question: `What are the opening hours at ${loc.shortName}?`,
+            answer: `${hours}.${sundayNote} Call ${loc.phone} to check before you travel.`,
+          },
+        ]
+      : []),
     {
       question: `Which used cars can I see at ${loc.shortName}?`,
       answer:
@@ -113,6 +149,12 @@ export default async function LocationPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-ground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdString(locationPageSchema(loc.slug, title, description)),
+        }}
+      />
       <Breadcrumbs
         items={[{ label: "Locations", href: "/locations" }, { label: loc.shortName }]}
       />
@@ -234,7 +276,7 @@ export default async function LocationPage({ params }: Props) {
                 <ul className="space-y-1.5">
                   {loc.services.map((s) => (
                     <li key={s} className="text-body text-ink-2">
-                      {s}
+                      {serviceLabel(s)}
                     </li>
                   ))}
                 </ul>
@@ -244,9 +286,56 @@ export default async function LocationPage({ params }: Props) {
         </div>
       </section>
 
+      {/* Map: only for a site whose address is confirmed. */}
+      {loc.addressConfirmed && (
+        <section aria-labelledby="map-title" className="border-b border-line py-12">
+          <div className="container mx-auto max-w-4xl px-4 md:px-8">
+            {/* The address is printed once, under the map, by SiteMap. */}
+            <h2 id="map-title" className="mb-6 font-display text-h2 text-ink">
+              Map and directions
+            </h2>
+            <SiteMap location={loc} track={`location-map-${loc.slug}`} />
+          </div>
+        </section>
+      )}
+
       {/* Areas + visiting */}
       <section className="bg-ground-2 py-14">
         <div className="container mx-auto max-w-4xl space-y-9 px-4 md:px-8">
+          {!loc.addressConfirmed && (
+            <article>
+              <h2 className="mb-3 font-display text-h2 text-ink">Finding {loc.shortName}</h2>
+              <p className="text-body text-ink-2">
+                {hasOwnName
+                  ? `This site is called ${siteName}. It is in ${place}, ${loc.city}.`
+                  : `This site is in the ${place} locality of ${loc.city} city.`}{" "}
+                Its street address and map pin are not published on this website yet, so this page
+                has no map. Call{" "}
+                <a
+                  href={`tel:${loc.phoneE164}`}
+                  data-track-location={`location-finding-${loc.slug}`}
+                  data-num
+                  className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                >
+                  {loc.phone}
+                </a>{" "}
+                and we will give you directions from where you are.
+              </p>
+              {PRIMARY_LOCATION.addressConfirmed && (
+                <p className="mt-3 text-body text-ink-2">
+                  If you would rather come to an address you can look up, our{" "}
+                  <Link
+                    href={`/locations/${PRIMARY_LOCATION.slug}`}
+                    className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                  >
+                    {PRIMARY_LOCATION.shortName} site
+                  </Link>{" "}
+                  has one: {locationAddressLine(PRIMARY_LOCATION)}.
+                </p>
+              )}
+            </article>
+          )}
+
           {loc.areasServed.length > 0 && (
           <article>
               <h2 className="mb-3 font-display text-h2 text-ink">Areas near {place}</h2>
@@ -290,7 +379,11 @@ export default async function LocationPage({ params }: Props) {
 
       {vehicles.length > 0 && (
         <FeaturedInventory
-          vehicles={vehicles.slice(0, 6)}
+          // Each card is handed only the photos it can show, not all of the
+          // car's photos (up to 49 addresses per car were written into this page).
+          vehicles={vehicles.slice(0, 6).map((v) => toCardVehicle(v))}
+          listId={`location-${loc.slug}`}
+          listName={`Used cars at ${loc.shortName}`}
           title="Used cars in stock in Jammu"
           subtitle={`${total} ${total === 1 ? "car" : "cars"} across our ${LOCATIONS.length} locations — call to check which site a car is at`}
         />

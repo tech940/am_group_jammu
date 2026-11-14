@@ -12,7 +12,9 @@ import {
   WaveField,
 } from "@/components/system/backdrops"
 import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
-import { closedSundays, locationAddressLines, locationNames } from "@/lib/seo/locations"
+import { closedSundays, locationAddressLine, locationAddressLines, locationNames } from "@/lib/seo/locations"
+import { FaqSection, type FaqItem } from "@/components/seo/faq-section"
+import { SiteMap } from "@/app/locations/site-map"
 
 /**
  * Contact — for someone buying or selling a used car in Jammu.
@@ -29,6 +31,40 @@ import { closedSundays, locationAddressLines, locationNames } from "@/lib/seo/lo
  * and a low wave field behind the form — nothing with an edge anywhere near an
  * input.
  */
+/**
+ * Short answers to what people ask before they call. Every value is read from
+ * lib/locations.ts. Nothing on this page or in its form promises a reply time:
+ * the "within one working day" wording was removed until the company confirms
+ * it. Put it back, here and in contact-form.tsx, only when it does.
+ */
+function contactFaqs(): FaqItem[] {
+  const hours = formatHours(PRIMARY_LOCATION)
+  const unconfirmed = LOCATIONS.filter((l) => !l.addressConfirmed)
+  return [
+    {
+      question: "What is the phone number for AM Group Used Cars?",
+      answer: `${PRIMARY_LOCATION.phone}. The same number reaches all ${LOCATIONS.length} of our used-car sites in Jammu. You can also message us on WhatsApp from this page.`,
+    },
+    {
+      question: "What are the opening hours?",
+      answer: `${hours}.${closedSundays(PRIMARY_LOCATION) ? " We are closed on Sundays." : ""}`,
+    },
+    {
+      question: "Which site should I visit?",
+      answer:
+        `Each car is kept at one of our ${LOCATIONS.length} sites, so call first and we will tell you where the car you want is. ` +
+        `${PRIMARY_LOCATION.shortName} is at ${locationAddressLine(PRIMARY_LOCATION)}.` +
+        (unconfirmed.length > 0
+          ? ` For ${unconfirmed.map((l) => l.shortName).join(" and ")}, call for exact directions.`
+          : ""),
+    },
+    {
+      question: "Can I email instead?",
+      answer: `Yes. Write to ${PRIMARY_LOCATION.email}, or use the form on this page.`,
+    },
+  ]
+}
+
 export function ContactPage() {
   const [days, times] = formatHours(PRIMARY_LOCATION).split(", ")
 
@@ -38,12 +74,14 @@ export function ContactPage() {
         eyebrow="Contact"
         title={
           <>
-            Call, WhatsApp
+            {/* The space before the break matters: without it a text-only
+                reader (a crawler, a screen reader) gets "WhatsAppor". */}
+            Call, WhatsApp{" "}
             <br />
             or write
           </>
         }
-        lede="Phone and WhatsApp reach our used-car team in Jammu during opening hours. The form goes to the same desk and is answered within one working day."
+        lede="Phone and WhatsApp reach our used-car team in Jammu during opening hours. The form goes to the same desk."
         image={SUPABASE_MEDIA.branches["jammu-hyundai"].exterior}
         backdrop={
           <>
@@ -59,7 +97,6 @@ export function ContactPage() {
         stats={[
           { term: "Locations", detail: String(LOCATIONS.length), note: "all in Jammu" },
           { term: "Open", detail: days, note: times ?? "" },
-          { term: "Reply target", detail: "1", note: "working day" },
         ]}
         actions={
           <>
@@ -234,6 +271,15 @@ export function ContactPage() {
             </li>
           ))}
         </ul>
+
+        {/* A map of the one site whose address is confirmed. The component
+            renders nothing for the others. */}
+        <div className="mt-10 border-t border-line pt-10">
+          <h3 className="mb-5 font-display text-h2 uppercase text-ink">
+            {PRIMARY_LOCATION.shortName} on the map
+          </h3>
+          <SiteMap location={PRIMARY_LOCATION} track="contact-map" />
+        </div>
       </Band>
 
       {/* The form -------------------------------------------------------- */}
@@ -265,7 +311,7 @@ export function ContactPage() {
               for you to reach.
             </p>
             <p className="border-t border-line pt-6 text-body text-ink-2">
-              We answer within one working day. Selling a car? The{" "}
+              Selling a car? The{" "}
               <Link
                 href="/sell-your-car"
                 className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent"
@@ -279,6 +325,8 @@ export function ContactPage() {
           <ContactForm />
         </div>
       </Band>
+
+      <FaqSection items={contactFaqs()} title="Before you call" />
     </>
   )
 }

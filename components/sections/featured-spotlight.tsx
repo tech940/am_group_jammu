@@ -37,6 +37,7 @@ export function FeaturedSpotlight({
   const handlePrev = () => setCurrentIdx((prev) => (prev - 1 + vehicles.length) % vehicles.length)
 
   const href = `/inventory/${activeVehicle.slug}`
+  const activeName = `${activeVehicle.year ? `${activeVehicle.year} ` : ""}${activeVehicle.title}`
 
   return (
     <section className={`bg-ground-2 border-t border-line text-ink overflow-hidden ${isListingPage ? "pt-2 md:pt-3 pb-8 md:pb-12" : "py-12 md:py-16"}`}>
@@ -88,7 +89,11 @@ export function FeaturedSpotlight({
             {/* MAIN IMAGE — shorter on a phone so the search bar and the
                 listing below are not pushed a full screen down. */}
             <div className={`${thumbnails.length > 0 ? "lg:col-span-7" : "lg:col-span-12"} relative h-[240px] sm:h-[420px] lg:h-[480px] w-full overflow-hidden bg-deep-2`}>
-              <AnimatePresence mode="wait">
+              {/* initial={false}: the first photo is in the server HTML as a
+                  visible image. Without it the wrapper was sent with
+                  opacity:0 and only script could show the photo. The
+                  cross-fade still plays when the car is changed. */}
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeVehicle.id}
                   initial={{ opacity: 0 }}
@@ -99,7 +104,7 @@ export function FeaturedSpotlight({
                 >
                   <Image
                     src={mainImage}
-                    alt={activeVehicle.title}
+                    alt={activeName}
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 60vw"
@@ -108,7 +113,7 @@ export function FeaturedSpotlight({
                 </motion.div>
               </AnimatePresence>
 
-              <Link href={href} className="absolute inset-0 z-[5]" aria-label={`View ${activeVehicle.title}`} />
+              <Link href={href} className="absolute inset-0 z-[5]" aria-label={`View ${activeName}`} />
 
               <div className="absolute inset-0 bg-gradient-to-t from-deep-2/80 via-transparent to-deep-2/40 pointer-events-none" />
 
@@ -161,7 +166,7 @@ export function FeaturedSpotlight({
                   >
                     <Image
                       src={src}
-                      alt={`${activeVehicle.title} photo ${index + 2}`}
+                      alt={`${activeName}, photo ${index + 2}`}
                       fill
                       sizes="(max-width: 1024px) 50vw, 20vw"
                       className="object-cover brightness-[0.92]"

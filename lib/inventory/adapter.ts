@@ -40,6 +40,74 @@ export function displayFuel(raw: string | null): string | null {
   return raw.trim()
 }
 
+/**
+ * Make and model names as a buyer should read them.
+ *
+ * The stock list holds "TATA NEXON", "MARUTI SUZUKI VITARA BREZZA" and
+ * "Hyundai ALCAZAR" beside "Kia Seltos", because staff type the name as it is
+ * written on the car or the RC. It is put right HERE, once, at the edge, so
+ * every card, heading, filter, landing page and schema block says "Tata Nexon"
+ * without each having to remember to.
+ *
+ * THE ONE RULE THAT MUST HOLD: only the CASE of a letter may change. Car page
+ * addresses are built from these names by `slugify`, which lower-cases, so a
+ * case-only change can never move a page. `displayName` checks this itself and
+ * hands the original back if a future edit to the table below breaks it.
+ */
+
+/** Words whose correct spelling is not "first letter capital". Keyed in lower case. */
+const NAME_WORDS: Record<string, string> = {
+  // Makes written in capitals because they are initials.
+  mg: 'MG',
+  bmw: 'BMW',
+  byd: 'BYD',
+  // A make that is a word, however short. Without this "KIA" would be kept as
+  // a badge by the short-word rule below.
+  kia: 'Kia',
+  // Badges and codes that stay in capitals even when typed small.
+  ev: 'EV',
+  cng: 'CNG',
+  amt: 'AMT',
+  dct: 'DCT',
+  cvt: 'CVT',
+  xuv: 'XUV',
+  kuv: 'KUV',
+  tuv: 'TUV',
+  // Short model names that are words, not initials.
+  eon: 'Eon',
+  zen: 'Zen',
+}
+
+/** "I20" and "i20" are the same Hyundai; the maker writes a small i. */
+const SMALL_I_MODEL = /^i\d{2}$/i
+
+function displayWord(word: string): string {
+  const known = NAME_WORDS[word.toLowerCase()]
+  if (known) return known
+  if (SMALL_I_MODEL.test(word)) return word.toLowerCase()
+  // Anything else with a digit is a code ("XUV700", "K10", "800"): leave it.
+  if (/\d/.test(word)) return word
+  const hasUpper = /\p{Lu}/u.test(word)
+  const hasLower = /\p{Ll}/u.test(word)
+  // Already mixed case ("Creta", "McLaren"): the listing knows best.
+  if (hasUpper && hasLower) return word
+  // A short word in capitals is a badge we have not listed ("ZXI", "RXT").
+  if (hasUpper && word.length <= 3) return word
+  // "TATA" -> "Tata", "seltos" -> "Seltos".
+  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+}
+
+/** Tidy a make, a model or a "make model" title for display. Null stays null. */
+export function displayName(raw: string | null): string | null {
+  if (raw === null) return null
+  const tidy = raw
+    .split(/(\s+|-)/) // keep the separators so they are put back exactly
+    .map((part) => (/^(\s+|-)?$/.test(part) ? part : displayWord(part)))
+    .join('')
+  // The guard described above: case may change, letters may not.
+  return tidy.toLowerCase() === raw.toLowerCase() ? tidy : raw
+}
+
 const BODY_TYPE_SLUGS: Record<string, string> = {
   suv: 'SUV',
   'compact-suv': 'Compact SUV',
@@ -196,10 +264,13 @@ export function toInventoryVehicle(v: MotorsVehicle): InventoryVehicle {
 
   return {
     id: v.id,
+    // The slug is built from the names as stored. `displayName` only changes
+    // case and `slugify` lower-cases, so it would come out the same either
+    // way; using the stored names makes that plain.
     slug: buildSlug(v),
-    title: v.title || v.titleRaw,
-    make: v.make,
-    model: v.model,
+    title: displayName(v.title || v.titleRaw) ?? '',
+    make: displayName(v.make),
+    model: displayName(v.model),
     year: v.year,
     price: v.price,
     originalPrice: v.originalPrice,

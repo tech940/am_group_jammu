@@ -15,13 +15,16 @@ import {
   locationNames,
 } from "@/lib/seo/locations"
 import { pageSocial } from "@/lib/seo/site"
+import { dealerId, jsonLdString, pageSchema } from "@/lib/seo-schemas"
+import { AboutDealer } from "./about"
 
 const COUNT = LOCATIONS.length
 
 const title = "Used Car Locations in Jammu"
+// Kept near 155 characters so the phone number is not cut off in a search result.
 const description =
-  `AM Group sells used cars at ${COUNT} locations in Jammu: ${locationNames()}. ` +
-  `Open ${formatHours(PRIMARY_LOCATION)}. Call ${PRIMARY_LOCATION.phone} for directions and to check which cars are at each site.`
+  `AM Group sells used cars at ${COUNT} sites in Jammu: ${locationNames()}. ` +
+  `Open ${formatHours(PRIMARY_LOCATION)}. Call ${PRIMARY_LOCATION.phone}.`
 
 export const metadata: Metadata = {
   title,
@@ -75,6 +78,16 @@ export default async function LocationsPage() {
 
   return (
     <div className="min-h-screen bg-ground">
+      {/* Says, by id, that this page is about the dealer. The dealer itself is
+          described once, in the site-wide graph the root layout renders. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLdString(
+            pageSchema({ path: "/locations", name: title, description, aboutId: dealerId() }),
+          ),
+        }}
+      />
       <Breadcrumbs items={[{ label: "Locations" }]} />
 
       <section className="border-b border-line bg-ground-2">
@@ -218,6 +231,8 @@ export default async function LocationsPage() {
           </div>
         </div>
       </section>
+
+      <AboutDealer />
 
       <FaqSection items={faqs} title="Visiting AM Group in Jammu — FAQs" />
     </div>

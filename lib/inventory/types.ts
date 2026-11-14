@@ -53,6 +53,25 @@ export interface InventoryVehicle {
   /** Canonical listing URL on the WordPress site. */
   sourceUrl: string
   postedAt: string | null
+
+  /*
+   * Facts only the website's own database holds (lib/cars/mapper.ts sets
+   * them). They are OPTIONAL on purpose: a car read from WordPress never has
+   * them, and every one is null until staff type it into the admin form.
+   * Nothing downstream may print a default in their place.
+   */
+  /** Trim level as the dealer wrote it, e.g. "SX" or "HTX Plus". */
+  variant?: string | null
+  /** How many owners the car has had, counting the one selling it. */
+  owners?: number | null
+  /** Registration series only ("JK02"), never the full plate. */
+  registration?: string | null
+  /** Which site the car is kept at: a slug from lib/locations.ts. */
+  locationSlug?: string | null
+  /** The dealer's own words about this car. Plain text. */
+  description?: string | null
+  /** When the row was last changed (price, photos, status). ISO timestamp. */
+  updatedAt?: string | null
 }
 
 export interface FacetValue {
