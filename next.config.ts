@@ -37,9 +37,9 @@ interface LegacyRedirect {
 
 const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   /* Company ------------------------------------------------------------- */
-  { source: '/about-us', destination: '/about' },
+  { source: '/about-us', destination: '/' },
   // Thin divisions hub; /about carries the same group-level story.
-  { source: '/our-businesses', destination: '/about' },
+  { source: '/our-businesses', destination: '/' },
 
   /* Contact ------------------------------------------------------------- */
   { source: '/contact-us', destination: '/contact' },
@@ -52,16 +52,16 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   { source: '/listings', destination: '/inventory' },
 
   /* Editorial ------------------------------------------------------------ */
-  { source: '/news-updates', destination: '/blog' },
-  { source: '/category/news', destination: '/blog' },
-  { source: '/category/uncategorized', destination: '/blog' },
+  { source: '/news-updates', destination: '/' },
+  { source: '/category/news', destination: '/' },
+  { source: '/category/uncategorized', destination: '/' },
   // The four real news posts. There are no individual post pages in this app
   // yet, so these land on the index. See MIGRATION.md — they are the clearest
   // case for content that should be rebuilt rather than folded away.
-  { source: '/am-hyundai-bags-two-prestigious-awards', destination: '/blog' },
-  { source: '/am-hyundai-inaugurates-smart-car-care-clinic', destination: '/blog' },
-  { source: '/am-hyundai-launches-indias-first-fully-electric-suv-kona-electric', destination: '/blog' },
-  { source: '/am-hyundai-launches-all-new-i20', destination: '/blog' },
+  { source: '/am-hyundai-bags-two-prestigious-awards', destination: '/' },
+  { source: '/am-hyundai-inaugurates-smart-car-care-clinic', destination: '/' },
+  { source: '/am-hyundai-launches-indias-first-fully-electric-suv-kona-electric', destination: '/' },
+  { source: '/am-hyundai-launches-all-new-i20', destination: '/' },
 
   /* Enquiry forms -------------------------------------------------------- */
   // Elementor lead-capture templates, one per franchise. The product differs
@@ -103,13 +103,37 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   // Service actions. Each is an enquiry, which /contact can genuinely take.
   { source: '/book-service', destination: '/contact', temporary: true },
   { source: '/insurance-solutions', destination: '/contact', temporary: true },
-  // Inverse intent — a seller must never be dropped on /inventory.
-  { source: '/sell-your-car', destination: '/contact', temporary: true },
+  // /sell-your-car is a real page now (app/sell-your-car), so it has no
+  // redirect — an entry here would shadow it.
 
   // Hospitality. Nothing on this site is close; /about is the group hub and is
   // the least-wrong holding position until these are rebuilt.
-  { source: '/milele', destination: '/about', temporary: true },
-  { source: '/mocha', destination: '/about', temporary: true },
+  { source: '/milele', destination: '/', temporary: true },
+  { source: '/mocha', destination: '/', temporary: true },
+
+  /* ------------------------------------------------------------------------
+   * Pages this site used to have. It is a used-car site only now: the company
+   * profile, the divisions, news, gallery and the new-vehicle showroom pages
+   * were removed on 2026-11-14. Each old URL lands on the closest live page
+   * rather than a 404. Temporary, because the group may give these a home on
+   * its own company site later.
+   * ---------------------------------------------------------------------- */
+  // The fuel landing page was named after the feed's word for petrol.
+  { source: '/used-cars/gasoline-cars-in-jammu', destination: '/used-cars/petrol-cars-in-jammu' },
+  { source: '/about', destination: '/', temporary: true },
+  { source: '/automobile', destination: '/inventory', temporary: true },
+  { source: '/hp-indian-oil', destination: '/', temporary: true },
+  { source: '/real-estate', destination: '/', temporary: true },
+  { source: '/s-mega-mart', destination: '/', temporary: true },
+  { source: '/blog', destination: '/', temporary: true },
+  { source: '/gallery', destination: '/inventory', temporary: true },
+  { source: '/hyundai', destination: '/inventory', temporary: true },
+  { source: '/am-tata', destination: '/inventory', temporary: true },
+  { source: '/am-kia', destination: '/inventory', temporary: true },
+  { source: '/amg-autocraft-jammu', destination: '/inventory', temporary: true },
+  { source: '/honda-two-wheeler', destination: '/inventory', temporary: true },
+  { source: '/ktm-jammu', destination: '/inventory', temporary: true },
+  { source: '/am-bajaj-jammu', destination: '/inventory', temporary: true },
 ]
 
 /**
@@ -141,8 +165,7 @@ const TAXONOMY_MAP: Record<string, Record<string, string>> = {
     'premium-suv': '/used-cars/premium-suv-in-jammu',
   },
   fuel: {
-    // WordPress calls it petrol; our normalised stock calls it gasoline.
-    petrol: '/used-cars/gasoline-cars-in-jammu',
+    petrol: '/used-cars/petrol-cars-in-jammu',
     diesel: '/used-cars/diesel-cars-in-jammu',
   },
   transmission: {

@@ -32,20 +32,9 @@ interface Entry {
 }
 
 const ENTRIES: Entry[] = [
-  { label: "About", href: "/about" },
-  {
-    label: "Businesses",
-    href: "/automobile",
-    children: [
-      { label: "Automobile", href: "/automobile", note: "8 franchises, sales & service" },
-      { label: "HP & Indian Oil", href: "/hp-indian-oil", note: "Petroleum, since 1968" },
-      { label: "Real Estate", href: "/real-estate", note: "Commercial & residential" },
-      { label: "S Mega Mart", href: "/s-mega-mart", note: "Retail" },
-    ],
-  },
-  { label: "Used Cars", href: "/inventory" },
+  { label: "Buy a used car", href: "/inventory" },
+  { label: "Sell your car", href: "/sell-your-car" },
   { label: "Locations", href: "/locations" },
-  { label: "News", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ]
 

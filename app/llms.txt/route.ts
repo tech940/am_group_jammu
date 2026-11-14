@@ -113,16 +113,11 @@ ${locationLinks.join("\n")}
 ${line("All showrooms", "/locations", "Addresses, opening hours, service areas and directions for both branches.")}
 ${line("Contact AM Group", "/contact", `Enquiry form, phone and WhatsApp. Phone: ${PRIMARY_LOCATION.phone}. Email: ${PRIMARY_LOCATION.email}.`)}
 
-## About
-${line("About AM Group", "/about", "Company history from 1968, milestones and group divisions.")}
-${line("Automobile division", "/automobile", "New car dealerships, certified pre-owned outlets and service workshops.")}
-${line("News and updates", "/blog", "Announcements, launches and awards.")}
+## Selling a car
+${line("Sell your car", "/sell-your-car", "Free valuation at the Jammu sites; payment and RC transfer handled in-house.")}
 
 ## Optional
 ${line("Sitemap", "/sitemap.xml", "Every indexable URL on the site.")}
-${line("Energy division", "/hp-indian-oil", "HP and Indian Oil fuel stations across J&K.")}
-${line("Real estate division", "/real-estate", "Commercial and residential projects.")}
-${line("S Mega Mart", "/s-mega-mart", "Retail division.")}
 `
 
   return new Response(body, {

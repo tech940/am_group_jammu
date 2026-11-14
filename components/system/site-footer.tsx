@@ -41,14 +41,10 @@ function showsStockDirectory(pathname: string | null): boolean {
 }
 
 const SITE_INDEX: { label: string; href: string }[] = [
-  { label: "About the group", href: "/about" },
-  { label: "Automobile division", href: "/automobile" },
-  { label: "HP & Indian Oil", href: "/hp-indian-oil" },
-  { label: "Real estate", href: "/real-estate" },
-  { label: "S Mega Mart", href: "/s-mega-mart" },
   { label: "All used cars", href: "/inventory" },
-  { label: "Showrooms & directions", href: "/locations" },
-  { label: "News & updates", href: "/blog" },
+  { label: "Used cars in Jammu", href: "/used-cars/jammu" },
+  { label: "Sell your car", href: "/sell-your-car" },
+  { label: "Our locations", href: "/locations" },
   { label: "Contact", href: "/contact" },
 ]
 

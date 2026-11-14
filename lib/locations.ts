@@ -25,7 +25,10 @@ export interface Location {
   /** Localities this branch realistically serves, for on-page copy. */
   areasServed: string[]
   region: string
+  /** Empty when the company has not supplied it. Never guessed. */
   postalCode: string
+  /** False when only the locality is known — pages then say "address on request". */
+  addressConfirmed: boolean
   phone: string
   /** E.164, for tel: links and schema. */
   phoneE164: string
@@ -49,75 +52,129 @@ const STANDARD_HOURS = [
   },
 ]
 
+/**
+ * The switchboard number published on amgroupind.com (header, footer, schema
+ * and the WhatsApp widget all use it). It replaced a sequential dummy number
+ * (+91 94191 00000) on 2026-11-14.
+ */
+const MAIN_PHONE = '+91 94842 00000'
+const MAIN_PHONE_E164 = '+919484200000'
+
+const USED_CAR_SERVICES = [
+  'Certified pre-owned car sales',
+  'Test drives',
+  'Sell or exchange your car',
+  'Car finance assistance',
+  'RC & insurance transfer',
+]
+
+/**
+ * The three used-car sites, all in Jammu.
+ *
+ * This list used to hold a Jammu site and a Srinagar office. The managing
+ * director's instruction of 2026-11-14 is that used cars are sold from three
+ * Jammu locations: Nanak Nagar, AM Auto Square at Gangyal, and AM Business
+ * Park. There is no Srinagar used-car location.
+ *
+ * WHAT IS CONFIRMED AND WHAT IS NOT. Only AM Business Park has a street
+ * address on record. For Nanak Nagar and Gangyal the company has given a
+ * locality and nothing else, so `streetAddress` is the locality, `postalCode`
+ * is empty and `addressConfirmed` is false — pages show "exact address on
+ * request" rather than a guessed street. Fill these in from the Google
+ * Business Profile for each site; do not approximate them.
+ */
 export const LOCATIONS: Location[] = [
   {
     slug: 'jammu',
-    name: 'AM Group Jammu — AM Business Park',
-    shortName: 'Jammu',
+    name: 'AM Group Used Cars — AM Business Park',
+    shortName: 'AM Business Park',
     city: 'Jammu',
     streetAddress: 'AM Business Park, N-H 1 Bye-Pass Road',
     landmark: 'Opposite Jammu Railway Station',
     areasServed: [
       'Channi Himmat', 'Gandhi Nagar', 'Trikuta Nagar', 'Bahu Plaza', 'Talab Tillo',
-      'Satwari', 'Nanak Nagar', 'Rehari', 'Bakshi Nagar', 'Digiana', 'Sidhra',
+      'Satwari', 'Rehari', 'Bakshi Nagar', 'Sidhra',
     ],
     region: 'Jammu and Kashmir',
     postalCode: '180012',
-    phone: '+91 94191 00000',
-    phoneE164: '+919419100000',
+    addressConfirmed: true,
+    phone: MAIN_PHONE,
+    phoneE164: MAIN_PHONE_E164,
     email: 'info@amgroupind.com',
-    // TODO: replace with the exact pin from the Jammu Google Business Profile.
+    // TODO: replace with the exact pin from the Google Business Profile.
     geo: { latitude: 32.7266, longitude: 74.857, verified: false },
     mapUrl:
       'https://www.google.com/maps/dir/?api=1&destination=AM+Business+Park+NH+1+Bye+Pass+Road+Jammu+180012',
     hours: STANDARD_HOURS,
-    services: [
-      'Certified pre-owned car sales',
-      'Test drives',
-      'Car finance assistance',
-      'Part-exchange valuation',
-      'RC & insurance transfer',
-      'Service and workshop',
-    ],
+    services: USED_CAR_SERVICES,
     isPrimary: true,
     blurb:
-      'Our flagship site on the N-H 1 Bye-Pass Road, opposite the railway station. All certified ' +
-      'pre-owned stock is held here and can be inspected without an appointment.',
+      'On the N-H 1 Bye-Pass Road, opposite the railway station. Walk in during opening hours ' +
+      'to see used cars and get your own car valued.',
   },
   {
-    slug: 'srinagar',
-    name: 'AM Group Srinagar — AM Tower',
-    shortName: 'Srinagar',
-    city: 'Srinagar',
-    streetAddress: 'AM Tower, Hyderpora Bye-Pass',
-    landmark: 'Hyderpora Bye-Pass, near the airport road',
-    areasServed: [
-      'Hyderpora', 'Rawalpora', 'Bemina', 'Sanat Nagar', 'Baghat', 'Natipora',
-      'Barzulla', 'Rambagh', 'Budgam',
-    ],
+    slug: 'nanak-nagar',
+    name: 'AM Group Used Cars — Nanak Nagar',
+    shortName: 'Nanak Nagar',
+    city: 'Jammu',
+    streetAddress: 'Nanak Nagar',
+    landmark: 'Nanak Nagar, Jammu',
+    areasServed: ['Nanak Nagar', 'Gandhi Nagar', 'Digiana', 'Sanjay Nagar', 'Shastri Nagar'],
     region: 'Jammu and Kashmir',
-    postalCode: '190014',
-    phone: '+91 94191 00000',
-    phoneE164: '+919419100000',
+    postalCode: '',
+    addressConfirmed: false,
+    phone: MAIN_PHONE,
+    phoneE164: MAIN_PHONE_E164,
     email: 'info@amgroupind.com',
-    // TODO: replace with the exact pin from the Srinagar Google Business Profile.
-    geo: { latitude: 34.0179, longitude: 74.7847, verified: false },
-    mapUrl:
-      'https://www.google.com/maps/dir/?api=1&destination=AM+Tower+Hyderpora+Bye+Pass+Srinagar+190014',
+    // Locality centre only — NOT a pin for the showroom. Replace before launch.
+    geo: { latitude: 32.7, longitude: 74.866, verified: false },
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=AM+Group+Nanak+Nagar+Jammu',
     hours: STANDARD_HOURS,
-    services: [
-      'Certified pre-owned car sales',
-      'Test drives by appointment',
-      'Car finance assistance',
-      'Part-exchange valuation',
-      'RC & insurance transfer',
-    ],
+    services: USED_CAR_SERVICES,
     isPrimary: false,
     blurb:
-      'Our Kashmir Valley office at AM Tower on the Hyderpora Bye-Pass. Cars from the Jammu stock ' +
-      'can be brought here for inspection — call ahead so we have the one you want on site.',
+      'Our used-car location in Nanak Nagar. Call before you come and we will confirm which ' +
+      'cars are on site and give you exact directions.',
+  },
+  {
+    slug: 'gangyal',
+    name: 'AM Group Used Cars — AM Auto Square, Gangyal',
+    shortName: 'AM Auto Square, Gangyal',
+    city: 'Jammu',
+    streetAddress: 'AM Auto Square, Gangyal',
+    landmark: 'Gangyal, Jammu',
+    areasServed: ['Gangyal', 'Digiana', 'Bari Brahmana', 'Kunjwani', 'Satwari'],
+    region: 'Jammu and Kashmir',
+    postalCode: '',
+    addressConfirmed: false,
+    phone: MAIN_PHONE,
+    phoneE164: MAIN_PHONE_E164,
+    email: 'info@amgroupind.com',
+    // Locality centre only — NOT a pin for the showroom. Replace before launch.
+    geo: { latitude: 32.676, longitude: 74.866, verified: false },
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=AM+Auto+Square+Gangyal+Jammu',
+    hours: STANDARD_HOURS,
+    services: USED_CAR_SERVICES,
+    isPrimary: false,
+    blurb:
+      'AM Auto Square at Gangyal. Call before you come and we will confirm which cars are on ' +
+      'site and give you exact directions.',
   },
 ]
+
+/**
+ * The Hyundai Promise (H Promise) used-car line.
+ *
+ * TODO(client): the managing director asked for this number on the site on
+ * 2026-11-14 but it has not been supplied. Set NEXT_PUBLIC_HPROMISE_PHONE to a
+ * 10-digit mobile number and every surface that reads H_PROMISE picks it up;
+ * while it is unset nothing renders, so no page shows a guessed number.
+ */
+const hpDigits = (process.env.NEXT_PUBLIC_HPROMISE_PHONE || '').replace(/\D/g, '').slice(-10)
+export const H_PROMISE: { phone: string; phoneE164: string } | null =
+  hpDigits.length === 10
+    ? { phone: `+91 ${hpDigits.slice(0, 5)} ${hpDigits.slice(5)}`, phoneE164: `+91${hpDigits}` }
+    : null
 
 export const PRIMARY_LOCATION = LOCATIONS.find((l) => l.isPrimary) ?? LOCATIONS[0]
 
@@ -162,5 +219,10 @@ export function whatsappUrl(message: string): string {
 
 /** Full one-line address, for display and for NAP consistency checks. */
 export function formatAddress(location: Location): string {
-  return `${location.streetAddress}, ${location.city}, ${location.region} ${location.postalCode}`
+  const tail = [location.region, location.postalCode].filter(Boolean).join(' ')
+  const street =
+    location.streetAddress.toLowerCase().includes(location.city.toLowerCase())
+      ? location.streetAddress
+      : `${location.streetAddress}, ${location.city}`
+  return `${street}, ${tail}`
 }

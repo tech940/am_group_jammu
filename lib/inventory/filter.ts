@@ -113,7 +113,9 @@ export function filtersFromSearchParams(
   const body = matchAgainst('bodyType', get('bodyType') || get('body') || get('type'))
   if (body) out.bodyType = body
 
-  const fuel = matchAgainst('fuel', get('fuel'))
+  // Old links and bookmarks say fuel=Gasoline; the stock now says Petrol.
+  const fuelParam = get('fuel')
+  const fuel = matchAgainst('fuel', /^gasoline$/i.test(fuelParam) ? 'Petrol' : fuelParam)
   if (fuel) out.fuel = fuel
 
   const transmission = matchAgainst('transmission', get('transmission'))

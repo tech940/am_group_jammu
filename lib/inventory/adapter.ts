@@ -21,6 +21,25 @@ import type {
  * fuel as real facets — so body style, colour and engine have to be recognized
  * by value. Anything unrecognized is left null rather than guessed at.
  */
+/**
+ * The fuel name shown to buyers.
+ *
+ * The WordPress feed says "Gasoline" (and sometimes "ELECTRIC" in capitals).
+ * Nobody in Jammu calls petrol gasoline, so it is renamed HERE, once, at the
+ * edge — every card, filter, facet, landing page and schema block downstream
+ * then says Petrol without each having to remember to.
+ */
+export function displayFuel(raw: string | null): string | null {
+  if (!raw) return null
+  const k = raw.trim().toLowerCase()
+  if (k === 'gasoline' || k === 'petrol') return 'Petrol'
+  if (k === 'diesel') return 'Diesel'
+  if (k === 'electric' || k === 'ev') return 'Electric'
+  if (k === 'cng') return 'CNG'
+  if (k === 'hybrid') return 'Hybrid'
+  return raw.trim()
+}
+
 const BODY_TYPE_SLUGS: Record<string, string> = {
   suv: 'SUV',
   'compact-suv': 'Compact SUV',
@@ -194,7 +213,7 @@ export function toInventoryVehicle(v: MotorsVehicle): InventoryVehicle {
     savings: isCredibleDiscount ? v.originalPrice! - v.price! : null,
     mileage: v.mileage,
     mileageLabel: v.mileage !== null ? `${v.mileage.toLocaleString('en-IN')} km` : '—',
-    fuel: v.fuel,
+    fuel: displayFuel(v.fuel),
     transmission: v.transmission,
     drivetrain: v.drivetrain,
     condition: v.condition,

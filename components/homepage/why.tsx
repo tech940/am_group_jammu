@@ -74,10 +74,10 @@ export function Why() {
             ))}
           </ol>
           <Link
-            href="/about"
+            href="/locations"
             className="mt-6 inline-flex min-h-11 items-center gap-2 text-button uppercase text-accent transition-colors duration-(--duration-1) hover:text-accent-hover"
           >
-            About AM Group
+            Where to see the cars
             <ArrowGlyph />
           </Link>
         </div>

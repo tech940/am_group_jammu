@@ -2,7 +2,6 @@ import { MetadataRoute } from "next"
 import { getInventory } from "@/lib/inventory/server"
 import { getAllLandingSlugs } from "@/lib/seo/landing"
 import { LOCATIONS } from "@/lib/locations"
-import { FRANCHISES } from "@/components/home/content"
 
 /**
  * Only indexable URLs belong here.
@@ -22,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
     { url: `${baseUrl}/inventory`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/sell-your-car`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
     { url: `${baseUrl}/locations`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
     ...LOCATIONS.map((l) => ({
@@ -33,19 +32,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       // the Google Business Profile, so they matter more than a brochure page.
       priority: l.isPrimary ? 0.9 : 0.8,
     })),
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 },
-    { url: `${baseUrl}/automobile`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    // Franchise showroom pages, at the exact slugs the legacy site ranked
-    // under. /ktm-jammu owns a near-uncontested query, hence the bump.
-    ...FRANCHISES.filter((f) => f.slug !== null).map((f) => ({
-      url: `${baseUrl}/${f.slug}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly" as const,
-      priority: f.slug === "ktm-jammu" ? 0.8 : 0.7,
-    })),
-    { url: `${baseUrl}/real-estate`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${baseUrl}/s-mega-mart`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${baseUrl}/hp-indian-oil`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     // Low priority, but they must be listed and crawlable: Google Ads and Meta
     // lead-form review both check for a reachable privacy policy.
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.2 },

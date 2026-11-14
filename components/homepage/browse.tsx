@@ -77,13 +77,7 @@ export function Browse({
     href: `/brands/${m.value.toLowerCase().replace(/\s+/g, "-")}`,
   }))
   const fuels = [
-    // The feed calls petrol "Gasoline"; nobody in Jammu does. Display only —
-    // the link still carries the feed's own value, which is what filters.
-    ...facets.fuels.map((f) => ({
-      label: /^gasoline$/i.test(f.label) ? "Petrol" : f.label,
-      count: f.count,
-      href: q("fuel", f.value),
-    })),
+    ...facets.fuels.map((f) => ({ label: f.label, count: f.count, href: q("fuel", f.value) })),
     ...facets.transmissions.map((t) => ({
       label: t.label,
       count: t.count,
