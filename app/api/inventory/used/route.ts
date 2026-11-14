@@ -5,12 +5,20 @@ import {
   MotorsError,
   MOTORS_REVALIDATE_SECONDS,
 } from '@/lib/integrations/motors'
+import { getInventorySource } from '@/lib/inventory/server'
 
 /**
  * GET /api/inventory/used
  *
  * Normalized used-vehicle inventory, sourced from the AM Group WordPress site.
  * Returns clean JSON — never the upstream markup.
+ *
+ * THIS IS NOT THE SITE'S STOCK LIST. It always reads WordPress, for checking
+ * the WordPress sync and for the import. The public pages read the website's
+ * own database once it holds any car (lib/inventory/server.ts), and from then
+ * on a car listed here may already be sold. `siteSource` in every successful
+ * response says which source the public site is using right now; the stock the
+ * site is actually showing is at /api/vehicles.
  *
  * Query params:
  *   ?fresh=1        bypass the cache (requires MOTORS_REFRESH_TOKEN, see below)
@@ -43,6 +51,21 @@ export async function GET(request: NextRequest) {
 
   const debug = searchParams.get('debug') === '1'
 
+  // Once the cars live in our own database this route is no longer the stock
+  // list: WordPress may still show cars the database has marked sold. From
+  // then on it is a sync-checking tool only, behind the same shared secret as
+  // the cache bypass. The public list is /api/vehicles.
+  const siteSource = await getInventorySource()
+  if (siteSource === 'database') {
+    const expected = process.env.MOTORS_REFRESH_TOKEN
+    if (!expected || request.headers.get('x-refresh-token') !== expected) {
+      return NextResponse.json(
+        { error: 'gone', message: 'The stock list has moved to /api/vehicles.' },
+        { status: 410, headers: { 'Cache-Control': 'no-store' } },
+      )
+    }
+  }
+
   // A cache bypass is a request amplifier pointed at the WordPress origin, so
   // it is gated behind a shared secret. Without the env var configured the
   // bypass is simply unavailable rather than open to the world.
@@ -67,6 +90,10 @@ export async function GET(request: NextRequest) {
     })
 
     const body = {
+      // What THIS response was read from, and what the public pages are reading
+      // from — they differ as soon as the cars have been imported.
+      source: 'wordpress' as const,
+      siteSource,
       vehicles: result.vehicles,
       count: result.vehicles.length,
       total: result.total,
@@ -88,7 +115,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(body, {
       headers: {
-        'Cache-Control': fresh
+        'Cache-Control': fresh || siteSource === 'database'
           ? 'no-store'
           : `public, s-maxage=${MOTORS_REVALIDATE_SECONDS}, stale-while-revalidate=${MOTORS_REVALIDATE_SECONDS * 2}`,
       },

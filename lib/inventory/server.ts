@@ -3,13 +3,17 @@
  *
  * SERVER ONLY. Pages call these, then pass plain data down into Client
  * Components as props — no component fetches inventory for itself, so a page
- * renders exactly one upstream read (and that read is cached for 30 minutes).
+ * renders exactly one cached read.
  *
- * Every function degrades to an empty snapshot rather than throwing: a
- * WordPress outage should show "no vehicles available", not a 500.
+ * Every function degrades to an empty snapshot rather than throwing: an
+ * outage should show "no vehicles available", not a 500.
  */
 
+import { unstable_cache } from 'next/cache'
 import { getUsedInventory } from '../integrations/motors/index.ts'
+import { carRowToInventoryVehicle } from '../cars/mapper.ts'
+import { readAllCars } from '../cars/store.ts'
+import { INVENTORY_CACHE_TAG } from '../cars/types.ts'
 import { buildFacets, idFromSlug, toInventoryVehicle } from './adapter.ts'
 import type { InventoryFacets, InventorySnapshot, InventoryVehicle } from './types.ts'
 
@@ -35,7 +39,82 @@ function defaultSort(a: InventoryVehicle, b: InventoryVehicle): number {
   return (b.price ?? 0) - (a.price ?? 0)
 }
 
+/**
+ * WHERE THE STOCK COMES FROM.
+ *
+ *   1. The website's own database (`used_cars`), whenever it holds at least
+ *      one car of ANY status. From that moment the database is the only
+ *      source: a car marked sold disappears even if WordPress still lists it.
+ *   2. WordPress, only while the table does not exist yet or is completely
+ *      empty — that is, before the import has been run.
+ *
+ * A database that is configured, has the table, and then FAILS to answer is
+ * NOT a reason to fall back to WordPress: that would quietly put sold cars
+ * back on sale. It takes the degraded path instead ("stock list is not
+ * loading, call us").
+ *
+ * The database read is cached and tagged, and every admin write expires the
+ * tag (lib/cars/actions.ts), so an edit is on the site at once while ordinary
+ * page views do not each cost a query.
+ */
+const DB_REVALIDATE_SECONDS = 300
+
+type DbStock = { source: 'database'; vehicles: InventoryVehicle[]; fetchedAt: string } | { source: 'none' }
+
+const cachedDbStock = unstable_cache(
+  async (): Promise<DbStock> => {
+    const all = await readAllCars()
+    if (all.state === 'absent' || all.rows.length === 0) return { source: 'none' }
+    return {
+      source: 'database',
+      vehicles: all.rows.filter((r) => r.status === 'published').map(carRowToInventoryVehicle),
+      fetchedAt: new Date().toISOString(),
+    }
+  },
+  ['used-cars-db-v1'],
+  { revalidate: DB_REVALIDATE_SECONDS, tags: [INVENTORY_CACHE_TAG] },
+)
+
+/** Which source is serving the site right now — for the admin and the API. */
+export async function getInventorySource(): Promise<'database' | 'wordpress' | 'unavailable'> {
+  try {
+    return (await cachedDbStock()).source === 'database' ? 'database' : 'wordpress'
+  } catch {
+    return 'unavailable'
+  }
+}
+
+function degradedSnapshot(err: unknown, what: string): InventorySnapshot {
+  const reason = err instanceof Error ? err.message : String(err)
+  console.warn(`[inventory] ${what} unavailable (${reason}); serving empty snapshot`)
+  return {
+    vehicles: [],
+    facets: EMPTY_FACETS,
+    total: 0,
+    fetchedAt: new Date().toISOString(),
+    degraded: true,
+  }
+}
+
 export async function getInventory(): Promise<InventorySnapshot> {
+  let db: DbStock
+  try {
+    db = await cachedDbStock()
+  } catch (err) {
+    return degradedSnapshot(err, 'cars database')
+  }
+
+  if (db.source === 'database') {
+    const vehicles = [...db.vehicles].sort(defaultSort)
+    return {
+      vehicles,
+      facets: buildFacets(vehicles),
+      total: vehicles.length,
+      fetchedAt: db.fetchedAt,
+      degraded: false,
+    }
+  }
+
   try {
     const result = await getUsedInventory()
     const vehicles = result.vehicles.map(toInventoryVehicle).sort(defaultSort)
@@ -47,15 +126,7 @@ export async function getInventory(): Promise<InventorySnapshot> {
       degraded: false,
     }
   } catch (err) {
-    const reason = err instanceof Error ? err.message : String(err)
-    console.warn(`[inventory] upstream fetch unavailable (${reason}); serving empty snapshot`)
-    return {
-      vehicles: [],
-      facets: EMPTY_FACETS,
-      total: 0,
-      fetchedAt: new Date().toISOString(),
-      degraded: true,
-    }
+    return degradedSnapshot(err, 'upstream fetch')
   }
 }
 

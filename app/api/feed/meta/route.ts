@@ -3,8 +3,12 @@
  *
  * The Meta (Facebook / Instagram) vehicle catalogue feed, built live from the
  * same inventory the website shows. A car added to stock appears here on the
- * next refresh (the inventory is cached for about 30 minutes) and a sold car
- * drops out, so nobody has to export a spreadsheet by hand any more.
+ * next refresh (this response may be cached for up to 30 minutes) and a sold
+ * car drops out, so nobody has to export a spreadsheet by hand any more.
+ *
+ * `vehicle_id` is the car's own number in our stock list. Cars imported from
+ * WordPress kept the number they had there, so the catalogue Meta already
+ * holds stays matched to the same cars.
  *
  * HOW TO CONNECT IT IN META COMMERCE MANAGER (one-time setup)
  *   1. Commerce Manager -> pick the vehicle catalogue -> Data sources.

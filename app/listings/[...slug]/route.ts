@@ -14,8 +14,10 @@ import { resolveLegacyListing } from '@/lib/seo/legacy-listing-urls'
  * This is a route handler rather than a next.config redirect table because
  * stock turns over: a static map of today's 27 slugs is wrong the first time a
  * car sells. Matching runs against live inventory, where `sourceUrl` is the
- * exact WordPress URL the vehicle was scraped from — so the mapping is derived,
- * never hand-maintained.
+ * exact WordPress URL the car used to live at — so the mapping is derived,
+ * never hand-maintained. The stock is now kept in the website's own database:
+ * a car imported from WordPress keeps that address and still redirects, while
+ * a car added in the admin has none and is never matched by a legacy link.
  *
  * The emoji are load-bearing. Two pairs of live slugs differ by nothing else:
  *
@@ -41,7 +43,7 @@ export async function GET(
 
   const { vehicles, facets } = await getInventory()
 
-  // Upstream is down — bounce to the listing page rather than 404ing a URL that
+  // The stock could not be read — bounce to the listing page rather than 404ing a URL that
   // is genuinely still valid. A 301 here is safe: it is where the car lives.
   if (vehicles.length === 0) return redirect('/inventory')
 

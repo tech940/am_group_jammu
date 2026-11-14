@@ -228,7 +228,10 @@ function EnquiryDialog({
               listingId: vehicle.id,
               title: vehicle.title,
               price: vehicle.price,
-              url: vehicle.sourceUrl,
+              // A car added in the admin has no WordPress page, so the lead
+              // carries the car's page on this site instead — the address the
+              // visitor was actually looking at.
+              url: vehicle.sourceUrl || `${window.location.origin}/inventory/${vehicle.slug}`,
             }
           : null,
       }

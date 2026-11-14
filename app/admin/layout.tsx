@@ -9,15 +9,16 @@ import { cn } from "@/lib/utils"
 import { logout } from "@/lib/admin/actions"
 
 // No icons: every destination is a word, and a word beside its own pictogram is
-// noise. When the rail is collapsed the initial stands in for the word — the
-// seven initials (D V I L C R S) are unique — and the full name is carried on
-// `aria-label` / `title` so it is never lost.
-const navItems = [
+// noise. When the rail is collapsed a short form stands in for the word — the
+// first letter, or two where "Cars" and "Customers" would otherwise both be C —
+// and the full name is carried on `aria-label` / `title` so it is never lost.
+const navItems: { name: string; href: string; short?: string }[] = [
   { name: "Dashboard", href: "/admin" },
-  { name: "Vehicles", href: "/admin/vehicles" },
-  { name: "Inventory", href: "/admin/inventory" },
+  // One entry for the stock. There used to be "Vehicles" and "Inventory", two
+  // pages over the same table; /admin/inventory now redirects here.
+  { name: "Cars", href: "/admin/vehicles", short: "Ca" },
   { name: "Leads", href: "/admin/leads" },
-  { name: "Customers", href: "/admin/customers" },
+  { name: "Customers", href: "/admin/customers", short: "Cu" },
   { name: "Reports", href: "/admin/reports" },
   { name: "Settings", href: "/admin/settings" },
 ]
@@ -114,7 +115,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Navigation */}
         <nav className="space-y-1 p-4">
           {navItems.map((item) => {
-            const isActive = pathname === item.href
+            // A section stays lit on its inner pages (a car's form, a lead's
+            // detail). The dashboard is matched exactly, or it would always be lit.
+            const isActive =
+              item.href === "/admin" ? pathname === "/admin" : pathname === item.href || pathname.startsWith(`${item.href}/`)
             return (
               <Link
                 key={item.name}
@@ -135,7 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <span className="text-nav">{item.name}</span>
                 ) : (
                   <span aria-hidden className="font-display text-h4 leading-none uppercase">
-                    {item.name.charAt(0)}
+                    {item.short ?? item.name.charAt(0)}
                   </span>
                 )}
               </Link>

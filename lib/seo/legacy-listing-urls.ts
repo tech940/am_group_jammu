@@ -40,7 +40,11 @@ export function exactKey(segment: string): string {
   return decode(segment).replace(/\/+$/, '').toLowerCase()
 }
 
-/** Last path segment of a vehicle's WordPress URL, decoded. */
+/**
+ * Last path segment of a vehicle's WordPress URL, decoded. Null for a car
+ * added in the admin, which never had one — so such a car can never be the
+ * answer to a legacy link.
+ */
 export function sourceSegment(vehicle: Pick<InventoryVehicle, 'sourceUrl'>): string | null {
   if (!vehicle.sourceUrl) return null
   try {
@@ -99,7 +103,11 @@ export function resolveLegacyListing(
 ): Resolution {
   const id = numericId(segment)
   if (id !== null) {
-    const byId = vehicles.find((v) => v.id === id)
+    // Only a car that had a WordPress page can be the target of a WordPress
+    // link. Cars added in the admin are numbered separately and have no
+    // `sourceUrl`; without this check a stray /listings/<number> could land on
+    // one of them purely because the numbers happened to coincide.
+    const byId = vehicles.find((v) => v.id === id && Boolean(v.sourceUrl))
     return byId
       ? { kind: 'vehicle', destination: `/inventory/${byId.slug}`, vehicle: byId, via: 'id' }
       : { kind: 'fallback', destination: '/inventory', via: 'index' }
