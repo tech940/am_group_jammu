@@ -283,7 +283,7 @@ function ImageArea({
       {/* Badges — only rendered when the underlying data exists. They never
           take pointer events: a swipe or tap that starts on one still reaches
           the photo underneath. */}
-      <div className="pointer-events-none absolute top-3 left-3 z-30 flex flex-wrap items-center gap-2">
+      <div className="pointer-events-none absolute inset-x-3 top-3 z-30 flex flex-wrap items-center gap-2">
         {vehicle.condition && (
           <span className="inline-flex items-center rounded-sm border border-line bg-surface px-2 py-0.5 text-meta uppercase text-ink">
             {vehicle.condition}
@@ -294,14 +294,15 @@ function ImageArea({
             {vehicle.discountPercent}% off
           </span>
         )}
-      </div>
-      {vehicle.bodyType && (
-        <div className="pointer-events-none absolute top-3 right-3 z-30">
-          <span className="inline-flex items-center rounded-sm bg-deep px-2 py-0.5 text-meta uppercase text-on-deep">
+        {/* In the same wrapping row as the other badges, pushed to the right:
+            as a separate absolutely-placed badge it sat on top of the discount
+            on a narrow card ("50%" hidden behind "Premium Hatchback"). */}
+        {vehicle.bodyType && (
+          <span className="ml-auto inline-flex items-center rounded-sm bg-deep px-2 py-0.5 text-meta uppercase text-on-deep">
             {vehicle.bodyType}
           </span>
-        </div>
-      )}
+        )}
+      </div>
       {count > 1 && (
         <div className="pointer-events-none absolute bottom-3 right-3 z-30">
           <span className="inline-flex items-center rounded-sm bg-deep-2 px-2 py-0.5 text-meta text-on-deep" data-num>
@@ -440,7 +441,7 @@ export function VehicleCard({
 
   /* ── GRID VIEW ─────────────────────────────────────────── */
   return (
-    <div className="group bg-surface overflow-hidden rounded-md border border-line transition-colors duration-(--duration-1) hover:border-line-strong flex flex-col">
+    <div className="group flex h-full flex-col overflow-hidden rounded-md border border-line bg-surface transition-colors duration-(--duration-1) hover:border-line-strong">
       <ImageArea
         vehicle={vehicle}
         eager={eager}

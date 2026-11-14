@@ -96,12 +96,15 @@
      chips, selected states and links stay blue, or the teal stops meaning
      "press here".
 
-     The label on a teal fill is dark, not white: white on this teal measures
-     2.96:1. `pop-text` is the deeper teal for small text and glyphs on light
-     grounds (5.4:1 on white), and `pop-bg` is the mint disc behind a glyph. */
-  --color-pop: #12a594;
-  --color-pop-hover: #2bbcab;
-  --color-on-pop: #04231f;
+     The label on a teal fill is WHITE (the owner's call, 2026-11-15). The
+     first teal, #12a594, measured 2.96:1 under white, so the fill was deepened
+     to the lightest teal that holds 4.5:1 with a white label (4.58:1). Hover
+     goes darker, never lighter, for the same reason. `pop-text` is the deeper
+     teal for small text and glyphs on light grounds (5.4:1 on white), and
+     `pop-bg` is the mint disc behind a glyph. */
+  --color-pop: #0b8478;
+  --color-pop-hover: #0a786d;
+  --color-on-pop: #ffffff;
   --color-pop-text: #0a786d;
   --color-pop-bg: #d5f2ec;
 
@@ -751,3 +754,5 @@
   background: var(--color-ink-2);
 }
 
+
+ 
