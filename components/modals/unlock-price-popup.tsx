@@ -2,44 +2,201 @@
 
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { useActionState, useEffect, useRef } from "react"
+import { useActionState, useEffect, useId, useRef, useState } from "react"
 
 import { Dialog } from "@/components/ui/dialog"
 import { Field, Input, Textarea } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
 import { Alert, Spinner } from "@/components/ui/feedback"
+import { ChevronGlyph } from "@/components/system/marks"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import { submitLead } from "@/lib/leads/actions"
+import { validateLead } from "@/lib/leads/validation"
+import type { CreateLeadInput, LeadIntent } from "@/lib/leads/types"
+import type { InventoryVehicle } from "@/lib/inventory/types"
 import { useToast } from "@/hooks/use-toast"
 import { useInventoryStore } from "@/store/use-inventory-store"
 import { pushEvent, vehicleParams } from "@/lib/analytics/gtm"
 
 /**
- * The enquiry modal — every lead in the business comes through this file.
+ * The enquiry modal — every lead opened from a button comes through this file.
  *
- * The submission machinery below is unchanged from the previous version and
- * must stay that way; only the presentation was rebuilt. What changed:
+ * Shape of the form, and why:
  *
- *  - It is now a <Dialog>, so it finally has role="dialog", aria-modal,
- *    aria-labelledby, a focus trap, Escape-to-close, body scroll lock and
- *    focus restoration. It previously had none of those.
- *  - The five real fields are wrapped in <Field>, which binds a real <label>.
- *    Before this, the only htmlFor in the file was on the honeypot, so screen
- *    readers announced the lead form as five unlabelled text boxes.
- *  - Gone: the 900px two-panel slab, rounded-[40px], the 0_50px_150px shadow,
- *    the blur-[100px] red blob, four backdrop-blur glass panels, 8-10px
- *    font-black micro-caps, the 🎉 in an <h2>, and an infinite-loop
- *    PartyPopper animation that ignored prefers-reduced-motion.
+ *  - Two required fields, Name and Phone, and nothing else in the way. The
+ *    sales desk calls people back; a phone number is the whole lead. Email and
+ *    a message are optional and sit behind a collapsed disclosure.
+ *  - The submit button lives in the Dialog FOOTER, which is pinned under the
+ *    scrolling body. It is on screen the moment the sheet opens on a phone and
+ *    stays there however long the body gets. It reaches the form through the
+ *    `form` attribute, so it is still a real submit button.
+ *  - Heading, button label and success copy all come from the lead intent. They
+ *    used to say "Book a test drive" for every enquiry that had no vehicle.
  *
- * The vehicle context is now a compact header block rather than a fixed 320px
- * side rail: an enquiry about a car should show the car, but the form is the
- * job, and a side rail forced the dialog to be huge on every screen.
+ * The submission contract is unchanged: submitLead's input shape, the
+ * `companyWebsite` honeypot, duplicate handling, toasts and analytics events.
  */
+
+/* -------------------------------------------------------------------------- */
+/* Copy per intent                                                            */
+/* -------------------------------------------------------------------------- */
+
+interface IntentCopy {
+  title: string
+  submit: string
+  /** Completes "Thanks — we have your details. …" on the success view. */
+  next: string
+  /** Toast body for a new enquiry. */
+  toast: string
+  messagePlaceholder: string
+}
+
+const INTENT_COPY: Record<LeadIntent, IntentCopy> = {
+  "Vehicle Enquiry": {
+    title: "Enquire about this car",
+    submit: "Get best price",
+    next: "We will call you with our best price on this car.",
+    toast: "We will call you with our best price on this car.",
+    messagePlaceholder: "Anything you want to know about this car",
+  },
+  "Test Drive": {
+    title: "Book a test drive",
+    submit: "Book test drive",
+    next: "We will call you to fix a day and time for your test drive.",
+    toast: "We will call you to fix a time for your test drive.",
+    messagePlaceholder: "Which car, and when suits you",
+  },
+  Finance: {
+    title: "Ask about finance",
+    submit: "Get finance options",
+    next: "We will call you to go through the finance options.",
+    toast: "We will call you to go through the finance options.",
+    messagePlaceholder: "Which car, and the down payment you have in mind",
+  },
+  Insurance: {
+    title: "Get an insurance quote",
+    submit: "Get my quote",
+    next: "We will call you with an insurance quote.",
+    toast: "We will call you with an insurance quote.",
+    messagePlaceholder: "Your car's make, model and year",
+  },
+  "Sell Your Car": {
+    title: "Sell or exchange your car",
+    submit: "Get my valuation",
+    next: "We will call you to arrange a valuation of your car.",
+    toast: "We will call you to arrange a valuation of your car.",
+    messagePlaceholder: "Your car's make, model, year and km driven",
+  },
+  Service: {
+    title: "Book a service",
+    submit: "Book a slot",
+    next: "We will call you to confirm a service slot.",
+    toast: "We will call you to confirm a service slot.",
+    messagePlaceholder: "Your car, and what it needs",
+  },
+  General: {
+    title: "Send an enquiry",
+    submit: "Send enquiry",
+    next: "We will call you back.",
+    toast: "We will call you back.",
+    messagePlaceholder: "Tell us what you are looking for",
+  },
+}
+
+/* -------------------------------------------------------------------------- */
+/* Shell — owns the open/close session                                        */
+/* -------------------------------------------------------------------------- */
+
+interface Session {
+  key: number
+  open: boolean
+  vehicle: InventoryVehicle | null
+  intent: LeadIntent
+  sourceLabel: string | null
+}
+
 export function UnlockPricePopup() {
   const { isOpen, vehicle, intent, sourceLabel, onClose } = useEnquiryModal()
+
+  // This component is mounted once in the root layout and never unmounts, so
+  // anything it holds outlives the dialog. Two consequences are handled here:
+  //
+  //  1. Each OPEN gets a new key, which remounts the form with fresh action
+  //     state. Without it the second enquiry of a visit opened straight onto
+  //     the previous one's "Enquiry received" screen.
+  //  2. The vehicle and intent are snapshotted at open. The store clears them
+  //     on close, which used to swap the heading and drop the car summary
+  //     while the sheet was still animating out.
+  const [session, setSession] = useState<Session>({
+    key: 0,
+    open: false,
+    vehicle: null,
+    intent: "General",
+    sourceLabel: null,
+  })
+  if (isOpen && !session.open) {
+    setSession({ key: session.key + 1, open: true, vehicle, intent, sourceLabel })
+  } else if (!isOpen && session.open) {
+    setSession({ ...session, open: false })
+  }
+
+  return (
+    <EnquiryDialog
+      key={session.key}
+      open={isOpen && session.open}
+      vehicle={session.vehicle}
+      intent={session.intent}
+      sourceLabel={session.sourceLabel}
+      onClose={onClose}
+    />
+  )
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dialog + form                                                              */
+/* -------------------------------------------------------------------------- */
+
+interface FormValues {
+  name: string
+  phone: string
+  email: string
+  message: string
+}
+
+type SubmitState =
+  | { status: "idle" }
+  | {
+      status: "error"
+      message: string
+      code?: string
+      /** Per-field messages, when the failure was validation. */
+      fields: Record<string, string>
+      /** What the visitor typed, so a failed submit does not empty the form. */
+      values: FormValues
+    }
+  | { status: "success"; duplicate: boolean; leadId: string }
+
+function EnquiryDialog({
+  open,
+  vehicle,
+  intent,
+  sourceLabel,
+  onClose,
+}: {
+  open: boolean
+  vehicle: InventoryVehicle | null
+  intent: LeadIntent
+  sourceLabel: string | null
+  onClose: () => void
+}) {
   const { setHasInquired, setShowConfetti } = useInventoryStore()
   const { toast } = useToast()
   const pathname = usePathname()
+  const formId = useId()
+  const moreId = useId()
+  // "This car" needs a car. A vehicle enquiry opened without one reads as a
+  // general enquiry; the intent sent to submitLead is not changed.
+  const copy = INTENT_COPY[intent === "Vehicle Enquiry" && !vehicle ? "General" : intent]
 
   // Driven by useActionState rather than post-await setState.
   //
@@ -50,18 +207,17 @@ export function UnlockPricePopup() {
   // but the button stayed on "Processing..."). useActionState is the primitive
   // designed for this: React owns the pending flag and commits the returned
   // state when the action resolves.
-  type SubmitState =
-    | { status: "idle" }
-    | { status: "error"; message: string; code?: string }
-    | { status: "success"; duplicate: boolean; leadId: string }
-
   const [state, formAction, isSubmitting] = useActionState(
     async (_prev: SubmitState, fd: FormData): Promise<SubmitState> => {
-      const result = await submitLead({
-        name: `${fd.get("firstName") ?? ""} ${fd.get("lastName") ?? ""}`.trim(),
+      const values: FormValues = {
+        name: String(fd.get("name") ?? ""),
         phone: String(fd.get("phone") ?? ""),
         email: String(fd.get("email") ?? ""),
         message: String(fd.get("message") ?? ""),
+      }
+
+      const input: CreateLeadInput = {
+        ...values,
         intent,
         sourcePath: pathname,
         sourceLabel,
@@ -75,26 +231,61 @@ export function UnlockPricePopup() {
               url: vehicle.sourceUrl,
             }
           : null,
-      })
+      }
 
-      if (!result.ok) return { status: "error", message: result.error, code: result.code }
+      // Same validator the server runs, run here first so each message can be
+      // shown against its own field without a round trip. The server still
+      // validates; this is only for the visitor's benefit. A honeypot hit is
+      // deliberately passed through so submitLead can answer it as it always
+      // has.
+      const check = validateLead(input)
+      if (!check.ok && !check.errors._bot) {
+        return {
+          status: "error",
+          message: Object.values(check.errors)[0] ?? "Please check the form and try again.",
+          code: "validation",
+          fields: check.errors,
+          values,
+        }
+      }
+
+      const result = await submitLead(input)
+
+      if (!result.ok) {
+        return { status: "error", message: result.error, code: result.code, fields: {}, values }
+      }
       return { status: "success", duplicate: result.data.duplicate, leadId: result.data.id }
     },
     { status: "idle" },
   )
 
   const isSuccess = state.status === "success"
-  const fieldError = state.status === "error" ? state.message : null
+  const fields = state.status === "error" ? state.fields : {}
+  const values = state.status === "error" ? state.values : null
+  // An error that belongs to no single field (rate limit, storage failure).
+  const formError =
+    state.status === "error" && Object.keys(state.fields).length === 0 ? state.message : null
+
+  // Email and message stay mounted while collapsed so their values submit and
+  // survive a toggle. A validation error inside the section opens it — an
+  // error the visitor cannot see is a form that will not submit for no reason.
+  const [moreToggled, setMoreToggled] = useState(false)
+  const moreOpen = moreToggled || Boolean(fields.email || fields.message)
 
   // Latch on the reported submission. `toast` from useToast() is not
   // guaranteed referentially stable, so this effect can re-run for the same
   // success state — harmless for the idempotent store writes, but it would
   // double-count the conversion.
   const reportedRef = useRef<string | null>(null)
+  const reportedErrorRef = useRef<SubmitState | null>(null)
 
   // Side effects belong here, not in the action reducer.
   useEffect(() => {
     if (state.status === "error") {
+      // Once per failed submit: a re-run for the same state would double-count
+      // the error and pull focus away from whatever the visitor is typing.
+      if (reportedErrorRef.current === state) return
+      reportedErrorRef.current = state
       pushEvent("form_error", {
         form_id: "enquiry-modal",
         error_message: state.message,
@@ -105,6 +296,12 @@ export function UnlockPricePopup() {
         lead_source_label: sourceLabel,
         lead_source_path: pathname,
       })
+      // Put the visitor on the field that needs fixing. Its error text is
+      // wired through aria-describedby, so focusing it also reads it out.
+      document
+        .getElementById(formId)
+        ?.querySelector<HTMLElement>('[aria-invalid="true"]')
+        ?.focus()
       return
     }
 
@@ -142,84 +339,79 @@ export function UnlockPricePopup() {
     toast({
       title: state.duplicate ? "We already have your enquiry" : "Enquiry sent",
       description: state.duplicate
-        ? "Our team is already on it and will call you shortly."
-        : "Our team will call you shortly with the best price on this car.",
+        ? "Our team already has your details and will call you."
+        : copy.toast,
     })
-  }, [state, setHasInquired, setShowConfetti, toast, intent, sourceLabel, pathname, vehicle])
+  }, [state, setHasInquired, setShowConfetti, toast, intent, sourceLabel, pathname, vehicle, formId, copy])
 
-  // Inputs are uncontrolled and the form unmounts with the modal, so there is
-  // no stale form state to clear — which is what previously let a second
-  // enquiry resubmit the last message.
-  const handleClose = () => onClose()
+  const footer = isSuccess ? (
+    <div className="w-full pb-[env(safe-area-inset-bottom)]">
+      <Button type="button" size="lg" full onClick={onClose}>
+        Close
+      </Button>
+    </div>
+  ) : (
+    <div className="w-full pb-[env(safe-area-inset-bottom)]">
+      <Button type="submit" form={formId} disabled={isSubmitting} size="lg" full>
+        {isSubmitting ? (
+          <>
+            <Spinner label="Sending" />
+            Sending…
+          </>
+        ) : (
+          copy.submit
+        )}
+      </Button>
+      <p className="mt-2.5 text-caption text-ink-2">
+        By submitting, you agree that AM Group may call or text you about this enquiry.{" "}
+        <a href="/terms" className="text-accent-text-light underline underline-offset-2">
+          Terms of use
+        </a>
+      </p>
+    </div>
+  )
 
   return (
     <Dialog
-      open={isOpen}
-      onClose={handleClose}
-      size="lg"
-      title={isSuccess ? "Enquiry received" : vehicle ? "Enquire about this car" : "Book a test drive"}
-      description={
-        isSuccess
-          ? undefined
-          : "Leave your details and our team will call you back. Fields marked * are required."
-      }
+      open={open}
+      onClose={onClose}
+      size="sm"
+      title={isSuccess ? "Enquiry received" : copy.title}
+      description={isSuccess ? undefined : "Leave your number and we will call you back."}
+      footer={footer}
     >
       {isSuccess ? (
-        <div className="py-4">
-          <p className="max-w-[52ch] text-body-lg text-ink">
-            Thanks — we have your details{vehicle ? ` for the ${vehicle.title}` : ""}. Our team will
-            call you with the best possible price.
+        <div>
+          <p className="text-body-lg text-ink">
+            Thanks — we have your details{vehicle ? ` for the ${vehicle.title}` : ""}. {copy.next}
           </p>
-
           {vehicle && (
-            <div className="mt-6 border border-line bg-ground px-5 py-4">
-              <p className="text-meta uppercase text-ink-2">Listed asking price</p>
-              <p className="mt-1 font-display text-h2 text-ink" data-num>
-                {vehicle.priceLabel}
-              </p>
-              {vehicle.originalPriceLabel && (
-                <p className="mt-1 text-small text-ink-3 line-through" data-num>
-                  Was {vehicle.originalPriceLabel}
-                </p>
-              )}
-            </div>
+            <p className="mt-3 text-small text-ink-2" data-num>
+              Listed asking price {vehicle.priceLabel}
+            </p>
           )}
-
-          <p className="mt-6 text-small text-ink-2">
-            A relationship manager will be in touch shortly to confirm your booking.
-          </p>
-
-          <div className="mt-7">
-            <Button type="button" onClick={handleClose}>
-              Close
-            </Button>
-          </div>
         </div>
       ) : (
         <>
           {vehicle && (
-            <div className="mb-6 flex items-center gap-4 border border-line bg-ground p-3">
-              <div className="relative h-20 w-28 shrink-0 overflow-hidden bg-ground-2">
-                {vehicle.primaryImage ? (
+            <div className="mb-4 flex items-center gap-3 rounded-sm border border-line bg-ground p-2">
+              <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-sm bg-ground-2">
+                {vehicle.primaryImage && (
                   <Image
                     src={vehicle.primaryImage}
-                    alt={vehicle.title}
+                    alt=""
                     fill
-                    sizes="112px"
+                    sizes="64px"
                     className="object-cover"
                   />
-                ) : (
-                  <span className="flex h-full items-center justify-center text-meta uppercase text-ink-3">
-                    No photo
-                  </span>
                 )}
               </div>
               <div className="min-w-0">
-                <p className="truncate font-display text-h4 uppercase leading-none text-ink">
+                <p className="truncate text-label text-ink">
                   {vehicle.year ? `${vehicle.year} ` : ""}
                   {vehicle.title}
                 </p>
-                <p className="mt-1.5 text-small text-ink-2" data-num>
+                <p className="mt-0.5 truncate text-small text-ink-2" data-num>
                   {vehicle.priceLabel}
                   {vehicle.mileage !== null && ` · ${vehicle.mileageLabel}`}
                 </p>
@@ -227,58 +419,90 @@ export function UnlockPricePopup() {
             </div>
           )}
 
-          <form className="space-y-5" action={formAction}>
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="First name" required>
-                {(p) => <Input type="text" name="firstName" placeholder="e.g. Rahul" required {...p} />}
-              </Field>
-              <Field label="Last name">
-                {(p) => <Input type="text" name="lastName" placeholder="e.g. Sharma" {...p} />}
-              </Field>
-            </div>
+          <form id={formId} className="grid gap-4" action={formAction} noValidate>
+            {formError && <Alert tone="danger">{formError}</Alert>}
 
-            <div className="grid gap-5 sm:grid-cols-2">
-              <Field label="Phone" required help="We will call you on this number.">
-                {(p) => (
-                  <Input
-                    type="tel"
-                    name="phone"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    placeholder="+91 XXXXX XXXXX"
-                    required
-                    {...p}
-                  />
-                )}
-              </Field>
-              <Field label="Email" required>
-                {(p) => (
-                  <Input
-                    type="email"
-                    name="email"
-                    autoComplete="email"
-                    placeholder="e.g. rahul@example.com"
-                    required
-                    {...p}
-                  />
-                )}
-              </Field>
-            </div>
-
-            <Field label="Message">
+            <Field label="Name" required error={fields.name}>
               {(p) => (
-                <Textarea
-                  name="message"
-                  rows={3}
-                  placeholder={
-                    vehicle
-                      ? `I am interested in the ${vehicle.title}...`
-                      : "Tell us what you are looking for..."
-                  }
+                <Input
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  autoCapitalize="words"
+                  enterKeyHint="next"
+                  // "Next" must move on, not submit: the footer button is the
+                  // form's default submit, so a bare Enter here would send a
+                  // form with no phone number in it.
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return
+                    e.preventDefault()
+                    e.currentTarget.form
+                      ?.querySelector<HTMLInputElement>('input[name="phone"]')
+                      ?.focus()
+                  }}
+                  defaultValue={values?.name}
+                  required
                   {...p}
                 />
               )}
             </Field>
+
+            <Field label="Mobile number" required error={fields.phone}>
+              {(p) => (
+                <Input
+                  type="tel"
+                  name="phone"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  enterKeyHint="send"
+                  placeholder="10-digit mobile number"
+                  defaultValue={values?.phone}
+                  required
+                  {...p}
+                />
+              )}
+            </Field>
+
+            <div>
+              <button
+                type="button"
+                aria-expanded={moreOpen}
+                aria-controls={moreId}
+                onClick={() => setMoreToggled((v) => !v)}
+                className="-my-1 inline-flex min-h-11 items-center gap-1.5 text-label text-accent-text-light underline-offset-4 hover:underline"
+              >
+                Add email or a message (optional)
+                <ChevronGlyph direction={moreOpen ? "up" : "down"} />
+              </button>
+
+              <div id={moreId} hidden={!moreOpen} className="mt-2 grid gap-4">
+                <Field label="Email" error={fields.email}>
+                  {(p) => (
+                    <Input
+                      type="email"
+                      name="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      autoCapitalize="none"
+                      defaultValue={values?.email}
+                      {...p}
+                    />
+                  )}
+                </Field>
+
+                <Field label="Message" error={fields.message}>
+                  {(p) => (
+                    <Textarea
+                      name="message"
+                      rows={3}
+                      placeholder={copy.messagePlaceholder}
+                      defaultValue={values?.message}
+                      {...p}
+                    />
+                  )}
+                </Field>
+              </div>
+            </div>
 
             {/* Honeypot — visually hidden, never focusable. The field name is a
                 contract with submitLead: renaming it disables bot rejection. */}
@@ -291,31 +515,6 @@ export function UnlockPricePopup() {
                 tabIndex={-1}
                 autoComplete="off"
               />
-            </div>
-
-            {fieldError && <Alert tone="danger">{fieldError}</Alert>}
-
-            <div className="border-t border-line pt-5">
-              <Button type="submit" disabled={isSubmitting} size="lg" full>
-                {isSubmitting ? (
-                  <>
-                    <Spinner label="Sending" />
-                    Sending…
-                  </>
-                ) : vehicle ? (
-                  "Get best price"
-                ) : (
-                  "Book test drive"
-                )}
-              </Button>
-              <p className="mt-4 text-small text-ink-2">
-                By submitting, you agree that AM Group and its affiliates may call or text you about
-                your enquiry. See our{" "}
-                <a href="/terms" className="text-accent-text-light underline underline-offset-4">
-                  terms of use
-                </a>
-                .
-              </p>
             </div>
           </form>
         </>

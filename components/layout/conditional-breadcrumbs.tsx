@@ -30,6 +30,7 @@ const OWN_BREADCRUMBS = [
   "/locations",
   "/privacy-policy",
   "/terms",
+  "/sell-your-car",
 ]
 
 export function ConditionalBreadcrumbs() {

@@ -1,19 +1,22 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Band, Head } from "@/components/system/page-kit"
-import { GradientGround, Grain, RadialWash } from "@/components/system/backdrops"
+import { Band } from "@/components/system/page-kit"
 import { StockRail } from "@/components/system/stock-rail"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
 import type { InventoryVehicle } from "@/lib/inventory/types"
+import { SectionHead, TIGHT_BAND } from "./section-head"
 
 /**
- * Live certified stock — the one band on this page whose contents change
- * without anyone editing a file.
+ * Live stock — the one band on this page whose contents change without anyone
+ * editing a file.
  *
  * When the feed is down it says so. It does not render placeholder cars, and it
  * does not quietly disappear either: a visitor who came to look at cars gets the
  * phone and WhatsApp instead of an empty section (DESIGN.md, Do's — "never fake
  * cars").
+ *
+ * No backdrop: every card carries its own photograph, price and badges, and
+ * anything behind them competes with the one thing this section shows.
  */
 export function Stock({
   vehicles,
@@ -29,30 +32,15 @@ export function Stock({
 }) {
   const available = !degraded && vehicles.length > 0
 
-  // Deliberately the quietest band on the page: every card carries its own
-  // photograph, price and badges, and anything busy behind them competes with
-  // the one thing this section exists to show.
   return (
-    <Band
-      ground="ground"
-      labelledBy="stock-title"
-      id="stock"
-      backdrop={
-        <>
-          <GradientGround tone="light" angle="180deg" strength={0.5} />
-          <RadialWash at="50% 0%" strength={0.09} />
-          <Grain />
-        </>
-      }
-    >
-      <Head
+    <Band ground="ground-2" labelledBy="stock-title" id="stock" className={TIGHT_BAND}>
+      <SectionHead
         id="stock-title"
-        label="In stock now"
-        title={available ? "Latest arrivals" : "Certified used cars"}
-        lede="Every car below is physically at the Jammu site and can be inspected without an appointment. Photographs and odometer readings are the dealership's own."
+        title={available ? "Just arrived" : "Used cars in stock"}
+        lede="The photographs, odometer readings and prices are our own. Stock is spread across three sites in Jammu, so call to confirm which site a car is at."
       />
 
-      <div className="mt-12">
+      <div className="mt-7 md:mt-10">
         {available ? (
           <>
             <StockRail
@@ -62,8 +50,8 @@ export function Stock({
             />
 
             {bestValue.length > 0 && (
-              <div className="mt-14">
-                <h3 className="mb-6 border-b border-line-strong pb-3 font-display text-h3 uppercase text-ink">
+              <div className="mt-9 md:mt-12">
+                <h3 className="mb-5 font-display text-h2 uppercase text-ink">
                   Lowest priced today
                 </h3>
                 <StockRail
@@ -74,7 +62,7 @@ export function Stock({
               </div>
             )}
 
-            <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-line pt-8">
+            <div className="mt-7 flex flex-wrap items-center gap-3 md:mt-9">
               <Button asChild variant="primary" size="lg">
                 <Link href="/inventory">See all {total} cars</Link>
               </Button>
@@ -90,10 +78,9 @@ export function Stock({
               Live stock is not loading right now
             </h3>
             <p className="mt-3 max-w-[60ch] text-body text-ink-2">
-              The connection to the dealership&apos;s stock system is down, so we are not
-              showing a list rather than showing one we cannot vouch for. The cars are
-              still on the forecourt — call or message and we will tell you exactly what
-              is there today.
+              The connection to our stock system is down, so we are not showing a list
+              rather than showing one we cannot vouch for. The cars are still here — call
+              or message and we will tell you exactly what is available today.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button asChild variant="primary" size="lg">

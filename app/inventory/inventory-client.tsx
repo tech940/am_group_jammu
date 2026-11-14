@@ -1,11 +1,11 @@
 "use client"
 
 import React, { useCallback, useMemo, useState, useTransition } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CloseGlyph, SearchGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
-import { PRIMARY_LOCATION } from "@/lib/locations"
+import { FOUNDED } from "@/components/home/content"
+import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
 import { Input, Select } from "@/components/ui/field"
 import { VehicleCard } from "@/components/ui/vehicle-card"
 import { InventoryFilters } from "@/components/ui/inventory-filters"
@@ -60,7 +60,6 @@ export default function InventoryClient({
   copy,
   faqs,
   frequentSearches,
-  seoGroups,
 }: {
   vehicles: InventoryVehicle[]
   allVehiclesCount: number
@@ -78,7 +77,11 @@ export default function InventoryClient({
   copy: ListingCopy
   faqs: FaqItem[]
   frequentSearches: SeoLink[]
-  seoGroups: SeoLinkGroup[]
+  /**
+   * Not rendered here. Still accepted because app/inventory/page.tsx passes it;
+   * drop it from both sides together.
+   */
+  seoGroups?: SeoLinkGroup[]
 }) {
   const router = useRouter()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -209,6 +212,25 @@ export default function InventoryClient({
 
   const headingScope = [filters.make, filters.model, filters.bodyType].filter(Boolean).join(" ")
 
+  /* One control, two homes: in the sticky row from md up, below it on phones. */
+  const sortSelect = (
+    <Select
+      value={sort}
+      onChange={(e) => pushParams({ sort: e.target.value === "recent" ? null : e.target.value })}
+      aria-label="Sort cars"
+    >
+      {SORT_OPTIONS.map((o) => (
+        <option key={o.value} value={o.value}>{o.label}</option>
+      ))}
+    </Select>
+  )
+
+  const locationNames = LOCATIONS.map((l) => l.shortName)
+  const locationList =
+    locationNames.length > 1
+      ? `${locationNames.slice(0, -1).join("; ")} and ${locationNames[locationNames.length - 1]}`
+      : locationNames[0]
+
   return (
     <div className="min-h-screen bg-ground text-ink">
       <Breadcrumbs items={[{ label: "Used Cars in Jammu" }]} />
@@ -225,10 +247,16 @@ export default function InventoryClient({
 
       {spotlight.length > 0 && <FeaturedSpotlight vehicles={spotlight} isListingPage />}
 
-      {/* TOOLBAR */}
-      <section className="sticky top-20 z-40 bg-surface border-b border-line py-4 shadow-raised">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+      {/* STICKY BAR — one row, flush under the fixed nav (h-16, md:h-20).
+          z-30 keeps it under the nav (z-50) and the nav's open sheet. On a
+          phone it is search + Filters only, about 56px; everything else in the
+          toolbar scrolls away with the page. No shadow: the hairline is enough,
+          and --shadow-raised is reserved for things that actually float. */}
+      <section
+        aria-label="Search and filter cars"
+        className="sticky top-16 z-30 bg-surface border-b border-line"
+      >
+        <div className="container mx-auto flex items-center gap-2 px-4 py-1.5 md:gap-3 md:px-8 md:py-3">
             <form
               onSubmit={(e) => {
                 e.preventDefault()
@@ -243,28 +271,60 @@ export default function InventoryClient({
                 }
                 pushParams({ q: searchDraft || null })
               }}
-              className="relative flex-1 max-w-md"
+              role="search"
+              className="relative min-w-0 flex-1 md:max-w-md"
             >
               <SearchGlyph className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3 pointer-events-none" />
               <Input
                 type="search"
-                aria-label="Search vehicles"
+                aria-label="Search cars"
+                enterKeyHint="search"
                 placeholder={
                   facets.makes.length > 0
-                    ? `Search ${facets.makes.slice(0, 3).map((m) => m.label).join(", ")}...`
-                    : "Search vehicles..."
+                    ? `Search ${facets.makes.slice(0, 2).map((m) => m.label).join(", ")}…`
+                    : "Search cars…"
                 }
                 value={searchDraft}
                 onChange={(e) => setSearchDraft(e.target.value)}
-                className="pl-10"
+                // 16px on phones: iOS Safari zooms the whole page when a
+                // focused input is smaller than that, and does not zoom back.
+                className="pl-10 max-md:text-(length:--text-h4)"
               />
             </form>
 
+            <div className="hidden md:block md:ml-auto md:w-56">{sortSelect}</div>
+
+            <Button type="button" variant="secondary" onClick={() => setIsFilterOpen(true)} className="shrink-0">
+              <span>Filters</span>
+              {activeCount > 0 && (
+                <span className="h-5 min-w-5 px-1 rounded-sm bg-accent text-on-accent text-meta flex items-center justify-center" data-num>
+                  {activeCount}
+                </span>
+              )}
+            </Button>
+
+            <div className="hidden md:flex shrink-0 items-center overflow-hidden rounded-sm border border-line bg-surface" role="group" aria-label="View type">
+              <button type="button" onClick={() => setViewType("grid")} aria-label="Grid view" aria-pressed={viewType === "grid"}
+                className={`h-11 px-4 text-button transition-colors duration-(--duration-1) cursor-pointer ${viewType === "grid" ? "bg-deep text-on-deep" : "text-ink-2 hover:bg-ground-2 hover:text-ink"}`}>
+                Grid
+              </button>
+              <button type="button" onClick={() => setViewType("list")} aria-label="List view" aria-pressed={viewType === "list"}
+                className={`h-11 px-4 text-button transition-colors duration-(--duration-1) cursor-pointer ${viewType === "list" ? "bg-deep text-on-deep" : "text-ink-2 hover:bg-ground-2 hover:text-ink"}`}>
+                List
+              </button>
+            </div>
+        </div>
+      </section>
+
+      {/* Scrolls away with the page: make chips, the phone's sort control, and
+          whichever filters are active. */}
+      <section className="bg-surface border-b border-line">
+        <div className="container mx-auto px-4 md:px-8 py-3">
             <div
               role="region"
               tabIndex={0}
               aria-label="Filter by make"
-              className="flex items-center gap-1.5 overflow-x-auto overscroll-x-contain pb-2 lg:pb-0 no-scrollbar"
+              className="-mx-4 flex items-center gap-1.5 overflow-x-auto overscroll-x-contain px-4 md:mx-0 md:px-0 no-scrollbar"
             >
               {makeTabs.map((tab) => (
                 <button
@@ -284,40 +344,7 @@ export default function InventoryClient({
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="min-w-0 flex-1 sm:flex-none sm:w-56">
-                <Select
-                  value={sort}
-                  onChange={(e) => pushParams({ sort: e.target.value === "recent" ? null : e.target.value })}
-                  aria-label="Sort vehicles"
-                >
-                  {SORT_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </Select>
-              </div>
-
-              <Button type="button" variant="secondary" onClick={() => setIsFilterOpen(true)}>
-                <span>Filters</span>
-                {activeCount > 0 && (
-                  <span className="h-5 min-w-5 px-1 rounded-sm bg-accent text-on-accent text-meta flex items-center justify-center" data-num>
-                    {activeCount}
-                  </span>
-                )}
-              </Button>
-
-              <div className="flex items-center border border-line bg-surface" role="group" aria-label="View type">
-                <button type="button" onClick={() => setViewType("grid")} aria-label="Grid view" aria-pressed={viewType === "grid"}
-                  className={`h-11 px-4 text-button transition-colors duration-(--duration-1) cursor-pointer ${viewType === "grid" ? "bg-deep text-on-deep" : "text-ink-2 hover:bg-ground-2 hover:text-ink"}`}>
-                  Grid
-                </button>
-                <button type="button" onClick={() => setViewType("list")} aria-label="List view" aria-pressed={viewType === "list"}
-                  className={`h-11 px-4 text-button transition-colors duration-(--duration-1) cursor-pointer ${viewType === "list" ? "bg-deep text-on-deep" : "text-ink-2 hover:bg-ground-2 hover:text-ink"}`}>
-                  List
-                </button>
-              </div>
-            </div>
-          </div>
+            <div className="mt-3 md:hidden">{sortSelect}</div>
 
           {activeChips.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 pt-3 mt-3 border-t border-line">
@@ -342,7 +369,7 @@ export default function InventoryClient({
         <div className="container mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-line">
             <div>
-              <h2 className="font-display text-h2 text-ink">Available Vehicles</h2>
+              <h2 className="font-display text-h2 text-ink">Cars in stock</h2>
               <p className="text-small text-ink-2" data-num>
                 {allVehiclesCount === 0
                   ? "Inventory is temporarily unavailable"
@@ -439,26 +466,47 @@ export default function InventoryClient({
       {/* VALUE PROPS */}
       <section className="py-16 bg-ground-2 border-t border-line">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-12">
-            <span className="block text-meta uppercase text-ink-2 mb-2">
-              Why Buy From AM Group Jammu
-            </span>
-            <h2 className="font-display text-h2 text-ink">
-              Jammu &amp; Kashmir&apos;s Most Trusted Dealer
-            </h2>
-          </div>
+          <h2 className="font-display text-h2 text-ink mb-8 max-w-3xl">
+            Buying from AM Group
+          </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { title: "Certified Pre-owned", body: "Every vehicle undergoes rigorous multi-point mechanical, structural, and electrical diagnostic checks." },
-              { title: "Instant Financing & Insurance", body: "Seamless loan approvals with leading nationalized & private banks at competitive interest rates." },
-              { title: "55+ Years Regional Trust", body: "Serving customers across Jammu, Srinagar, Udhampur & Kathua since 1968." },
-            ].map((c) => (
-              <div key={c.title} className="p-8 bg-surface border border-line text-left">
-                <h3 className="font-display text-h3 text-ink mb-2">{c.title}</h3>
-                <p className="text-body text-ink-2">{c.body}</p>
-              </div>
-            ))}
+          {/* Three facts a buyer can check, not three adjectives. */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="rounded-md border border-line bg-surface p-6 md:p-8">
+              <h3 className="font-display text-h3 text-ink mb-2">
+                In Jammu since <span data-num>{FOUNDED}</span>
+              </h3>
+              <p className="text-body text-ink-2">
+                AM Group has been in business in Jammu since {FOUNDED}. You buy from a dealer you
+                can walk in and meet, not from a stranger in a classified ad.
+              </p>
+            </div>
+
+            <div className="rounded-md border border-line bg-surface p-6 md:p-8">
+              <h3 className="font-display text-h3 text-ink mb-2">
+                {LOCATIONS.length === 3 ? "Three" : LOCATIONS.length} used-car locations in Jammu
+              </h3>
+              <p className="text-body text-ink-2">
+                {locationList}. Call before you come and we will tell you which location the
+                car is at.
+              </p>
+              <a
+                href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                data-track-location="inventory-facts"
+                className="mt-2 inline-flex min-h-11 items-center text-body font-semibold text-accent-text-light underline underline-offset-4"
+                data-num
+              >
+                Call {PRIMARY_LOCATION.phone}
+              </a>
+            </div>
+
+            <div className="rounded-md border border-line bg-surface p-6 md:p-8">
+              <h3 className="font-display text-h3 text-ink mb-2">Paperwork done in-house</h3>
+              <p className="text-body text-ink-2">
+                Our own team handles the RC transfer and the insurance transfer, and helps with
+                the loan application if you are financing the car.
+              </p>
+            </div>
           </div>
         </div>
       </section>

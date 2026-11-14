@@ -9,14 +9,16 @@
  * Every link is generated from stock that exists, so the site never advertises
  * a facet that returns nothing.
  *
- * Cities are deliberately limited to the four locations AM Group actually
- * serves. Spinning up "used cars in <every city in India>" pages that all
+ * The only city page is Jammu, where all three used-car locations are.
+ * Spinning up "used cars in <every city>" pages that all
  * render the same Jammu stock is the doorway-page pattern Google penalises.
  */
 
 import { getInventory } from '../inventory/server.ts'
 import { formatINRShort, slugify } from '../inventory/adapter.ts'
 import { getAllLandingSlugs, SERVICE_CITY_SLUGS } from './landing.ts'
+import { LOCATIONS } from '../locations.ts'
+import { locationHeading } from './locations.ts'
 
 export interface SeoLink {
   label: string
@@ -58,13 +60,22 @@ export interface SeoLinks {
   makes: SeoLink[]
   models: SeoLink[]
   bodyTypes: SeoLink[]
+  budgets: SeoLink[]
+  fuels: SeoLink[]
+  transmissions: SeoLink[]
   cities: SeoLink[]
+  /** One link per used-car location page. */
+  locations: SeoLink[]
 }
 
 export async function getSeoLinks(): Promise<SeoLinks> {
   const cities: SeoLink[] = SERVICE_CITIES.map((c) => ({
     label: `Used Cars in ${c.label}`,
     href: `/used-cars/${c.slug}`,
+  }))
+  const locations: SeoLink[] = LOCATIONS.map((l) => ({
+    label: locationHeading(l),
+    href: `/locations/${l.slug}`,
   }))
 
   try {
@@ -126,7 +137,7 @@ export async function getSeoLinks(): Promise<SeoLinks> {
       { title: 'Used Cars by Brand', links: makes },
       { title: 'Used Cars by Model', links: models },
       { title: 'Used Cars by Budget', links: budgets },
-      { title: 'Used Cars by City', links: cities },
+      { title: 'Used Cars by Location', links: [...cities, ...locations] },
       { title: 'Used Cars by Body Type', links: bodyTypes },
       { title: 'Used Cars by Fuel', links: fuels },
       { title: 'Used Cars by Transmission', links: transmissions },
@@ -140,19 +151,27 @@ export async function getSeoLinks(): Promise<SeoLinks> {
       makes,
       models,
       bodyTypes,
+      budgets,
+      fuels,
+      transmissions,
       cities,
+      locations,
     }
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err)
-    console.warn(`[seo-links] link resolution degraded (${reason}); serving fallback cities link graph`)
+    console.warn(`[seo-links] link resolution degraded (${reason}); serving fallback location link graph`)
     return {
-      groups: [{ title: 'Used Cars by City', links: cities }],
-      all: cities,
+      groups: [{ title: 'Used Cars by Location', links: [...cities, ...locations] }],
+      all: [...cities, ...locations],
       total: 0,
       makes: [],
       models: [],
       bodyTypes: [],
+      budgets: [],
+      fuels: [],
+      transmissions: [],
       cities,
+      locations,
     }
   }
 }

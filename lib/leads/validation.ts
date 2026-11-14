@@ -66,6 +66,9 @@ export function validateLead(input: CreateLeadInput): ValidationResult {
   const phone = normalizePhone(input.phone ?? '')
   if (!phone) errors.phone = 'Enter a valid 10-digit Indian mobile number.'
 
+  // Email is OPTIONAL. The enquiry form asks for a name and a phone number
+  // only; the sales desk calls people back. A blank email is stored as null
+  // (the column is nullable) and is only format-checked when one is given.
   let email: string | null = null
   const rawEmail = (input.email ?? '').trim()
   if (rawEmail) {

@@ -1,6 +1,8 @@
+import Link from "next/link"
 import { Band, Head, PageHero } from "@/components/system/page-kit"
 import { ContactForm } from "./contact-form"
 import { Button } from "@/components/ui/button"
+import { HPromiseLine } from "@/components/seo/h-promise-line"
 import { SUPABASE_MEDIA } from "@/lib/supabase-media"
 import {
   GlowOrbs,
@@ -10,48 +12,38 @@ import {
   WaveField,
 } from "@/components/system/backdrops"
 import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
+import { closedSundays, locationAddressLines, locationNames } from "@/lib/seo/locations"
 
 /**
- * Contact.
+ * Contact — for someone buying or selling a used car in Jammu.
  *
- * The page it replaces printed `+91 9484200000` as the corporate number while
- * every other surface in the application printed `+91 94191 00000` from
- * lib/locations.ts. NAP disagreement across your own site is one of the things
- * Google actively penalises for local ranking, and it is exactly the drift that
- * file exists to stop — so nothing here types an address, a phone number or an
- * opening time. All of it renders from LOCATIONS.
+ * Nothing here types an address, a phone number or an opening time: all of it
+ * renders from lib/locations.ts, the single NAP source. Disagreement between
+ * pages of the same site is one of the things Google penalises for local
+ * ranking.
  *
- * The Gurugram address below is kept, because it is a real company office, but
- * it is deliberately NOT in lib/locations.ts: that list drives the location
- * pages, the sitemap and the LocalBusiness schema, and a corporate office with
- * no showroom and no published hours should not become a landing page claiming
- * to serve customers.
+ * Two of the three sites have only a locality on record, so they show the
+ * locality and "call for exact directions" rather than a guessed street.
  *
- * BACKDROP SIGNATURE: the calmest of the eight. A wash on the branch block and a
- * low wave field behind the form — nothing with an edge anywhere near an input.
- * This page's job is to be filled in and sent, and a decorated form field is a
- * form field people abandon.
+ * BACKDROP SIGNATURE: the calmest on the site. A wash on the locations block
+ * and a low wave field behind the form — nothing with an edge anywhere near an
+ * input.
  */
-const CORPORATE_OFFICE = {
-  label: "Gurugram",
-  role: "Corporate office",
-  address: "B-2/8 Amaltas Marg, DLF Phase 1, Sector 26A, Gurugram, Haryana 122002",
-  note: "Head-office correspondence only — no showroom, no service, and no walk-in stock.",
-}
-
 export function ContactPage() {
+  const [days, times] = formatHours(PRIMARY_LOCATION).split(", ")
+
   return (
     <>
       <PageHero
-        eyebrow="Get in touch"
+        eyebrow="Contact"
         title={
           <>
-            Someone
+            Call, WhatsApp
             <br />
-            answers
+            or write
           </>
         }
-        lede="Phone and WhatsApp reach the Jammu site directly during opening hours. The form goes to the same desk and is answered within one working day."
+        lede="Phone and WhatsApp reach our used-car team in Jammu during opening hours. The form goes to the same desk and is answered within one working day."
         image={SUPABASE_MEDIA.branches["jammu-hyundai"].exterior}
         backdrop={
           <>
@@ -65,9 +57,8 @@ export function ContactPage() {
           </>
         }
         stats={[
-          { term: "Branches", detail: String(LOCATIONS.length), note: "Jammu · Srinagar" },
-          { term: "Open", detail: "Mon–Sat", note: "9:30 am – 6:30 pm" },
-          { term: "Corporate office", detail: "1", note: "Gurugram" },
+          { term: "Locations", detail: String(LOCATIONS.length), note: "all in Jammu" },
+          { term: "Open", detail: days, note: times ?? "" },
           { term: "Reply target", detail: "1", note: "working day" },
         ]}
         actions={
@@ -82,7 +73,7 @@ export function ContactPage() {
             </Button>
             <Button asChild variant="glass" size="lg">
               <a
-                href={whatsappUrl("Hi AM Group, I have a question.")}
+                href={whatsappUrl("Hi AM Group, I have a question about a used car.")}
                 target="_blank"
                 rel="noopener noreferrer"
                 data-track-location="contact-hero"
@@ -90,15 +81,18 @@ export function ContactPage() {
                 WhatsApp
               </a>
             </Button>
+            <Button asChild variant="glass" size="lg">
+              <a href="#enquiry">Send a message</a>
+            </Button>
           </>
         }
       />
 
-      {/* Branches -------------------------------------------------------- */}
+      {/* Phone, WhatsApp, email ------------------------------------------- */}
       <Band
         ground="ground"
-        labelledBy="branches-title"
-        id="branches"
+        labelledBy="locations-title"
+        id="locations"
         backdrop={
           <>
             <GradientGround tone="light" angle="162deg" strength={0.75} />
@@ -107,71 +101,106 @@ export function ContactPage() {
         }
       >
         <Head
-          id="branches-title"
+          id="locations-title"
           label="Where we are"
-          title="Two branches, one corporate office"
-          lede="Both branches take walk-ins during opening hours. All certified pre-owned stock is held in Jammu."
+          title={`${LOCATIONS.length} used-car locations in Jammu`}
+          lede={`${locationNames()}. Each car is kept at one site — call first and we will tell you where the car you want is.`}
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-10 border-t border-line pt-10 md:grid-cols-2 md:gap-14">
+        <dl className="mt-12 grid grid-cols-1 gap-x-10 gap-y-6 border-t border-line pt-8 sm:grid-cols-3">
+          <div>
+            <dt className="text-label text-ink">Phone</dt>
+            <dd>
+              <a
+                href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                data-track-location="contact-direct"
+                data-num
+                className="inline-flex min-h-11 items-center text-body-lg font-semibold text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
+              >
+                {PRIMARY_LOCATION.phone}
+              </a>
+              <HPromiseLine track="contact-hpromise" />
+            </dd>
+          </div>
+          <div>
+            <dt className="text-label text-ink">WhatsApp</dt>
+            <dd>
+              <a
+                href={whatsappUrl("Hi AM Group, I have a question about a used car.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track-location="contact-direct"
+                className="inline-flex min-h-11 items-center text-body-lg font-semibold text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
+              >
+                Message us on WhatsApp
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-label text-ink">Email</dt>
+            <dd>
+              <a
+                href={`mailto:${PRIMARY_LOCATION.email}`}
+                data-track-location="contact-direct"
+                className="inline-flex min-h-11 items-center break-all text-body-lg font-semibold text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
+              >
+                {PRIMARY_LOCATION.email}
+              </a>
+            </dd>
+          </div>
+        </dl>
+
+        <ul className="mt-10 grid grid-cols-1 gap-10 border-t border-line pt-10 md:grid-cols-3 md:gap-10">
           {LOCATIONS.map((location) => (
-            <div key={location.slug}>
-              <h3 className="font-display text-h2 uppercase text-ink">{location.shortName}</h3>
+            <li key={location.slug} className="flex flex-col">
+              <h3 className="font-display text-h2 uppercase text-ink">
+                <Link
+                  href={`/locations/${location.slug}`}
+                  className="transition-colors duration-(--duration-1) hover:text-accent"
+                >
+                  {location.shortName}
+                </Link>
+              </h3>
 
               <address className="mt-4 not-italic text-body text-ink-2">
-                {location.streetAddress}
-                <br />
-                {location.city}, {location.region} {location.postalCode}
-                <br />
-                <span className="text-ink-2">{location.landmark}</span>
+                {locationAddressLines(location).map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
               </address>
+              {!location.addressConfirmed && (
+                <p className="mt-1 text-body font-semibold text-ink">Call for exact directions</p>
+              )}
 
               <dl className="mt-6 border-t border-line">
                 <div className="flex justify-between gap-6 border-b border-line py-3">
-                  <dt className="text-meta uppercase text-ink-2">Hours</dt>
-                  <dd className="text-right text-small text-ink">{formatHours(location)}</dd>
+                  <dt className="text-label text-ink-2">Hours</dt>
+                  <dd className="text-right text-small text-ink">
+                    {formatHours(location)}
+                    {closedSundays(location) && <span className="block text-ink-2">Closed Sundays</span>}
+                  </dd>
                 </div>
-                <div className="flex justify-between gap-6 border-b border-line py-3">
-                  <dt className="text-meta uppercase text-ink-2">Phone</dt>
+                <div className="flex items-center justify-between gap-6 border-b border-line">
+                  <dt className="text-label text-ink-2">Phone</dt>
                   <dd className="text-right text-small">
                     <a
                       href={`tel:${location.phoneE164}`}
                       data-track-location={`contact-${location.slug}`}
-                      className="text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
+                      data-num
+                      className="inline-flex min-h-11 items-center text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
                     >
                       {location.phone}
                     </a>
                   </dd>
                 </div>
-                <div className="flex justify-between gap-6 border-b border-line py-3">
-                  <dt className="text-meta uppercase text-ink-2">Email</dt>
-                  <dd className="text-right text-small">
-                    <a
-                      href={`mailto:${location.email}`}
-                      data-track-location={`contact-${location.slug}`}
-                      className="text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
-                    >
-                      {location.email}
-                    </a>
-                  </dd>
-                </div>
               </dl>
-
-              <p className="mt-5 text-small text-ink-2">{location.blurb}</p>
 
               <div className="mt-6 flex flex-wrap gap-2.5">
                 <Button asChild variant="secondary">
                   <a
-                    href={`tel:${location.phoneE164}`}
-                    data-track-location={`contact-${location.slug}`}
-                  >
-                    Call {location.shortName}
-                  </a>
-                </Button>
-                <Button asChild variant="secondary">
-                  <a
                     href={whatsappUrl(
-                      `Hi AM Group, I'd like to contact your ${location.city} office.`,
+                      `Hi AM Group, I'd like to visit ${location.shortName} in ${location.city} to see used cars.`,
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -180,33 +209,31 @@ export function ContactPage() {
                     WhatsApp
                   </a>
                 </Button>
-                <Button asChild variant="secondary">
-                  <a
-                    href={location.mapUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-track-location={`contact-${location.slug}`}
-                  >
-                    Directions
-                  </a>
-                </Button>
+                {location.addressConfirmed ? (
+                  <Button asChild variant="secondary">
+                    <a
+                      href={location.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-track-location={`contact-${location.slug}`}
+                    >
+                      Directions
+                    </a>
+                  </Button>
+                ) : (
+                  <Button asChild variant="secondary">
+                    <a
+                      href={`tel:${location.phoneE164}`}
+                      data-track-location={`contact-${location.slug}`}
+                    >
+                      Call for directions
+                    </a>
+                  </Button>
+                )}
               </div>
-            </div>
+            </li>
           ))}
-        </div>
-
-        {/* Kept separate from the branches, and labelled, so nobody drives to
-            Gurugram expecting a showroom. */}
-        <div className="mt-12 border-t border-line pt-8">
-          <p className="text-meta uppercase text-ink-2">{CORPORATE_OFFICE.role}</p>
-          <h3 className="mt-3 font-display text-h3 uppercase text-ink">
-            {CORPORATE_OFFICE.label}
-          </h3>
-          <address className="mt-2 not-italic text-body text-ink-2">
-            {CORPORATE_OFFICE.address}
-          </address>
-          <p className="mt-2 max-w-[60ch] text-small text-ink-2">{CORPORATE_OFFICE.note}</p>
-        </div>
+        </ul>
       </Band>
 
       {/* The form -------------------------------------------------------- */}
@@ -227,17 +254,25 @@ export function ContactPage() {
           id="form-title"
           label="Send a message"
           title="Write instead"
-          lede="If a call is not convenient, this reaches the same desk. Required fields are marked; everything else is optional."
+          lede="If a call is not convenient, this reaches the same desk. Name and phone are required; everything else is optional."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.4fr] lg:gap-20">
           <div className="space-y-6">
             <p className="text-body-lg text-ink-2">
-              Tell us what you are after — a specific car, a service booking, a part, a
-              property enquiry — and which branch is easiest for you to reach.
+              Tell us what you are after — a car you have seen on this site, a budget you are working
+              to, or a car you want to sell or exchange — and which of our Jammu locations is easiest
+              for you to reach.
             </p>
-            <p className="border-t border-line pt-6 text-meta uppercase text-ink-2">
-              Answered within one working day
+            <p className="border-t border-line pt-6 text-body text-ink-2">
+              We answer within one working day. Selling a car? The{" "}
+              <Link
+                href="/sell-your-car"
+                className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent"
+              >
+                sell your car
+              </Link>{" "}
+              page asks for the details we need to value it.
             </p>
           </div>
 

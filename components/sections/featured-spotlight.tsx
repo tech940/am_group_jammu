@@ -15,7 +15,7 @@ import type { InventoryVehicle } from "@/lib/inventory/types"
  * padding the grid with stock imagery.
  */
 export function FeaturedSpotlight({
-  vehicles,
+  vehicles: allVehicles,
   isListingPage = false,
 }: {
   vehicles: InventoryVehicle[]
@@ -24,6 +24,9 @@ export function FeaturedSpotlight({
   const { onOpen } = useEnquiryModal()
   const [currentIdx, setCurrentIdx] = React.useState(0)
 
+  // A listing with no photos has nothing to spotlight; skipping it here (rather
+  // than bailing out when it comes up) keeps prev/next from stranding on it.
+  const vehicles = allVehicles.filter((v) => v.images.length > 0)
   if (vehicles.length === 0) return null
 
   const activeVehicle = vehicles[Math.min(currentIdx, vehicles.length - 1)]
@@ -39,30 +42,52 @@ export function FeaturedSpotlight({
     <section className={`bg-ground-2 border-t border-line text-ink overflow-hidden ${isListingPage ? "pt-2 md:pt-3 pb-8 md:pb-12" : "py-12 md:py-16"}`}>
       <div className="container mx-auto px-4 md:px-8">
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
-          <div>
-            <span className="inline-flex items-center bg-accent text-on-accent px-3 py-1 rounded-sm text-meta uppercase mb-2">
-              Featured Stock
-            </span>
-            <h2 className="font-display text-h2 text-ink">
-              Featured Vehicle Spotlight
-            </h2>
-          </div>
+        <div className="flex flex-wrap items-center justify-between mb-4 sm:mb-8 gap-3">
+          <h2 className="font-display text-h2 text-ink">
+            {vehicles.length > 1 ? "Featured cars" : "Featured car"}
+          </h2>
 
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => onOpen(activeVehicle, { intent: "Vehicle Enquiry", sourceLabel: "spotlight" })}
-          >
-            Get Best Price
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Lives in the header, not on the thumbnail grid, so it is still
+                there on a phone and on a listing with a single photo. */}
+            {vehicles.length > 1 && (
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  onClick={handlePrev}
+                  aria-label="Previous featured car"
+                >
+                  <ChevronGlyph direction="left" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  onClick={handleNext}
+                  aria-label="Next featured car"
+                >
+                  <ChevronGlyph direction="right" />
+                </Button>
+              </div>
+            )}
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => onOpen(activeVehicle, { intent: "Vehicle Enquiry", sourceLabel: "spotlight" })}
+            >
+              Get Best Price
+            </Button>
+          </div>
         </div>
 
-        <div className="bg-surface border border-line p-3 sm:p-4 overflow-hidden relative">
+        <div className="bg-surface border border-line rounded-md p-3 sm:p-4 overflow-hidden relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-stretch">
 
-            {/* MAIN IMAGE */}
-            <div className={`${thumbnails.length > 0 ? "lg:col-span-7" : "lg:col-span-12"} relative h-[320px] sm:h-[420px] lg:h-[480px] w-full overflow-hidden bg-ink`}>
+            {/* MAIN IMAGE — shorter on a phone so the search bar and the
+                listing below are not pushed a full screen down. */}
+            <div className={`${thumbnails.length > 0 ? "lg:col-span-7" : "lg:col-span-12"} relative h-[240px] sm:h-[420px] lg:h-[480px] w-full overflow-hidden bg-ink`}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeVehicle.id}
@@ -125,11 +150,13 @@ export function FeaturedSpotlight({
 
             {/* GALLERY THUMBNAILS — this listing's own photos */}
             {thumbnails.length > 0 && (
-              <div className="lg:col-span-5 relative grid grid-cols-2 gap-2 sm:gap-3 h-full min-h-[300px] sm:min-h-[420px] lg:min-h-[480px]">
+              <div className="lg:col-span-5 relative hidden sm:grid grid-cols-2 gap-2 sm:gap-3 h-full sm:min-h-[420px] lg:min-h-[480px]">
                 {thumbnails.map((src, index) => (
                   <Link
-                    key={src}
+                    key={index}
                     href={href}
+                    tabIndex={-1}
+                    aria-hidden
                     className="relative overflow-hidden bg-ground-2 border border-line group cursor-pointer"
                   >
                     <Image
@@ -151,28 +178,6 @@ export function FeaturedSpotlight({
                   </div>
                 )}
 
-                {vehicles.length > 1 && (
-                  <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 z-20 flex items-center gap-1 bg-surface p-1 border border-line">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={handlePrev}
-                      aria-label="Previous featured vehicle"
-                    >
-                      <ChevronGlyph direction="left" />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={handleNext}
-                      aria-label="Next featured vehicle"
-                    >
-                      <ChevronGlyph direction="right" />
-                    </Button>
-                  </div>
-                )}
               </div>
             )}
           </div>

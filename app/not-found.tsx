@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/feedback"
 import { ArrowGlyph, ChevronGlyph } from "@/components/system/marks"
 
+
 export default async function NotFound() {
   // Pull a few real cars to show as suggestions
   let suggestedCars: Awaited<ReturnType<typeof getInventory>>["vehicles"] = []
@@ -18,9 +19,10 @@ export default async function NotFound() {
   }
 
   const quickLinks = [
-    { label: "Browse All Used Cars", href: "/inventory" },
-    { label: "Go to Homepage", href: "/" },
-    { label: "Contact Us", href: "/contact" },
+    { label: "Buy a used car", href: "/inventory" },
+    { label: "Sell your car", href: "/sell-your-car" },
+    { label: "Our Jammu locations", href: "/locations" },
+    { label: "Contact us", href: "/contact" },
   ]
 
   return (
@@ -29,27 +31,21 @@ export default async function NotFound() {
       {/* ── HERO SECTION ── */}
       <section data-ground="deep" className="bg-deep-2 pt-32 pb-24 px-5 md:px-10">
         <div className="container mx-auto max-w-3xl text-center">
-          <p className="mb-8 text-meta uppercase text-accent-text-dark">
-            404 — Page Not Found
-          </p>
-
           <h1 className="mb-6 font-display text-h1 uppercase text-on-deep">
-            This page has<br />
-            <span className="text-accent-text-dark">driven off</span>
+            Page not found
           </h1>
 
           <p className="mx-auto mb-10 max-w-xl text-body-lg text-on-deep-2">
-            The page you are looking for does not exist or may have been moved.
-            Our inventory, however, is very much here — explore below.
+            This page does not exist, or the car it showed has been sold. You can still browse the
+            used cars we have in Jammu, or sell us yours.
           </p>
 
-          {/* CTA buttons */}
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/inventory">Browse Inventory</Link>
+            <Button asChild variant="bright" size="lg">
+              <Link href="/inventory">See used cars</Link>
             </Button>
             <Button asChild variant="onDeep" size="lg">
-              <Link href="/">Go Home</Link>
+              <Link href="/sell-your-car">Sell your car</Link>
             </Button>
           </div>
         </div>
@@ -58,10 +54,8 @@ export default async function NotFound() {
       {/* ── QUICK LINKS ── */}
       <section className="py-12 px-5 md:px-10 bg-ground">
         <div className="container mx-auto max-w-4xl">
-          <p className="mb-8 text-center text-meta uppercase text-ink-2">
-            Where would you like to go?
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <h2 className="mb-6 font-display text-h2 text-ink">Where would you like to go?</h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {quickLinks.map((link) => (
               <Link
                 key={link.href}
@@ -84,14 +78,9 @@ export default async function NotFound() {
         <section className="py-14 px-5 md:px-10 bg-ground-2 border-t border-line">
           <div className="container mx-auto max-w-5xl">
             <div className="flex items-end justify-between gap-6 mb-8">
-              <div>
-                <p className="mb-1 text-meta uppercase text-accent-text-light">
-                  While you&apos;re here
-                </p>
-                <h2 className="font-display text-h2 uppercase text-ink">
-                  Cars you might like
-                </h2>
-              </div>
+              <h2 className="font-display text-h2 uppercase text-ink">
+                Used cars in stock now
+              </h2>
               <Link
                 href="/inventory"
                 className="hidden sm:inline-flex min-h-11 items-center gap-2 text-meta uppercase text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
@@ -193,7 +182,7 @@ export default async function NotFound() {
               Need help finding a car?
             </h2>
             <p className="mx-auto mb-6 max-w-md text-body text-on-deep-2">
-              Our team at AM Business Park, Jammu is available to help you find the right vehicle.
+              Call us and we will tell you which used cars are in stock in Jammu today.
             </p>
             <div className="flex justify-center">
               <Button asChild variant="onDeep" size="lg">

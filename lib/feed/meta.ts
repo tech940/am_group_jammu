@@ -1,0 +1,294 @@
+/**
+ * Builds the Meta (Facebook / Instagram) vehicle catalogue feed from the live
+ * used-car inventory.
+ *
+ * This is a port of the hand-run script that produced the catalogue CSV Meta
+ * already accepted. Pure functions only — no fetching, no request access — so
+ * the route handler stays a thin wrapper and this can be tested on its own.
+ *
+ * Nothing here invents data. A car that is missing something Meta requires is
+ * left out and reported with the reason, never padded with a guess.
+ */
+
+import { PRIMARY_LOCATION } from '../locations.ts'
+import type { InventoryVehicle } from '../inventory/types.ts'
+
+export const MAX_IMAGES = 10
+
+/** Column order Meta's vehicle catalogue reads. Do not reorder casually. */
+export const META_COLUMNS: string[] = [
+  'vehicle_id',
+  'title',
+  'description',
+  'url',
+  'make',
+  'model',
+  'year',
+  'mileage.value',
+  'mileage.unit',
+  'price',
+  'state_of_vehicle',
+  'body_style',
+  'fuel_type',
+  'transmission',
+  'drivetrain',
+  'exterior_color',
+  'address.addr1',
+  'address.city',
+  'address.region',
+  'address.postal_code',
+  'address.country',
+  'latitude',
+  'longitude',
+  ...Array.from({ length: MAX_IMAGES }, (_, i) => `image[${i}].url`),
+]
+
+/**
+ * Body style by model, in Meta's enum. The WordPress listings do not carry a
+ * reliable body-style term, so the models this dealership actually stocks are
+ * mapped by hand. Add a line here when a new model arrives and shows up in the
+ * "skipped" report.
+ */
+const BODY_BY_MODEL: Record<string, string> = {
+  CARENS: 'MPV',
+  SELTOS: 'SUV',
+  SWIFT: 'HATCHBACK',
+  'ALTO 800': 'HATCHBACK',
+  ALTROZ: 'HATCHBACK',
+  TIAGO: 'HATCHBACK',
+  PUNCH: 'SUV',
+  'CURV EV EMP A 55': 'SUV',
+  'PUNCH EV': 'SUV',
+  NEXON: 'SUV',
+  EXTER: 'SUV',
+  ALCAZAR: 'SUV',
+  CRETA: 'SUV',
+  BEAT: 'HATCHBACK',
+  VERNA: 'SEDAN',
+  'WAGON R': 'HATCHBACK',
+  'I20 SPORTZ': 'HATCHBACK',
+  'ALTO K10': 'HATCHBACK',
+  SYROS: 'SUV',
+}
+
+/** Fallback: the listing's own body type (see adapter BODY_TYPE_SLUGS) -> Meta enum. */
+const BODY_BY_LISTING_TYPE: Record<string, string> = {
+  SUV: 'SUV',
+  'COMPACT SUV': 'SUV',
+  'PREMIUM SUV': 'SUV',
+  SEDAN: 'SEDAN',
+  HATCHBACK: 'HATCHBACK',
+  'PREMIUM HATCHBACK': 'HATCHBACK',
+  MPV: 'MPV',
+  MUV: 'MPV',
+  COUPE: 'COUPE',
+  CONVERTIBLE: 'CONVERTIBLE',
+  PICKUP: 'PICKUP',
+  VAN: 'VAN',
+  CROSSOVER: 'CROSSOVER',
+}
+
+const FUEL: Record<string, string> = {
+  GASOLINE: 'PETROL',
+  PETROL: 'PETROL',
+  DIESEL: 'DIESEL',
+  ELECTRIC: 'ELECTRIC',
+  EV: 'ELECTRIC',
+}
+
+const FUEL_WORD: Record<string, string> = {
+  PETROL: 'Petrol',
+  DIESEL: 'Diesel',
+  ELECTRIC: 'Electric',
+}
+
+const DRIVETRAIN: Record<string, string> = {
+  FWD: 'FWD',
+  RWD: 'RWD',
+  AWD: 'AWD',
+  '4WD': '4X4',
+  '4X4': '4X4',
+}
+
+export type MetaFeedRow = Record<string, string>
+
+export interface MetaFeedSkipped {
+  id: number
+  title: string
+  reasons: string[]
+}
+
+export interface MetaFeed {
+  rows: MetaFeedRow[]
+  skipped: MetaFeedSkipped[]
+}
+
+/** Strip emoji and symbols Meta rejects or renders badly; collapse whitespace. */
+export function cleanText(input: string | null | undefined): string {
+  return (input ?? '')
+    .replace(/[^\p{L}\p{N}_\s\-.,/&()+'’]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function isAllCaps(s: string): boolean {
+  return /\p{Lu}/u.test(s) && !/\p{Ll}/u.test(s)
+}
+
+/**
+ * Tidy a name the listing shouts in capitals: "HYUNDAI" -> "Hyundai",
+ * "WAGON R" -> "Wagon R". Short words and anything with a digit keep their
+ * capitals, because those are badges and codes ("KIA", "EV", "I20", "K10").
+ * A name already in mixed case is left exactly as the listing has it.
+ */
+function tidyName(raw: string): string {
+  const s = cleanText(raw)
+  if (!isAllCaps(s)) return s
+  return s
+    .split(' ')
+    .map((w) => (/\d/.test(w) || w.length <= 3 ? w : w.charAt(0) + w.slice(1).toLowerCase()))
+    .join(' ')
+}
+
+/**
+ * Percent-encode anything outside plain URL-safe ASCII (spaces, Devanagari,
+ * accented letters in WordPress upload names) without touching an existing
+ * "%xx" escape. Meta's fetcher rejects raw non-ASCII in URLs.
+ */
+export function encodeUrl(url: string): string {
+  return url.replace(/[^A-Za-z0-9:/?&=%#+,;@!$'()*~\-._]/gu, (ch) => {
+    try {
+      return encodeURIComponent(ch)
+    } catch {
+      return '' // lone surrogate — cannot be part of a valid URL
+    }
+  })
+}
+
+function absoluteUrl(url: string, origin: string): string {
+  const u = url.trim()
+  if (/^https?:\/\//i.test(u)) return u
+  if (u.startsWith('//')) return `https:${u}`
+  return `${origin}${u.startsWith('/') ? '' : '/'}${u}`
+}
+
+function resolveBodyStyle(v: InventoryVehicle): string | null {
+  const byModel = v.model ? BODY_BY_MODEL[v.model.trim().toUpperCase()] : undefined
+  if (byModel) return byModel
+  const byListing = v.bodyType ? BODY_BY_LISTING_TYPE[v.bodyType.trim().toUpperCase()] : undefined
+  return byListing ?? null
+}
+
+function metaFuel(fuel: string | null): string {
+  const key = (fuel ?? '').trim().toUpperCase()
+  if (!key) return ''
+  return FUEL[key] ?? 'OTHER'
+}
+
+function metaTransmission(transmission: string | null): string {
+  const key = (transmission ?? '').trim().toUpperCase()
+  return key === 'AUTOMATIC' || key === 'MANUAL' ? key : ''
+}
+
+/**
+ * @param origin  Scheme + host of THIS site, no trailing slash. Each car's
+ *                `url` is its page here, so an ad click lands on our lead form.
+ */
+export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): MetaFeed {
+  const loc = PRIMARY_LOCATION
+  const address: MetaFeedRow = {
+    'address.addr1': loc.streetAddress,
+    'address.city': loc.city,
+    'address.region': loc.region,
+    'address.postal_code': loc.postalCode || '',
+    'address.country': 'IN',
+    latitude: String(loc.geo.latitude),
+    longitude: String(loc.geo.longitude),
+  }
+
+  const rows: MetaFeedRow[] = []
+  const skipped: MetaFeedSkipped[] = []
+  const seen = new Set<number>()
+
+  for (const v of vehicles) {
+    const make = tidyName(v.make ?? '')
+    const model = tidyName(v.model ?? '')
+    const body = resolveBodyStyle(v)
+    const images = v.images.filter((src) => typeof src === 'string' && src.trim() !== '')
+
+    const reasons: string[] = []
+    if (!v.price || v.price <= 0) reasons.push('no price on the listing')
+    if (images.length === 0) reasons.push('no photos on the listing')
+    if (!body) reasons.push(`unknown body style for model '${cleanText(v.model) || 'not set'}'`)
+    if (!make || !model || !v.year || v.mileage === null) {
+      reasons.push('missing make, model, year or odometer reading')
+    }
+    if (seen.has(v.id)) reasons.push('duplicate listing ID')
+
+    if (reasons.length > 0 || !body || !v.price) {
+      skipped.push({ id: v.id, title: cleanText(v.title), reasons })
+      continue
+    }
+    seen.add(v.id)
+
+    const km = v.mileage as number
+    const fuel = metaFuel(v.fuel)
+    const title = `${v.year} ${make} ${model}`
+    const colour = cleanText(v.colour)
+    const facts = [
+      title,
+      km ? `${km.toLocaleString('en-IN')} km` : null,
+      FUEL_WORD[fuel] ?? null,
+      cleanText(v.transmission) || null,
+      colour || null,
+    ].filter(Boolean)
+
+    // The hand-run script said every car was "held at AM Business Park" and
+    // could be inspected without an appointment. Stock now sits across three
+    // Jammu sites and the inventory does not say which, so the feed no longer
+    // claims a site per car.
+    const description =
+      `${facts.join(' · ')}. ${cleanText(v.condition) || 'Used'} car from AM Group, ${loc.city}. ` +
+      'Finance, insurance and RC transfer arranged in-house.'
+
+    const row: MetaFeedRow = {
+      vehicle_id: String(v.id),
+      title,
+      description,
+      url: encodeUrl(`${origin}/inventory/${v.slug}`),
+      make,
+      model,
+      year: String(v.year),
+      'mileage.value': String(km),
+      'mileage.unit': 'KM',
+      price: `${Math.round(v.price)} INR`,
+      state_of_vehicle: 'USED',
+      body_style: body,
+      fuel_type: fuel,
+      transmission: metaTransmission(v.transmission),
+      drivetrain: DRIVETRAIN[(v.drivetrain ?? '').trim().toUpperCase()] ?? '',
+      exterior_color: colour,
+      ...address,
+    }
+    for (let i = 0; i < MAX_IMAGES; i++) {
+      row[`image[${i}].url`] = i < images.length ? encodeUrl(absoluteUrl(images[i], origin)) : ''
+    }
+    rows.push(row)
+  }
+
+  return { rows, skipped }
+}
+
+/** One RFC 4180 field: quoted when it holds a comma, quote, line break or edge space. */
+function csvField(value: string): string {
+  return /[",\r\n]|^\s|\s$/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
+}
+
+/** RFC 4180 CSV: header row, CRLF line endings, UTF-8 without a BOM. */
+export function toCsv(rows: MetaFeedRow[]): string {
+  const lines = [META_COLUMNS.map(csvField).join(',')]
+  for (const row of rows) {
+    lines.push(META_COLUMNS.map((col) => csvField(row[col] ?? '')).join(','))
+  }
+  return `${lines.join('\r\n')}\r\n`
+}

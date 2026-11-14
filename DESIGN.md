@@ -473,6 +473,57 @@ In order of preference: **delete the icon** (most decorate a label that already 
 - **Don't** let a page invent its own Button, Input, Dialog or Table.
 - **Don't** put three identical cards in a row because there are three things.
 
+## Used-car storefront
+
+Added 2026-11-14. The site is a used-car shop for two people — a buyer and a
+seller — and no longer the group's company website. The managing director's
+reference was a marketplace app's phone home screen; its **structure** is
+adopted, in this system's own palette, type and tokens.
+
+**Homepage order.** Photo hero with a search → Buy / Sell tiles and six service
+tiles on a sheet that overlaps the hero → live stock rails → browse chips → why
+buy here → the three Jammu sites → reviews → closing call. Files:
+`components/homepage/{used-hero,photo-hero,doors,services,stock,browse,why,visit,voices}.tsx`.
+
+- **The hero is photographic again**, which supersedes the note under *Glass*
+  that the hero is a gradient. It is the showroom photograph, `.photo-scrim`,
+  and **one** `.glass` panel (`PhotoHero`). Inputs inside the panel sit on
+  `surface`; a second glass element inside it (a `glass` button, say) is rule 4
+  broken — use `bright` or `onDeep`.
+- **Search is one row.** A `q` text field and a Search button; make, body and
+  budget sit behind a native `<details>`. It is a GET form to `/inventory` with
+  no JavaScript. Form fields on public pages are `text-body-lg` (17px): iOS
+  zooms the page on any focused field under 16px.
+- **The sheet is the page ground, not a card** — `bg-ground`, `rounded-t-lg`,
+  no border, pulled up over the photograph with a negative margin as a sibling
+  of the hero. That is what keeps tiles on it from being card-in-card. It is
+  the one place a band edge is rounded.
+- **Buy and Sell are deliberately unequal fills**: `accent` / `on-accent` for
+  Buy, `deep` / `on-deep` with an `accent-bright` pictogram for Sell. Minimum
+  144px tall. Do not make them a matched pair.
+- **Service tiles** are `surface` + `line` border + `radius-md`, three across on
+  phones and six from `lg`, each a pictogram over a `text-label`. A tile is a
+  target first, so its pictogram passes the delete-first test; a pictogram next
+  to an ordinary button label still does not.
+- **Pictograms** come from `components/system/marks.tsx` (Home, Key, Tag,
+  Shield, Percent, Rupee, Wheel added). They are sized in `em`: set the
+  font-size on a wrapper, never a width on the glyph.
+- **Section headings have no kicker.** Storefront bands use `SectionHead`
+  (heading, optional one-sentence lede) and `TIGHT_BAND` padding
+  (`py-12` / `md:py-20`) instead of page-kit's `Head` and `py-20` / `md:py-28`.
+- **Phone tab bar** (`components/layout/mobile-action-bar.tsx`): Home · Buy ·
+  Sell · Call · WhatsApp on `.glass-bar`, 64px plus the safe-area inset —
+  `app/layout.tsx` reserves the same with `pb-16`. Labels are 11px sentence
+  case; the active route takes `aria-current="page"` and `accent-bright`.
+- **Locations are three Jammu sites and the copy must not say otherwise.** No
+  page says a car is "at the Jammu site" or names a site for the stock: it says
+  to call to confirm which site a car is at. A location with
+  `addressConfirmed: false` prints its locality and "exact address on request",
+  and offers a call rather than a Directions link.
+- **No group content on mounted storefront pages**: no other cities, outlet
+  counts, divisions or new-car franchises. And `/sell-your-car` promises no
+  price, payment time or pickup — only what `lib/locations.ts` lists.
+
 ---
 
 *Audit that produced this system, plus the phase plan and route tracking board: `REDESIGN.md`.*

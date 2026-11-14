@@ -319,7 +319,7 @@ export function InventoryFilters({
         )}
 
         {facets.fuels.length > 0 && (
-          <CollapsibleSection title="Fuel" subtitle="Powertrain" defaultOpen={false}>
+          <CollapsibleSection title="Fuel type" subtitle={facets.fuels.map((f) => f.label).join(", ")} defaultOpen={false}>
             <ChipSelect items={facets.fuels} selected={filters.fuel} onSelect={chip("fuel")} />
           </CollapsibleSection>
         )}

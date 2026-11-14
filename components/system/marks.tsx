@@ -511,3 +511,81 @@ export function StarGlyph({ className = "" }: { className?: string }) {
     </Glyph>
   )
 }
+
+/* ------------------------------------------------------------------ */
+/* Storefront pictograms — the used-car homepage's tiles and the      */
+/* phone tab bar. A tile is a target first and a label second, so     */
+/* these carry the category at a glance. Same construction as         */
+/* everything above: 20x20, 1.5px, square caps, sized 1.1em — a       */
+/* larger pictogram is made by setting font-size on its wrapper.      */
+/* ------------------------------------------------------------------ */
+
+export function HomeGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path d="M2.5 9.75 10 3l7.5 6.75" strokeLinejoin="miter" />
+      <path d="M4.75 8.25V17h10.5V8.25M8.25 17v-5h3.5v5" strokeLinejoin="miter" />
+    </Glyph>
+  )
+}
+
+/** A car key — buying. */
+export function KeyGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <circle cx="6.25" cy="13.75" r="3.5" />
+      <path d="M8.75 11.25 17 3M13.25 6.75l2.5 2.5M15.5 4.5l2 2" />
+    </Glyph>
+  )
+}
+
+/** A price tag — selling. */
+export function TagGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path d="M3 3h7l7.25 7.25-7 7L3 10V3Z" strokeLinejoin="miter" />
+      <circle cx="6.75" cy="6.75" r="1.25" />
+    </Glyph>
+  )
+}
+
+/** Cover — insurance. */
+export function ShieldGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path d="M10 2.5 16.5 5v5c0 3.75-2.75 6.25-6.5 7.5-3.75-1.25-6.5-3.75-6.5-7.5V5L10 2.5Z" strokeLinejoin="miter" />
+      <path d="m7 10 2.25 2.25L13.25 8" />
+    </Glyph>
+  )
+}
+
+/** A rate — finance. */
+export function PercentGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path d="M4.5 15.5 15.5 4.5" />
+      <circle cx="5.75" cy="5.75" r="2.25" />
+      <circle cx="14.25" cy="14.25" r="2.25" />
+    </Glyph>
+  )
+}
+
+/** The rupee sign — what a car is worth. */
+export function RupeeGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <path d="M5.5 3.5h9M5.5 7.25h9M5.5 3.5h2.75a3.75 3.75 0 0 1 0 7.5H5.5l6.5 6" strokeLinejoin="miter" />
+    </Glyph>
+  )
+}
+
+/** A steering wheel — the test drive. */
+export function WheelGlyph({ className = "" }: { className?: string }) {
+  return (
+    <Glyph className={className}>
+      <circle cx="10" cy="10" r="7.25" />
+      <circle cx="10" cy="10" r="1.75" />
+      <path d="M2.75 9.5h5.5M11.75 9.5h5.5M10 11.75v5.5" />
+    </Glyph>
+  )
+}

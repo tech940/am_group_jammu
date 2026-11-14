@@ -91,7 +91,9 @@ export function Field({
 /* -------------------------------------------------------------------------- */
 
 const CONTROL =
-  "w-full rounded-sm border bg-surface px-3.5 text-body text-ink transition-colors duration-(--duration-1) " +
+  // 16px below md: iOS Safari zooms the whole page when a focused control is
+  // smaller, and does not zoom back — which pushed the submit button off screen.
+  "w-full rounded-sm border bg-surface px-3.5 text-body max-md:text-[length:var(--text-h4)] text-ink transition-colors duration-(--duration-1) " +
   "placeholder:text-ink-3 disabled:cursor-not-allowed disabled:bg-ground-2 disabled:text-ink-3 " +
   "aria-[invalid=true]:border-danger"
 

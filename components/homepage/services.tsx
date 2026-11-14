@@ -1,98 +1,90 @@
-import { Band, Head } from "@/components/system/page-kit"
-import { DotMatrix, Grain, RadialWash } from "@/components/system/backdrops"
-import { EnquireCta } from "@/components/system/enquire-cta"
-import { RevealGroup, RevealItem } from "@/components/system/reveal"
-import type { LeadIntent } from "@/lib/leads/types"
+import Link from "next/link"
+import type { ReactNode } from "react"
+import {
+  ChatGlyph,
+  PercentGlyph,
+  PinGlyph,
+  RupeeGlyph,
+  ShieldGlyph,
+  WheelGlyph,
+} from "@/components/system/marks"
+import { whatsappUrl } from "@/lib/locations"
+import { EnquireTile } from "./enquire-tile"
 
 /**
- * The three service actions, carried over from the old homepage's "Featured
- * Services" — content, not design.
+ * The six things around buying or selling a car, as a grid of small tiles.
  *
- * What survived from the old block is what mattered: insurance, selling your
- * car to us, and booking a service are the three things a visitor who is NOT
- * shopping for a car comes to a dealership site to do, and this page had no
- * door for any of them. The Elementor icon boxes, the icon font, and the links
- * into WordPress pages (/insurance-solutions, /book-service, /sell-your-car —
- * all currently parked on temporary redirects) did not survive.
+ * This replaces the old three-column "Exchange, finance, insure" band, which
+ * was a heading, a lede and three paragraphs before any button — a lot of
+ * scrolling on a phone to reach "ask about finance". A tile is the button.
  *
- * Each card opens the shared enquiry modal with the REAL CRM intent — the lead
- * desk has typed Insurance / Service / Sell Your Car lanes already, so these
- * enquiries land sorted instead of arriving as "General" and being triaged by
- * hand. No icons: DESIGN.md's delete-first rule — every label here already
- * says the word.
+ * Three tiles open the enquiry form with the CRM's own typed intent (Finance,
+ * Insurance, Test Drive), so those leads land sorted. The other three are
+ * plain links: the valuation section of /sell-your-car, the locations page,
+ * and WhatsApp.
+ *
+ * The pictograms pass DESIGN.md's delete-first test here because a tile is a
+ * target first and a label second — at three across on a phone the shape is
+ * what the thumb finds.
  */
-const SERVICES: {
-  intent: LeadIntent
-  title: string
-  body: string
-  action: string
-}[] = [
-  // Ordered for a used-car buyer: the car they already own comes first,
-  // because a part-exchange is what makes most purchases possible.
-  {
-    intent: "Sell Your Car",
-    title: "Sell or exchange your car",
-    body: "Bring the car to the Jammu site and have it valued while you wait. Payment and RC transfer are handled in-house.",
-    action: "Get a valuation",
-  },
-  {
-    intent: "Finance",
-    title: "Car finance",
-    body: "Bank finance arranged at the dealership desk for any car in stock. Ask for the EMI on the one you like.",
-    action: "Ask about finance",
-  },
-  {
-    intent: "Insurance",
-    title: "Motor insurance",
-    body: "New policies and renewals handled at the dealership desk — quotes compared for you, paperwork done on site.",
-    action: "Get an insurance quote",
-  },
-]
+const tile =
+  "flex min-h-24 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md " +
+  "border border-line bg-surface px-2 py-3 text-center text-label text-ink " +
+  "transition-colors duration-(--duration-1) hover:border-line-strong hover:bg-ground-2 md:min-h-28"
+
+function Face({ glyph, label }: { glyph: ReactNode; label: string }) {
+  return (
+    <>
+      {/* Glyphs are sized in em, so the wrapper's font-size is the icon size. */}
+      <span aria-hidden className="text-h2 leading-none text-accent">
+        {glyph}
+      </span>
+      <span>{label}</span>
+    </>
+  )
+}
 
 export function Services() {
   return (
-    <Band
-      ground="ground-2"
-      labelledBy="services-title"
-      id="services"
-      backdrop={
-        <>
-          <RadialWash at="80% 0%" strength={0.1} />
-          <DotMatrix cell={22} strength={0.05} fade="both" />
-          <Grain />
-        </>
-      }
-    >
-      <Head
-        id="services-title"
-        label="Around the purchase"
-        title="Exchange, finance, insure"
-        lede="The three things that usually sit between liking a car and driving it home. Each button reaches the right desk directly."
-      />
-
-      <RevealGroup className="mt-14 grid grid-cols-1 gap-x-12 gap-y-12 border-t border-line-strong pt-10 md:grid-cols-3">
-        {SERVICES.map((service, i) => (
-          <RevealItem key={service.intent} className="flex flex-col">
-            <p className="flex items-baseline gap-4">
-              <span className="font-display text-h3 text-ink-2" data-num>
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="font-display text-h3 uppercase text-ink">
-                {service.title}
-              </span>
-            </p>
-            <p className="mt-3 flex-1 text-body text-ink-2">{service.body}</p>
-            <div className="mt-6">
-              <EnquireCta
-                label={service.action}
-                intent={service.intent}
-                sourceLabel={`home-services-${service.intent.toLowerCase().replace(/\s+/g, "-")}`}
-                variant="secondary"
-              />
-            </div>
-          </RevealItem>
-        ))}
-      </RevealGroup>
-    </Band>
+    <ul className="grid grid-cols-3 gap-2.5 md:gap-4 lg:grid-cols-6">
+      <li>
+        <EnquireTile intent="Finance" sourceLabel="home-tile-finance" className={tile}>
+          <Face glyph={<PercentGlyph />} label="Car finance" />
+        </EnquireTile>
+      </li>
+      <li>
+        <EnquireTile intent="Insurance" sourceLabel="home-tile-insurance" className={tile}>
+          <Face glyph={<ShieldGlyph />} label="Insurance" />
+        </EnquireTile>
+      </li>
+      <li>
+        <Link href="/sell-your-car#valuation" className={tile}>
+          <Face glyph={<RupeeGlyph />} label="Check car price" />
+        </Link>
+      </li>
+      <li>
+        <EnquireTile intent="Test Drive" sourceLabel="home-tile-test-drive" className={tile}>
+          <Face glyph={<WheelGlyph />} label="Book a test drive" />
+        </EnquireTile>
+      </li>
+      <li>
+        <Link href="/locations" className={tile}>
+          <Face glyph={<PinGlyph />} label="Our locations" />
+        </Link>
+      </li>
+      <li>
+        <a
+          href={whatsappUrl(
+            "Hi AM Group, I'm looking for a used car in Jammu. Can you help me with what's available?",
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-track-location="home-tile-whatsapp"
+          className={tile}
+        >
+          <Face glyph={<ChatGlyph />} label="WhatsApp us" />
+        </a>
+      </li>
+    </ul>
   )
 }

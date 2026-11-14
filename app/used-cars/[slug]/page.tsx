@@ -1,18 +1,23 @@
 import type { Metadata } from "next"
-import { PRIMARY_LOCATION } from "@/lib/locations"
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import { H_PROMISE, PRIMARY_LOCATION } from "@/lib/locations"
 import { FeaturedInventory } from "@/components/sections/inventory"
 import { Button } from "@/components/ui/button"
+import { PhoneGlyph } from "@/components/system/marks"
+import { EnquireCta } from "@/components/system/enquire-cta"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
-import { getFrequentSearches } from "@/lib/seo/links"
-import { getAllLandingSlugs, resolveLanding } from "@/lib/seo/landing"
+import { RelatedLinks } from "@/components/seo/related-links"
+import { getFrequentSearches, getSeoLinks, type SeoLinkGroup } from "@/lib/seo/links"
+import { getAllLandingSlugs, resolveLanding, type LandingKind } from "@/lib/seo/landing"
+import { generateVehicleListSchema } from "@/lib/seo-schemas"
+import { pageSocial } from "@/lib/seo/site"
 
 /**
- * One route serving every "used cars …" landing page: cities, budget bands,
- * models, body styles, fuel and transmission.
+ * One route serving every "used cars …" landing page: the Jammu city page,
+ * budget bands, models, body styles, fuel and transmission.
  *
  * These exist because a filtered listing URL answers the query but never names
  * it — `/inventory?priceMin=0&priceMax=1000000` returns the right 16 cars under
@@ -34,47 +39,77 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!landing) return { title: "Page Not Found", robots: "noindex" }
 
+  const path = `/used-cars/${landing.slug}`
+
   return {
     title: landing.title,
     description: landing.description,
-    alternates: { canonical: `/used-cars/${landing.slug}` },
+    alternates: { canonical: path },
+    // A page with no cars on it is thin. It stays reachable (links are still
+    // followed) but is kept out of the index until stock returns.
+    ...(landing.vehicles.length === 0 ? { robots: { index: false, follow: true } } : {}),
+    ...pageSocial({ title: landing.title, description: landing.description, path }),
   }
+}
+
+/**
+ * Which sibling groups a page links to. A page never lists its own kind first:
+ * a budget page sends the reader on to body styles and makes, a body page to
+ * budgets and makes, and so on.
+ */
+const SIBLING_ORDER: Record<LandingKind, string[]> = {
+  city: ["budget", "body", "make", "model"],
+  budget: ["body", "make", "model", "budget"],
+  body: ["budget", "make", "model", "body"],
+  model: ["make", "budget", "body", "model"],
+  fuel: ["budget", "body", "make", "fuel"],
+  transmission: ["budget", "body", "make", "transmission"],
 }
 
 export default async function UsedCarsLandingPage({ params }: Props) {
   const { slug } = await params
   const landing = await resolveLanding(slug)
 
-  // A slug with no stock behind it would be a thin page, so it 404s rather
-  // than rendering an empty grid.
+  // An unknown slug, or a facet with no stock behind it, is a 404 rather than
+  // an empty grid.
   if (!landing) notFound()
 
-  const frequentSearches = await getFrequentSearches(30)
+  const [frequentSearches, seoLinks] = await Promise.all([getFrequentSearches(30), getSeoLinks()])
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
+  const path = `/used-cars/${landing.slug}`
+  const count = landing.vehicles.length
+
+  const pool: Record<string, SeoLinkGroup> = {
+    budget: { title: "By budget", links: seoLinks.budgets },
+    body: { title: "By body type", links: seoLinks.bodyTypes },
+    make: { title: "By make", links: seoLinks.makes },
+    model: { title: "By model", links: seoLinks.models.slice(0, 8) },
+    fuel: { title: "By fuel", links: seoLinks.fuels },
+    transmission: { title: "By transmission", links: seoLinks.transmissions },
+  }
+  const siblings = SIBLING_ORDER[landing.kind]
+    .slice(0, 3)
+    .map((key) => ({
+      title: pool[key].title,
+      // Never link a page to itself.
+      links: pool[key].links.filter((l) => l.href !== path),
+    }))
+
+  const jsonLd = generateVehicleListSchema({
     name: landing.heading,
     description: landing.description,
-    url: `https://amgroupind.com/used-cars/${landing.slug}`,
-    mainEntity: {
-      "@type": "ItemList",
-      numberOfItems: landing.vehicles.length,
-      itemListElement: landing.vehicles.slice(0, 20).map((v, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        url: `https://amgroupind.com/inventory/${v.slug}`,
-        name: `${v.year ?? ""} ${v.title}`.trim(),
-      })),
-    },
-  }
+    path,
+    vehicles: landing.vehicles,
+  })
 
   return (
     <div className="min-h-screen bg-ground">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {count > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
 
       <Breadcrumbs
         items={[
@@ -83,16 +118,11 @@ export default async function UsedCarsLandingPage({ params }: Props) {
         ]}
       />
 
-      {/* Hero: H1 carries the exact phrase the page targets */}
+      {/* The H1 carries the exact phrase the page targets, and the first
+          screen carries a way to enquire. */}
       <section className="border-b border-line bg-ground-2">
-        <div className="container mx-auto px-4 md:px-8 py-10 md:py-14">
-          <span className="block text-meta uppercase text-accent-text-light mb-4">
-            {landing.cityName}
-          </span>
-
-          <h1 className="font-display text-h1 text-ink mb-5 max-w-4xl">
-            {landing.heading}
-          </h1>
+        <div className="container mx-auto px-4 py-10 md:px-8 md:py-14">
+          <h1 className="mb-5 max-w-4xl font-display text-h1 text-ink">{landing.heading}</h1>
 
           <div className="max-w-3xl space-y-3">
             {landing.intro.map((p, i) => (
@@ -102,46 +132,70 @@ export default async function UsedCarsLandingPage({ params }: Props) {
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 mt-7">
-            <span className="inline-flex items-center rounded-sm border border-line bg-surface px-3 py-1.5 text-meta uppercase text-ink-2">
-              Inspected &amp; verified
-            </span>
-            <span className="inline-flex items-center rounded-sm border border-line bg-surface px-3 py-1.5 text-meta uppercase text-ink-2">
-              Since 1968
-            </span>
-            <Button asChild variant="primary">
-              <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="landing-faq">{PRIMARY_LOCATION.phone}</a>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <EnquireCta label="Enquire now" sourceLabel="landing-hero" />
+            <Button asChild variant="secondary" size="lg">
+              <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="landing-hero">
+                <PhoneGlyph /> {PRIMARY_LOCATION.phone}
+              </a>
             </Button>
           </div>
+
+          {H_PROMISE && (
+            <p className="mt-4 text-small text-ink-2">
+              H Promise (Hyundai certified used cars):{" "}
+              <a
+                href={`tel:${H_PROMISE.phoneE164}`}
+                data-track-location="landing-hero-hpromise"
+                className="inline-flex min-h-11 items-center font-semibold text-ink underline-offset-4 hover:underline"
+              >
+                {H_PROMISE.phone}
+              </a>
+            </p>
+          )}
         </div>
       </section>
 
       <FeaturedInventory
         vehicles={landing.vehicles}
         title={landing.crumb}
-        subtitle={`${landing.vehicles.length} ${landing.vehicles.length === 1 ? "car" : "cars"} in stock at AM Group ${landing.cityName}`}
-        emptyMessage={`Our live inventory is temporarily unavailable. Please call ${PRIMARY_LOCATION.phone}.`}
+        subtitle={`${count} ${count === 1 ? "car" : "cars"} in stock at AM Group, ${landing.cityName}`}
+        emptyMessage={`Our stock list is being updated. Please call ${PRIMARY_LOCATION.phone}.`}
       />
 
       {/* Long-form copy */}
-      <section className="py-16 bg-ground-2 border-t border-line">
-        <div className="container mx-auto px-4 md:px-8 max-w-4xl space-y-9">
+      <section className="border-t border-line bg-ground-2 py-16">
+        <div className="container mx-auto max-w-4xl space-y-9 px-4 md:px-8">
           {landing.sections.map((block) => (
             <article key={block.heading}>
-              <h2 className="font-display text-h2 text-ink mb-3">{block.heading}</h2>
+              <h2 className="mb-3 font-display text-h2 text-ink">{block.heading}</h2>
               <p className="text-body text-ink-2">{block.body}</p>
             </article>
           ))}
 
-          <p className="text-body text-ink-2 border-t border-line pt-6">
-            Browse the{" "}
+          <p className={`text-body text-ink-2 ${landing.sections.length ? "border-t border-line pt-6" : ""}`}>
+            Browse{" "}
             <Link
               href="/inventory"
               className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light"
             >
-              full used car inventory in Jammu
+              all used cars in Jammu
             </Link>
-            , or call us on{" "}
+            ,{" "}
+            <Link
+              href="/sell-your-car"
+              className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light"
+            >
+              sell or exchange your car
+            </Link>
+            , see{" "}
+            <Link
+              href="/locations"
+              className="font-semibold text-ink underline underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light"
+            >
+              where to find us
+            </Link>
+            , or call{" "}
             <a
               href={`tel:${PRIMARY_LOCATION.phoneE164}`}
               data-track-location="landing-cta"
@@ -149,10 +203,12 @@ export default async function UsedCarsLandingPage({ params }: Props) {
             >
               {PRIMARY_LOCATION.phone}
             </a>{" "}
-            and we will tell you what has just arrived.
+            and we will tell you what has just come in.
           </p>
         </div>
       </section>
+
+      <RelatedLinks groups={siblings} />
 
       <FaqSection items={landing.faqs} title={`${landing.crumb} — FAQs`} />
 

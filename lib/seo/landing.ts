@@ -18,6 +18,8 @@ import type { InventoryVehicle } from '../inventory/types.ts'
 import type { InventoryFilterState } from '../../store/use-inventory-store.ts'
 import { EMPTY_FILTERS } from '../../store/use-inventory-store.ts'
 import type { FaqItem } from '../../components/seo/faq-section.tsx'
+import { LOCATIONS, PRIMARY_LOCATION } from '../locations.ts'
+import { locationNames } from './locations.ts'
 
 export type LandingKind = 'city' | 'budget' | 'model' | 'body' | 'fuel' | 'transmission'
 
@@ -42,7 +44,13 @@ export interface Landing {
 
 const CITY = 'Jammu'
 
-export const SERVICE_CITY_SLUGS = ['jammu', 'srinagar', 'kathua', 'udhampur'] as const
+/**
+ * City landing pages. Jammu only: all three used-car locations are in Jammu
+ * and there is no site in any other city, so a "used cars in <other city>"
+ * page would be a doorway page showing Jammu stock under another city's name.
+ * Slugs this list used to carry redirect to /used-cars/jammu.
+ */
+export const SERVICE_CITY_SLUGS = ['jammu'] as const
 
 /** Round budget ceilings Indian buyers actually search for, in rupees. */
 const BUDGET_CEILINGS = [200_000, 300_000, 500_000, 700_000, 1_000_000, 1_500_000] as const
@@ -61,6 +69,17 @@ function priceSummary(vs: InventoryVehicle[]): string {
   return `${formatINR(Math.min(...prices))} to ${formatINR(Math.max(...prices))}`
 }
 
+/** "2016 to 2023", or "2021" when every car shares a year. */
+function yearSummary(vs: InventoryVehicle[]): string {
+  const years = vs.map((v) => v.year).filter((y): y is number => y !== null)
+  if (years.length === 0) return ''
+  const lo = Math.min(...years)
+  const hi = Math.max(...years)
+  return lo === hi ? String(lo) : `${lo} to ${hi}`
+}
+
+const SITE_COUNT = LOCATIONS.length
+
 function commonFaqs(scope: string, vs: InventoryVehicle[]): FaqItem[] {
   const prices = vs.map((v) => v.price).filter((n): n is number => n !== null)
   return [
@@ -69,14 +88,14 @@ function commonFaqs(scope: string, vs: InventoryVehicle[]): FaqItem[] {
           question: `What is the price range for ${scope}?`,
           answer:
             `Current stock runs from ${formatINR(Math.min(...prices))} to ${formatINR(Math.max(...prices))}. ` +
-            `Every price shown is the asking price at our Jammu showroom; registration transfer and insurance are quoted separately.`,
+            `Every price shown is the asking price; registration transfer and insurance are quoted separately.`,
         }]
       : []),
     {
       question: `Can I test drive before buying?`,
       answer:
-        'Yes. Every car page has a "Schedule Test Drive" button, or call +91 94191 00000. Test drives are ' +
-        'arranged at our Jammu and Srinagar locations at no charge and with no obligation.',
+        `Yes. Send an enquiry from the car's page or call ${PRIMARY_LOCATION.phone}. Test drives are arranged at ` +
+        `our Jammu locations (${locationNames()}) at no charge and with no obligation. Bring a valid driving licence.`,
     },
     {
       question: 'Is finance available?',
@@ -87,7 +106,7 @@ function commonFaqs(scope: string, vs: InventoryVehicle[]): FaqItem[] {
     {
       question: 'Will you take my existing car in part-exchange?',
       answer:
-        'Yes. Bring it to AM Business Park in Jammu and we will value it while you wait, then offset that against ' +
+        `Yes. Bring it to ${PRIMARY_LOCATION.shortName} in ${PRIMARY_LOCATION.city} and we will value it, then offset that against ` +
         'whichever car you are buying. Bring the RC, insurance and service records if you have them.',
     },
   ]
@@ -113,13 +132,13 @@ async function buildSpecs(): Promise<SlugSpec[]> {
   const { vehicles, facets, total } = await getInventory()
   const specs: SlugSpec[] = []
 
-  // Cities — the four locations AM Group actually serves.
+  // Cities — Jammu only; see SERVICE_CITY_SLUGS.
   for (const slug of SERVICE_CITY_SLUGS) {
     specs.push({
       kind: 'city',
       slug,
       label: slug.charAt(0).toUpperCase() + slug.slice(1),
-      match: () => true, // stock is held centrally and available to every city
+      match: () => true, // every car in stock is in Jammu
     })
   }
 
@@ -200,14 +219,20 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
   const spec = specs.find((s) => s.slug === slug.toLowerCase())
   if (!spec) return null
 
-  const { vehicles: all, facets } = await getInventory()
+  const { vehicles: all } = await getInventory()
   const vehicles = all.filter(spec.match)
-  if (vehicles.length === 0) return null
+  // A facet page with nothing behind it is a thin page and 404s. The city page
+  // is different: it is the redirect target of the old site's strongest URL,
+  // so it must keep resolving when the feed is briefly empty. The route marks
+  // it noindex while it has no cars.
+  if (vehicles.length === 0 && spec.kind !== 'city') return null
 
   const n = vehicles.length
   const makes = [...new Set(vehicles.map((v) => v.make).filter(Boolean))] as string[]
   const range = priceSummary(vehicles)
   const years = vehicles.map((v) => v.year).filter((y): y is number => y !== null)
+  const yearSpan = yearSummary(vehicles)
+  const cars = n === 1 ? 'car' : 'cars'
 
   const base = {
     kind: spec.kind,
@@ -219,42 +244,68 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
   switch (spec.kind) {
     case 'city': {
       const city = spec.label
+      if (n === 0) {
+        return {
+          ...base,
+          cityName: city,
+          crumb: `Used Cars in ${city}`,
+          heading: `Used Cars in ${city}`,
+          title: `Used Cars in ${city} | Second Hand Cars for Sale`,
+          description:
+            `Buy second hand cars in ${city} from AM Group. Call ${PRIMARY_LOCATION.phone} for the cars in stock today.`,
+          intro: [
+            `Our stock list for ${city} is being updated. Call ${PRIMARY_LOCATION.phone} and we will tell you ` +
+              `which used cars are available today at our ${SITE_COUNT} ${city} locations: ${locationNames()}.`,
+          ],
+          sections: [],
+          faqs: commonFaqs(`used cars in ${city}`, vehicles),
+        }
+      }
       return {
         ...base,
         cityName: city,
         crumb: `Used Cars in ${city}`,
-        heading: `Used Cars in ${city} — ${n} Certified Cars in Stock`,
+        heading: `Used Cars in ${city} — ${n} Second Hand ${n === 1 ? 'Car' : 'Cars'} in Stock`,
         title: `Used Cars in ${city} | ${n} Second Hand Cars for Sale`,
         description:
-          `Buy certified second hand cars in ${city} from AM Group. ${n} cars in stock` +
-          `${makes.length ? ` — ${list(makes)}` : ''}. Real photos, verified KMs, finance and exchange.`,
+          `Buy second hand cars in ${city} from AM Group. ${n} ${cars} in stock` +
+          `${makes.length ? ` — ${list(makes)}` : ''}${range ? `, priced ${range}` : ''}. ` +
+          `Real photos, recorded kilometres, finance and exchange.`,
         intro: [
-          `AM Group has been selling and servicing cars across Jammu & Kashmir since 1968. We currently have ` +
-            `${n} certified pre-owned cars available to buyers in ${city}${range ? `, priced from ${range}` : ''}.`,
-          `Stock is held centrally and can be moved to whichever of our locations is most convenient for your ` +
-            `inspection. Every car is photographed as it actually stands, and the odometer reading shown is the ` +
-            `reading recorded at intake.`,
+          `AM Group has ${n} used ${cars} for sale in ${city} right now` +
+            `${range ? `, priced from ${range}` : ''}` +
+            `${yearSpan ? `, with model years ${yearSpan}` : ''}` +
+            `${makes.length ? `. Makes in stock: ${list(makes)}` : ''}.`,
+          `The cars are kept at our ${SITE_COUNT} ${city} locations — ${locationNames()}. ` +
+            `Call ${PRIMARY_LOCATION.phone} before you travel and we will tell you which site a car is at.`,
+          `Every car is photographed as it stands, and the kilometres shown are the reading recorded when the car came in.`,
         ],
         sections: [
           {
             heading: `Buying a second hand car in ${city}`,
             body:
-              `Roads around ${city} put real demands on a car — stop-start town traffic, then long climbs on the ` +
-              `national highway. That makes mechanical condition and honest history more important than the badge. ` +
-              `Every car here is inspected, its documentation verified, and its service history checked where available.`,
+              `Driving around ${city} means stop-start town traffic and then long climbs on the national highway, ` +
+              `so mechanical condition and a clear history matter more than the badge. Ask for the service ` +
+              `records, drive the car up an incline, and bring your own mechanic if you like.`,
           },
           {
             heading: 'Paperwork, finance and exchange',
             body:
-              `We handle RC transfer, insurance transfer and hypothecation in-house, and arrange finance through ` +
-              `leading nationalised and private banks. If you are part-exchanging, we will value your existing car ` +
-              `at the showroom while you wait.`,
+              `We handle the RC transfer and insurance transfer, and arrange finance through nationalised and ` +
+              `private banks. If you are exchanging your present car, bring it with its RC and insurance and we ` +
+              `will value it.`,
           },
         ],
         faqs: [
           {
             question: `How many used cars are available in ${city}?`,
-            answer: `${n} certified pre-owned cars are in stock right now${makes.length ? `, across ${list(makes)}` : ''}. This page reflects live stock.`,
+            answer: `${n} used ${cars} ${n === 1 ? 'is' : 'are'} in stock right now${makes.length ? `, across ${list(makes)}` : ''}. This page shows live stock.`,
+          },
+          {
+            question: `Where can I see used cars in ${city}?`,
+            answer:
+              `At our ${SITE_COUNT} ${city} locations: ${locationNames()}. Call ${PRIMARY_LOCATION.phone} first ` +
+              `and we will confirm which site the car you want is at.`,
           },
           ...commonFaqs(`used cars in ${city}`, vehicles),
         ],
@@ -266,17 +317,18 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
       return {
         ...base,
         crumb: `Under ₹${label}`,
-        heading: `Used Cars Under ₹${label} in ${CITY} — ${n} Available`,
+        heading: `Used Cars Under ₹${label} in ${CITY} — ${n} in Stock`,
         title: `Used Cars Under ₹${label} in ${CITY} | ${n} Second Hand Cars`,
         description:
-          `${n} certified used cars under ₹${label} for sale in ${CITY}` +
-          `${makes.length ? ` — ${list(makes)}` : ''}. Real photos, verified KMs, finance and exchange at AM Group.`,
+          `${n} used ${cars} under ₹${label} for sale in ${CITY}` +
+          `${makes.length ? ` — ${list(makes)}` : ''}. Real photos, recorded kilometres, finance and exchange at AM Group.`,
         intro: [
-          `Looking for a used car under ₹${label} in ${CITY}? We currently have ${n} certified pre-owned ` +
-            `${n === 1 ? 'car' : 'cars'} within that budget${range ? `, priced from ${range}` : ''}` +
-            `${makes.length ? `, covering ${list(makes)}` : ''}.`,
-          `Every price shown is the actual asking price — not a teaser figure. Registration transfer and insurance ` +
-            `are quoted separately and honestly, so the number you see here is the number we negotiate from.`,
+          `We have ${n} used ${cars} under ₹${label} in ${CITY} right now` +
+            `${range ? `, priced from ${range}` : ''}` +
+            `${yearSpan ? `, with model years ${yearSpan}` : ''}` +
+            `${makes.length ? `. Makes in this budget: ${list(makes)}` : ''}.`,
+          `Every price shown is the asking price for that car. Registration transfer and insurance are quoted ` +
+            `separately, before you commit.`,
         ],
         sections: [
           {
@@ -284,21 +336,19 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
             body:
               `At this budget the sensible priority is condition and service history over badge or trim level. ` +
               `A well-kept car one segment down will usually cost you less over three years than a tired example ` +
-              `of something more prestigious. Our team will happily tell you which of the cars on this page has ` +
-              `the stronger history, even when that points you at the cheaper one.`,
+              `of something more prestigious. Ask us which of the cars on this page has the fuller service history.`,
           },
           {
             heading: 'Costs beyond the sticker price',
             body:
-              `Budget for RC transfer, fresh insurance, and any immediate servicing the car is due. We quote these ` +
-              `up front rather than at signing. If you are financing, remember the on-road figure — not the asking ` +
-              `price — is what the loan is assessed against.`,
+              `Budget for RC transfer, fresh insurance, and any servicing the car is due. Ask for these figures ` +
+              `along with the price so you can compare cars on the full amount.`,
           },
         ],
         faqs: [
           {
             question: `How many used cars under ₹${label} are available in ${CITY}?`,
-            answer: `${n} ${n === 1 ? 'car is' : 'cars are'} currently in stock under ₹${label} at AM Group ${CITY}. This page updates automatically as cars are sold or added.`,
+            answer: `${n} ${n === 1 ? 'car is' : 'cars are'} currently in stock under ₹${label} at AM Group in ${CITY}. This page updates as cars are sold or added.`,
           },
           ...(makes.length
             ? [{
@@ -320,13 +370,13 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
         title: `Used ${name} in ${CITY} | ${n} Second Hand ${spec.label} for Sale`,
         description:
           `${n} used ${name} for sale in ${CITY}${range ? `, priced ${range}` : ''}. ` +
-          `Real photos, verified KMs, full service history checks, finance and exchange at AM Group.`,
+          `Real photos, recorded kilometres, finance and exchange at AM Group.`,
         intro: [
-          `We currently have ${n} used ${name} ${n === 1 ? 'listing' : 'listings'} available in ${CITY}` +
+          `We have ${n} used ${name} ${cars} for sale in ${CITY} right now` +
             `${range ? `, priced from ${range}` : ''}` +
-            `${years.length ? `, with model years from ${Math.min(...years)} to ${Math.max(...years)}` : ''}.`,
-          `Each ${spec.label} below is a car physically in our stock — the photographs are of that specific ` +
-            `vehicle and the kilometres shown were recorded at intake.`,
+            `${yearSpan ? `, with model years ${yearSpan}` : ''}.`,
+          `Each ${spec.label} below is a car in our stock — the photographs are of that car and the kilometres ` +
+            `shown were recorded when it came in.`,
         ],
         sections: [
           {
@@ -338,17 +388,17 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
               `mechanic to inspect any ${spec.label} on this page.`,
           },
           {
-            heading: `Servicing a ${name} in ${CITY}`,
+            heading: `Before you pay for a used ${spec.label}`,
             body:
-              `AM Group has run workshops across the region since 1968, so a ${spec.label} bought here can be serviced ` +
-              `here too. We can quote for upcoming scheduled servicing before you commit, which is worth doing if a ` +
-              `car is close to a major interval.`,
+              `Check when the next scheduled service is due and what the tyres and battery have left in them — ` +
+              `a ${spec.label} close to a major service interval costs more in its first year than the price suggests. ` +
+              `Confirm the RC, insurance and pollution certificate are in order, and ask us for the transfer costs.`,
           },
         ],
         faqs: [
           {
             question: `How many used ${name} cars are available in ${CITY}?`,
-            answer: `${n} ${n === 1 ? 'is' : 'are'} in stock right now at AM Group ${CITY}${range ? `, priced ${range}` : ''}.`,
+            answer: `${n} ${n === 1 ? 'is' : 'are'} in stock right now at AM Group in ${CITY}${range ? `, priced ${range}` : ''}.`,
           },
           ...(years.length
             ? [{
@@ -371,15 +421,17 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
       return {
         ...base,
         crumb: nounTitle,
-        heading: `${nounTitle} in ${CITY} — ${n} Available`,
+        heading: `${nounTitle} in ${CITY} — ${n} in Stock`,
         title: `${nounTitle} in ${CITY} | ${n} Second Hand ${spec.label} Cars`,
         description:
           `${n} used ${spec.label.toLowerCase()} cars for sale in ${CITY}` +
-          `${range ? `, priced ${range}` : ''}. Real photos, verified KMs, finance and exchange at AM Group.`,
+          `${range ? `, priced ${range}` : ''}. Real photos, recorded kilometres, finance and exchange at AM Group.`,
         intro: [
-          `We have ${n} used ${spec.label.toLowerCase()} ${n === 1 ? 'car' : 'cars'} in stock in ${CITY}` +
-            `${range ? `, priced from ${range}` : ''}${makes.length ? `, across ${list(makes)}` : ''}.`,
-          `Every listing below is a real car in our stock with its own photographs and recorded odometer reading.`,
+          `We have ${n} used ${spec.label.toLowerCase()} ${cars} in stock in ${CITY} right now` +
+            `${range ? `, priced from ${range}` : ''}` +
+            `${yearSpan ? `, with model years ${yearSpan}` : ''}` +
+            `${makes.length ? `. Makes: ${list(makes)}` : ''}.`,
+          `Every listing below is a car in our stock, with its own photographs and recorded kilometres.`,
         ],
         sections: [
           {
@@ -389,17 +441,15 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
                 ? `A ${spec.label.toLowerCase()} suits the mix of town driving and highway running that most journeys ` +
                   `around ${CITY} involve. Ground clearance and load space matter here more than they would in a flatter city.`
                 : spec.kind === 'fuel'
-                  ? `${spec.label} suits buyers whose running is mostly in and around town, where the lower purchase ` +
-                    `price and simpler maintenance usually outweigh any difference in fuel economy.`
+                  ? fuelNote(spec.label, CITY)
                   : `${spec.label} transmissions take the effort out of stop-start traffic, which is most of what ` +
                     `driving in ${CITY} involves on a weekday.`,
           },
           {
             heading: 'Inspection and paperwork',
             body:
-              `Every car here has been inspected mechanically and structurally and its documentation verified before ` +
-              `sale. We handle RC transfer, insurance transfer and hypothecation in-house, and can arrange finance ` +
-              `through leading nationalised and private banks.`,
+              `Each car is checked and its documents verified before it is listed. We handle the RC transfer and ` +
+              `insurance transfer, and can arrange finance through nationalised and private banks.`,
           },
         ],
         faqs: [
@@ -412,6 +462,18 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
       }
     }
   }
+}
+
+function fuelNote(label: string, city: string): string {
+  const fuel = label.toLowerCase()
+  if (fuel === 'petrol')
+    return `Petrol suits buyers whose running is mostly in and around ${city}, where the lower purchase price ` +
+      `usually outweighs the difference in fuel economy.`
+  if (fuel === 'diesel')
+    return `Diesel suits buyers who cover long distances on the highway out of ${city}, where the better fuel ` +
+      `economy pays back the higher purchase price.`
+  return `${label} cars are listed here whenever one is in stock. Ask us about running costs and, for an ` +
+    `electric car, the battery condition, before you decide.`
 }
 
 /** Filters equivalent to a landing page, for the "refine further" links. */

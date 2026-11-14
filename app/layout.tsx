@@ -7,29 +7,50 @@ import { ConditionalBreadcrumbs } from "@/components/layout/conditional-breadcru
 
 import { UnlockPricePopup } from "@/components/modals/unlock-price-popup";
 import { Toaster } from "@/components/ui/toaster";
-import { generateLocalBusinessSchema } from "@/lib/seo-schemas";
+import { generateSiteSchema } from "@/lib/seo-schemas";
+import { OG_IMAGE, SITE_NAME, SITE_URL } from "@/lib/seo/site";
+import { locationNames } from "@/lib/seo/locations";
+import { LOCATIONS } from "@/lib/locations";
 import { getSeoLinks } from "@/lib/seo/links";
 import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/gtm";
 import { LinkTracker } from "@/components/analytics/link-tracker";
 import { MobileActionBar } from "@/components/layout/mobile-action-bar";
 
+const SITE_TITLE = "Used Cars in Jammu | Certified Pre-Owned | AM Group";
+const SITE_DESCRIPTION =
+  `Buy and sell used cars in Jammu with AM Group. Second hand cars with real photos and recorded kilometres, ` +
+  `finance and exchange, at ${LOCATIONS.length} Jammu locations: ${locationNames()}.`;
+const OG_DESCRIPTION =
+  `Second hand cars for sale in Jammu with real photos and recorded kilometres. Sell or exchange your car at ${locationNames()}.`;
+
 export const viewport: Viewport = {
-  themeColor: "#1b3a32",
+  // --color-deep from app/globals.css. A <meta> value cannot read a CSS
+  // variable, so this is the one place the token is repeated as a literal.
+  themeColor: "#14181e",
   width: "device-width",
   initialScale: 1,
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://amgroupind.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "AM Group Jammu | Car Dealerships, Service & Finance in J&K",
-    template: "%s | AM Group Jammu",
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: "AM Group is J&K's trusted automotive conglomerate since 1968 — new & certified used cars in Jammu and Srinagar, authorised showrooms, service workshops, and easy car finance.",
-  keywords: ["car dealership Jammu", "new cars Jammu", "used cars Jammu", "AM Group Jammu", "car service Jammu", "car finance J&K"],
-  authors: [{ name: "AM Group" }],
-  creator: "AM Group",
-  publisher: "AM Group",
+  description: SITE_DESCRIPTION,
+  keywords: [
+    "used cars in Jammu",
+    "second hand cars in Jammu",
+    "certified pre-owned cars Jammu",
+    "sell my car Jammu",
+    "used car dealer Jammu",
+    "car exchange Jammu",
+    "used car finance Jammu",
+  ],
+  applicationName: `${SITE_NAME} Used Cars`,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   robots: "index, follow",
   icons: {
     icon: "/icon.png",
@@ -39,24 +60,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://amgroupind.com",
-    title: "AM Group Jammu | Car Dealerships, Service & Finance in J&K",
-    description: "New & certified used cars in Jammu and Srinagar, authorised showrooms, service workshops, and easy car finance.",
-    siteName: "AM Group Jammu",
-    images: [
-      {
-        url: "/inventory_hero_bg.png",
-        width: 1200,
-        height: 630,
-        alt: "AM Group Jammu - Automotive Dealerships in J&K",
-      },
-    ],
+    url: SITE_URL,
+    title: SITE_TITLE,
+    description: OG_DESCRIPTION,
+    siteName: `${SITE_NAME} Used Cars`,
+    images: [OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "AM Group Jammu | Car Dealerships, Service & Finance in J&K",
-    description: "New & certified used cars in Jammu and Srinagar, authorised showrooms, service workshops, and easy car finance.",
-    images: ["/inventory_hero_bg.png"],
+    title: SITE_TITLE,
+    description: OG_DESCRIPTION,
+    images: [OG_IMAGE.url],
   },
 };
 
@@ -65,7 +79,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jsonLd = generateLocalBusinessSchema();
+  // Organization + WebSite (with its search action) + one AutoDealer per
+  // used-car location, as a single @graph.
+  const jsonLd = generateSiteSchema();
   // Fetched once in the layout (getInventory is cached for 30 min) so the
   // footer and navbar link graph is present in the SERVER-rendered HTML of
   // every page rather than appearing only after hydration.

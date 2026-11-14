@@ -4,12 +4,13 @@ import * as React from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { PRIMARY_LOCATION } from "@/lib/locations"
+import { H_PROMISE, PRIMARY_LOCATION } from "@/lib/locations"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import { PhoneGlyph } from "./marks"
 
 /**
- * Site-wide navigation. One header on every public route.
+ * Site-wide navigation for a used-car site. One header on every public route.
+ * Four flat entries — buy, sell, locations, contact — and no dropdowns.
  *
  * The header is a dark object in every state. That is not a style preference —
  * the AM Group logo is white artwork on a transparent ground, so it is only
@@ -28,7 +29,6 @@ import { PhoneGlyph } from "./marks"
 interface Entry {
   label: string
   href: string
-  children?: { label: string; href: string; note?: string }[]
 }
 
 const ENTRIES: Entry[] = [
@@ -64,21 +64,19 @@ function Logo({ className = "" }: { className?: string }) {
 export function SiteNav() {
   const pathname = usePathname() ?? "/"
   const [open, setOpen] = React.useState(false)
-  const [menu, setMenu] = React.useState<string | null>(null)
   const [scrolled, setScrolled] = React.useState(false)
 
   const sheetRef = React.useRef<HTMLDivElement>(null)
   const toggleRef = React.useRef<HTMLButtonElement>(null)
 
-  // The header is a lead-capture surface, not just a map. The navbar this
-  // replaced opened the enquiry modal from two places, and the first version of
-  // this component dropped both — the intent and sourceLabel below are the
-  // originals so the GTM funnel and the admin lead source stay continuous.
+  // The header is a lead-capture surface, not just a map. This is a used-car
+  // site, so the control says "Enquire" and opens a general enquiry — the
+  // old "Book test drive" label read as a new-car showroom. The sourceLabel is
+  // unchanged so the GTM funnel and the admin lead source stay continuous.
   const openEnquiry = useEnquiryModal((s) => s.onOpen)
-  const bookTestDrive = React.useCallback(() => {
+  const enquire = React.useCallback(() => {
     setOpen(false)
-    setMenu(null)
-    openEnquiry(null, { intent: "Test Drive", sourceLabel: "navbar" })
+    openEnquiry(null, { intent: "General", sourceLabel: "navbar" })
   }, [openEnquiry])
 
   const overDarkHero = DARK_HERO_ROUTES.has(pathname)
@@ -100,21 +98,17 @@ export function SiteNav() {
     }
   }, [open])
 
-  // Escape closes whichever layer is open, innermost first.
+  // Escape closes the sheet and returns focus to its toggle.
   React.useEffect(() => {
-    if (!open && !menu) return
+    if (!open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return
-      if (menu) {
-        setMenu(null)
-        return
-      }
       setOpen(false)
       toggleRef.current?.focus()
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [open, menu])
+  }, [open])
 
   // Move focus into the sheet on open so the keyboard path continues where the
   // eye does. The sheet is conditionally rendered, so there is nothing
@@ -127,7 +121,6 @@ export function SiteNav() {
   // pathname — a setState in that effect cascades an extra render.
   const closeAll = React.useCallback(() => {
     setOpen(false)
-    setMenu(null)
   }, [])
 
   const filled = !overDarkHero || scrolled || open
@@ -147,74 +140,37 @@ export function SiteNav() {
         className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
           filled ? "border-b border-line-on-deep bg-deep-2" : "glass-bar border-b border-line-on-deep"
         }`}
-        onMouseLeave={() => setMenu(null)}
       >
         <div className="mx-auto flex h-16 max-w-[1400px] items-stretch justify-between px-5 md:px-10">
           <Link
             href="/"
             className="flex items-center gap-3"
-            aria-label="AM Group — home"
+            aria-label="AM Group used cars — home"
             onClick={closeAll}
           >
             <Logo className="h-9 md:h-10" />
             <span className="hidden border-l border-line-on-deep pl-3 text-meta leading-[1.5] text-on-deep-2 sm:block">
-              Est. 1968
+              Used cars
               <br />
-              Jammu &amp; Kashmir
+              Jammu
             </span>
           </Link>
 
           <nav aria-label="Primary" className="hidden items-center gap-7 lg:flex">
             {ENTRIES.map((e) => {
               const current = isCurrent(e.href)
-              const tone = current ? "text-on-deep" : "text-on-deep-2 hover:text-on-deep"
-
-              if (!e.children) {
-                return (
-                  <Link
-                    key={e.label}
-                    href={e.href}
-                    aria-current={current ? "page" : undefined}
-                    onClick={closeAll}
-                    className={`text-nav transition-colors duration-(--duration-1) ${tone}`}
-                  >
-                    {e.label}
-                  </Link>
-                )
-              }
-
-              const expanded = menu === e.label
               return (
-                <div key={e.label} className="relative" onMouseEnter={() => setMenu(e.label)}>
-                  <button
-                    type="button"
-                    aria-expanded={expanded}
-                    aria-haspopup="true"
-                    onClick={() => setMenu(expanded ? null : e.label)}
-                    className={`text-nav transition-colors duration-(--duration-1) ${tone}`}
-                  >
-                    {e.label}
-                  </button>
-                  {expanded && (
-                    <div className="absolute left-1/2 top-full w-72 -translate-x-1/2 rounded-b-md border border-line-on-deep bg-deep-2 shadow-overlay">
-                      {e.children.map((c) => (
-                        <Link
-                          key={c.href}
-                          href={c.href}
-                          onClick={closeAll}
-                          className="block border-b border-line-on-deep px-4 py-3 last:border-b-0 hover:bg-deep"
-                        >
-                          <span className="block font-display text-lg font-semibold uppercase leading-none text-on-deep">
-                            {c.label}
-                          </span>
-                          {c.note && (
-                            <span className="mt-1 block text-meta text-on-deep-2">{c.note}</span>
-                          )}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <Link
+                  key={e.label}
+                  href={e.href}
+                  aria-current={current ? "page" : undefined}
+                  onClick={closeAll}
+                  className={`inline-flex h-11 items-center text-nav transition-colors duration-(--duration-1) ${
+                    current ? "text-on-deep" : "text-on-deep-2 hover:text-on-deep"
+                  }`}
+                >
+                  {e.label}
+                </Link>
               )
             })}
 
@@ -228,10 +184,10 @@ export function SiteNav() {
             </a>
             <button
               type="button"
-              onClick={bookTestDrive}
+              onClick={enquire}
               className="inline-flex h-11 items-center rounded-sm bg-accent-bright px-5 text-button text-on-accent-bright transition-colors duration-(--duration-1) hover:bg-accent-bright-hover"
             >
-              Book test drive
+              Enquire
             </button>
           </nav>
 
@@ -260,7 +216,7 @@ export function SiteNav() {
           data-ground="deep"
           className="fixed inset-0 z-40 bg-deep-2 lg:hidden"
         >
-          <div className="flex h-full flex-col px-5 pb-10 pt-24">
+          <div className="flex h-full flex-col px-5 pb-[calc(4rem+env(safe-area-inset-bottom)+1.5rem)] pt-24 md:pb-10">
             <nav aria-label="Site" className="flex-1 overflow-y-auto">
               {ENTRIES.map((e) => (
                 <div key={e.label} className="border-t border-line-on-deep last:border-b">
@@ -277,31 +233,16 @@ export function SiteNav() {
                       <span className="text-meta text-accent-text-dark">Current</span>
                     )}
                   </Link>
-                  {e.children && (
-                    <ul className="-mt-1 pb-3 pl-4">
-                      {e.children.map((c) => (
-                        <li key={c.href}>
-                          <Link
-                            href={c.href}
-                            onClick={closeAll}
-                            className="block py-1.5 text-small text-on-deep-2 hover:text-on-deep"
-                          >
-                            {c.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
               ))}
             </nav>
             <div className="mt-6 flex flex-col gap-3">
               <button
                 type="button"
-                onClick={bookTestDrive}
+                onClick={enquire}
                 className="inline-flex h-12 items-center justify-center rounded-sm bg-accent-bright px-6 text-button text-on-accent-bright transition-colors duration-(--duration-1) hover:bg-accent-bright-hover"
               >
-                Book test drive
+                Enquire
               </button>
               <a
                 href={`tel:${PRIMARY_LOCATION.phoneE164}`}
@@ -311,6 +252,17 @@ export function SiteNav() {
                 <PhoneGlyph />
                 {PRIMARY_LOCATION.phone}
               </a>
+              {/* Rendered only once the company supplies the number. */}
+              {H_PROMISE && (
+                <a
+                  href={`tel:${H_PROMISE.phoneE164}`}
+                  data-track-location="site-menu-hpromise"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border border-line-on-deep px-6 py-2 text-center text-button leading-snug text-on-deep transition-colors duration-(--duration-1) hover:bg-ground hover:text-ink"
+                >
+                  <PhoneGlyph />
+                  H Promise (Hyundai certified used cars) {H_PROMISE.phone}
+                </a>
+              )}
             </div>
           </div>
         </div>

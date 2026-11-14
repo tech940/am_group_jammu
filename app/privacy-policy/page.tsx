@@ -3,7 +3,7 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { LegalDocument, type LegalSection } from "@/components/sections/legal-document"
 
 /**
- * Carried over verbatim from https://amgroupind.com/privacy-policy/ so the
+ * Carried over verbatim from the /privacy-policy/ page of the previous site so the
  * legacy URL keeps its content at the same path after the migration —
  * /privacy-policy/ normalises to /privacy-policy, so no redirect rule is needed.
  *

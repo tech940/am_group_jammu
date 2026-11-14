@@ -120,6 +120,12 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
    * ---------------------------------------------------------------------- */
   // The fuel landing page was named after the feed's word for petrol.
   { source: '/used-cars/gasoline-cars-in-jammu', destination: '/used-cars/petrol-cars-in-jammu' },
+  // City pages and the Srinagar location were retired with the move to three
+  // Jammu sites.
+  { source: '/used-cars/srinagar', destination: '/used-cars/jammu' },
+  { source: '/used-cars/kathua', destination: '/used-cars/jammu' },
+  { source: '/used-cars/udhampur', destination: '/used-cars/jammu' },
+  { source: '/locations/srinagar', destination: '/locations' },
   { source: '/about', destination: '/', temporary: true },
   { source: '/automobile', destination: '/inventory', temporary: true },
   { source: '/hp-indian-oil', destination: '/', temporary: true },

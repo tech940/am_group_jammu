@@ -1,7 +1,9 @@
 import { getInventory } from "@/lib/inventory/server"
 import { getAllLandingSlugs } from "@/lib/seo/landing"
-import { LOCATIONS, formatAddress, formatHours, PRIMARY_LOCATION } from "@/lib/locations"
-import { formatINR } from "@/lib/inventory/adapter"
+import { H_PROMISE, LOCATIONS, formatHours, PRIMARY_LOCATION } from "@/lib/locations"
+import { formatINR, slugify } from "@/lib/inventory/adapter"
+import { SITE_URL } from "@/lib/seo/site"
+import { locationAddressLine, locationHeading, locationNames } from "@/lib/seo/locations"
 
 /**
  * /llms.txt — https://llmstxt.org
@@ -16,7 +18,7 @@ import { formatINR } from "@/lib/inventory/adapter"
  * file would be wrong within a week.
  */
 
-const SITE = "https://amgroupind.com"
+const SITE = SITE_URL
 
 export const dynamic = "force-static"
 export const revalidate = 1800
@@ -41,7 +43,7 @@ export async function GET() {
     .filter((l) => l.kind === "budget")
     .map((l) => {
       const lakhs = l.slug.match(/^under-([\d.]+)-lakh/)?.[1] ?? ""
-      return line(`Used cars under ₹${lakhs} lakh in Jammu`, `/used-cars/${l.slug}`, `Certified pre-owned cars priced under ₹${lakhs} lakh.`)
+      return line(`Used cars under ₹${lakhs} lakh in Jammu`, `/used-cars/${l.slug}`, `Used cars in stock priced under ₹${lakhs} lakh.`)
     })
 
   const modelLinks = landings
@@ -55,13 +57,17 @@ export async function GET() {
   const brandLinks = facets.makes.map((m) =>
     line(
       `Used ${m.label} cars in Jammu`,
-      `/brands/${m.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`,
+      `/brands/${slugify(m.value)}`,
       `${m.count} ${m.count === 1 ? "car" : "cars"} in stock.`,
     ),
   )
 
   const locationLinks = LOCATIONS.map((l) =>
-    line(`${l.city} showroom`, `/locations/${l.slug}`, `${formatAddress(l)}. Open ${formatHours(l)}.`),
+    line(
+      locationHeading(l),
+      `/locations/${l.slug}`,
+      `${locationAddressLine(l)}.${l.addressConfirmed ? "" : " Exact address on request — call for directions."} Open ${formatHours(l)}. Phone ${l.phone}.`,
+    ),
   )
 
   // Cap the individual listings: llms.txt is a map, not a dump. The full set
@@ -84,16 +90,20 @@ export async function GET() {
       ),
     )
 
-  const body = `# AM Group Jammu
+  const hPromise = H_PROMISE
+    ? ` H Promise (Hyundai certified used cars) line: ${H_PROMISE.phone}.`
+    : ""
 
-> Certified pre-owned car dealership in Jammu & Kashmir, trading since 1968. ${total} used cars currently in stock, priced ${priceRange}. Showrooms in Jammu and Srinagar.
+  const body = `# AM Group Used Cars, Jammu
 
-AM Group sells certified pre-owned cars and operates service workshops, fuel stations and real estate across Jammu, Srinagar, Udhampur and Kathua. Every listing on this site is a real vehicle physically in stock: the photographs are of that specific car and the odometer reading is the figure recorded at intake. Prices shown are the actual asking price.
+> Used car dealer in Jammu, India. ${total} used cars currently in stock, priced ${priceRange}. ${LOCATIONS.length} used-car locations, all in Jammu: ${locationNames()}.
 
-Current stock covers ${makes || "a range of brands"}. Inventory changes as cars are sold, so counts and prices on these pages are generated from live data rather than hand-maintained.
+This website is for people buying or selling a used car in Jammu. Every listing is a car in stock: the photographs are of that specific car and the kilometres shown are the reading recorded when it came in. Prices shown are the asking price; registration transfer and insurance are quoted separately. AM Group also buys cars and takes them in exchange.
+
+Current stock covers ${makes || "a range of makes"}. Stock changes as cars are sold, so the counts and prices on these pages are generated from live data. Each car is kept at one of the ${LOCATIONS.length} locations — phone ${PRIMARY_LOCATION.phone} to confirm where a car is before travelling.${hPromise}
 
 ## Browse used cars
-${line("All used cars in Jammu", "/inventory", `Full inventory, ${total} cars, 9 per page with filters for make, model, budget, body type, fuel, transmission, year and kilometres.`)}
+${line("All used cars in Jammu", "/inventory", `Full inventory, ${total} cars, with filters for make, model, budget, body type, fuel, transmission, year and kilometres.`)}
 ${budgetLinks.join("\n")}
 
 ## By brand
@@ -110,11 +120,11 @@ ${vehicleLinks.join("\n")}
 
 ## Locations and contact
 ${locationLinks.join("\n")}
-${line("All showrooms", "/locations", "Addresses, opening hours, service areas and directions for both branches.")}
+${line("All locations", "/locations", `The ${LOCATIONS.length} used-car locations in Jammu, with opening hours and phone.`)}
 ${line("Contact AM Group", "/contact", `Enquiry form, phone and WhatsApp. Phone: ${PRIMARY_LOCATION.phone}. Email: ${PRIMARY_LOCATION.email}.`)}
 
 ## Selling a car
-${line("Sell your car", "/sell-your-car", "Free valuation at the Jammu sites; payment and RC transfer handled in-house.")}
+${line("Sell your car", "/sell-your-car", "Ask AM Group to value and buy your car, or take it in exchange, at any of the Jammu locations.")}
 
 ## Optional
 ${line("Sitemap", "/sitemap.xml", "Every indexable URL on the site.")}

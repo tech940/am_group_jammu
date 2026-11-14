@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { RuleDraw } from "@/components/system/rule-draw"
 import { EnquireCta } from "@/components/system/enquire-cta"
 import { SUPABASE_MEDIA } from "@/lib/supabase-media"
-import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
+import { H_PROMISE, LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
 
 /**
  * The last call. Every public page ends with it.
@@ -23,8 +23,9 @@ export function ClosingCall({
   sourceLabel,
   tone = "deep",
   heading = "Someone answers the phone",
-  lede = "Mon–Sat, 9:30 am to 6:30 pm, at the Jammu site on the N-H 1 Bye-Pass. No appointment needed to look at the stock.",
+  lede = `${formatHours(PRIMARY_LOCATION)}, at ${LOCATIONS.length} sites in Jammu. Call to confirm which site a car is at before you set out.`,
   image = SUPABASE_MEDIA.branches["jammu-kia"].exterior,
+  above = "ground-2",
 }: {
   sourceLabel: string
   /** "deep" is the photographic glass band the inner routes use; "light" is
@@ -34,15 +35,22 @@ export function ClosingCall({
   heading?: string
   lede?: string
   image?: string
+  /** The ground of the band directly above, which the deep tone's top seam
+      fades out of. Pass "ground" when that band is not the alternate ground. */
+  above?: "ground" | "ground-2"
 }) {
   const waMessage =
     "Hi AM Group, I'd like to speak to someone about a car. Are you free now?"
+
+  // The Hyundai Promise line. Null until the number is supplied, and then
+  // nothing renders — no page shows a guessed number.
+  const hPromise = H_PROMISE
 
   if (tone === "light") {
     return (
       <section
         aria-labelledby="closing-title"
-        className="relative isolate overflow-hidden border-t border-line bg-ground-2 py-20 md:py-28"
+        className="relative isolate overflow-hidden border-t border-line bg-ground-2 py-12 md:py-24"
       >
         <GradientMesh tone="light" />
         <Grain />
@@ -82,8 +90,18 @@ export function ClosingCall({
                   </a>
                 </Button>
                 <EnquireCta sourceLabel={sourceLabel} label="Send an enquiry" variant="secondary" />
+                {hPromise && (
+                  <Button asChild variant="secondary" size="lg">
+                    <a
+                      href={`tel:${hPromise.phoneE164}`}
+                      data-track-location={`${sourceLabel}-h-promise`}
+                    >
+                      H Promise {hPromise.phone}
+                    </a>
+                  </Button>
+                )}
                 <Button asChild variant="secondary" size="lg">
-                  <Link href="/locations">Find us</Link>
+                  <Link href="/locations">Our locations</Link>
                 </Button>
               </div>
             </div>
@@ -93,7 +111,7 @@ export function ClosingCall({
                 <ParallaxImage src={image} distance={30} />
               </div>
               <figcaption className="mt-3 text-caption text-ink-2">
-                The Jammu site — no appointment needed to look at the stock.
+                Our showroom in Jammu.
               </figcaption>
             </figure>
           </div>
@@ -106,7 +124,7 @@ export function ClosingCall({
     <section
       aria-labelledby="closing-title"
       data-ground="deep"
-      className="relative isolate overflow-hidden bg-deep-2 py-20 md:py-28"
+      className="relative isolate overflow-hidden bg-deep-2 py-12 md:py-24"
     >
       <div aria-hidden className="absolute inset-0 -z-10">
         <ParallaxImage src={image} distance={50} />
@@ -115,7 +133,7 @@ export function ClosingCall({
       <Aurora animate />
       {/* Top only: the footer below is already dark, so a seam there would fade
           one dark ground into another and do nothing but cost a layer. */}
-      <GradientSeam side="top" ground="bg-ground-2" />
+      <GradientSeam side="top" ground={above === "ground" ? "bg-ground" : "bg-ground-2"} />
       <GlowOrbs
         orbs={[
           { at: "12% 76%", size: "34%", strength: 0.18 },
@@ -165,8 +183,18 @@ export function ClosingCall({
                 label="Send an enquiry"
                 variant="glass"
               />
+              {hPromise && (
+                <Button asChild variant="glass" size="lg">
+                  <a
+                    href={`tel:${hPromise.phoneE164}`}
+                    data-track-location={`${sourceLabel}-h-promise`}
+                  >
+                    H Promise {hPromise.phone}
+                  </a>
+                </Button>
+              )}
               <Button asChild variant="glass" size="lg">
-                <Link href="/locations">Find us</Link>
+                <Link href="/locations">Our locations</Link>
               </Button>
             </div>
           </div>

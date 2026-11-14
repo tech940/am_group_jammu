@@ -3,18 +3,21 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { LegalDocument, type LegalSection } from "@/components/sections/legal-document"
 
 /**
- * Carried over verbatim from https://amgroupind.com/terms/ so the legacy URL
- * keeps its content at the same path after the migration — /terms/ normalises
- * to /terms, so no redirect rule is needed.
+ * Carried over from the /terms/ page of the previous site so the legacy URL
+ * keeps its content at the same path — /terms/ normalises to /terms, so no
+ * redirect rule is needed.
  *
- * The wording is AM Group's legal position and is reproduced as written; only
- * the contact block is re-derived, from lib/locations.ts.
+ * The wording is AM Group's legal position and is reproduced as written, with
+ * one exception: section 1 described the whole group (new-vehicle dealerships,
+ * petroleum, property, logistics). This is the used-car website, so section
+ * 1 now describes what this website does. TODO(client): have the company
+ * confirm the revised section 1.
  */
 
 export const metadata: Metadata = {
   title: "Terms and Conditions",
   description:
-    "Terms and Conditions governing the use of the AM Group website and services — vehicle information and pricing, bookings, test drives, finance, and limitation of liability.",
+    "Terms and Conditions for the AM Group used-car website — vehicle information and pricing, bookings, test drives, finance, and limitation of liability.",
   alternates: { canonical: "/terms" },
 }
 
@@ -22,7 +25,7 @@ const SECTIONS: LegalSection[] = [
   {
     heading: "1. About AM Group",
     paragraphs: [
-      "AM Group operates multiple automotive dealerships and diversified business ventures including passenger vehicle sales, two-wheelers, service workshops, petroleum business, real estate, logistics, and related services across Jammu & Kashmir and other regions.",
+      "This website is operated by AM Group and lists used cars offered for sale at its used-car locations in Jammu. It also lets you ask AM Group to value and buy your car.",
     ],
   },
   {

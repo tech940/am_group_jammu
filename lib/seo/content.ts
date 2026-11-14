@@ -10,6 +10,11 @@
 import { formatINR, formatINRShort } from '../inventory/adapter.ts'
 import type { InventoryFacets, InventoryVehicle } from '../inventory/types.ts'
 import type { FaqItem } from '../../components/seo/faq-section.tsx'
+import { LOCATIONS, PRIMARY_LOCATION } from '../locations.ts'
+import { locationAddressLine, locationNames } from './locations.ts'
+
+/** Never typed: the switchboard number lives in lib/locations.ts. */
+const PHONE = PRIMARY_LOCATION.phone
 
 const list = (items: string[], conj = 'and'): string => {
   if (items.length === 0) return ''
@@ -39,21 +44,20 @@ export function buildListingCopy(
 
   if (total > 0) {
     intro.push(
-      `AM Group is one of Jammu & Kashmir's longest-running automotive groups, trading since 1968. ` +
-        `We currently have ${total} certified pre-owned ${total === 1 ? 'car' : 'cars'} available in ${cityName}` +
+      `AM Group has ${total} used ${total === 1 ? 'car' : 'cars'} for sale in ${cityName} right now` +
         `${makes.length ? `, covering ${list(makes)}` : ''}. ` +
         `Prices start from ${priceLow} and go up to ${priceHigh}, with model years spanning ${yearLow} to ${yearHigh}.`,
     )
     intro.push(
-      `Every car listed here is a real unit physically in stock — the photographs are of the actual vehicle, ` +
-        `and the odometer reading shown is the reading recorded at intake. ` +
+      `Every car listed here is in stock — the photographs are of that car, ` +
+        `and the kilometres shown are the reading recorded when it came in. ` +
         `${bodies.length ? `You can browse by body style (${list(bodies)})` : 'You can browse'}` +
         `${fuels.length ? `, by fuel type (${list(fuels, 'or')})` : ''}, by budget, by model year, or by kilometres driven.`,
     )
   } else {
     intro.push(
-      `AM Group has been serving Jammu & Kashmir's motorists since 1968. Our certified pre-owned listings for ` +
-        `${cityName} are being updated right now — please call +91 94191 00000 and our team will tell you what has just arrived.`,
+      `Our used car listings for ${cityName} are being updated right now — please call ${PHONE} and ` +
+        `we will tell you what is in stock today.`,
     )
   }
 
@@ -63,9 +67,8 @@ export function buildListingCopy(
       body:
         `A used car in ${cityName} has to cope with everything from city traffic to long climbs on the ` +
         `national highway, so mechanical condition matters more here than the badge on the bonnet. ` +
-        `Before a car reaches this page it is inspected, its paperwork is verified, and its service history is ` +
-        `checked where available. We publish the asking price against the original listed price so you can see ` +
-        `exactly how a vehicle has been valued, and there is no obligation to arrange finance through us.`,
+        `Before a car reaches this page it is checked, its paperwork is verified, and its service history is ` +
+        `looked at where available. There is no obligation to arrange finance through us.`,
     },
     {
       heading: 'What to check before you buy',
@@ -79,10 +82,10 @@ export function buildListingCopy(
     {
       heading: 'Finance, exchange and paperwork',
       body:
-        `We work with leading nationalised and private banks to arrange finance, and we handle the RC transfer, ` +
-        `insurance transfer and hypothecation paperwork in-house. If you are part-exchanging, we will value your ` +
-        `existing car at the showroom while you wait. Visit us at AM Business Park, N-H 1 Bye-Pass Road, opposite ` +
-        `the railway station in Jammu, or at AM Tower, Hyderpora Bye-Pass in Srinagar.`,
+        `We arrange finance through nationalised and private banks, and we handle the RC transfer and ` +
+        `insurance transfer. If you are exchanging your present car, bring it along and we will value it. ` +
+        `Visit us at ${locationAddressLine(PRIMARY_LOCATION)}. We also sell used cars at ` +
+        `${LOCATIONS.filter((l) => !l.isPrimary).map((l) => l.shortName).join(' and ')} — call ${PHONE} for directions.`,
     },
   ]
 
@@ -101,13 +104,13 @@ export function buildListingFaqs(
     faqs.push({
       question: `How many used cars does AM Group have in ${cityName} right now?`,
       answer:
-        `There are ${total} certified pre-owned cars in stock at the moment` +
-        `${makes.length ? `, across ${list(makes)}` : ''}. This page updates automatically as cars are sold or added, ` +
-        `so the count you see is the live figure rather than an estimate.`,
+        `There ${total === 1 ? 'is' : 'are'} ${total} used ${total === 1 ? 'car' : 'cars'} in stock at the moment` +
+        `${makes.length ? `, across ${list(makes)}` : ''}. This page updates as cars are sold or added, ` +
+        `so the count you see is the live figure.`,
     })
 
     faqs.push({
-      question: `What is the price range of used cars at AM Group ${cityName}?`,
+      question: `What is the price range of used cars at AM Group in ${cityName}?`,
       answer:
         `Current stock runs from ${formatINR(facets.priceRange.min)} to ${formatINR(facets.priceRange.max)}. ` +
         `You can filter by budget using the price slider, or use the budget links at the foot of this page.`,
@@ -118,7 +121,7 @@ export function buildListingFaqs(
         question: 'Which fuel types are available?',
         answer:
           `We currently stock ${list(facets.fuels.map((f) => `${f.label} (${f.count} ${f.count === 1 ? 'car' : 'cars'})`))}. ` +
-          `We do not have any electric or CNG cars in stock at present — call us and we will let you know when one arrives.`,
+          `If the fuel type you want is not listed, call ${PHONE} and we will tell you when one comes in.`,
       })
     }
 
@@ -136,33 +139,33 @@ export function buildListingFaqs(
     {
       question: 'Are these cars certified, and what does that cover?',
       answer:
-        'Cars listed as Certified Used have passed a multi-point mechanical, structural and electrical inspection, ' +
-        'and their documentation has been verified before being put on sale. Cars listed simply as Used have been ' +
-        'checked and are sold as described. The condition of each car is shown on its own page.',
+        'Cars listed as Certified Used have been inspected and their documents verified before being put on sale. ' +
+        'Cars listed simply as Used have been checked and are sold as described. The condition of each car is ' +
+        'shown on its own page — ask us what the inspection covered for the car you are interested in.',
     },
     {
       question: 'Can I book a test drive before buying?',
       answer:
-        'Yes. Every car page has a "Schedule Test Drive" button, or you can call +91 94191 00000. ' +
-        'Test drives are arranged at our Jammu and Srinagar locations and there is no charge or obligation.',
+        `Yes. Send an enquiry from the car's page or call ${PHONE}. Test drives are arranged at our Jammu ` +
+        `locations (${locationNames()}) and there is no charge or obligation.`,
     },
     {
       question: 'Do you arrange finance for used cars?',
       answer:
-        'Yes. We work with leading nationalised and private banks and can usually give you an indicative decision ' +
-        'the same day. You are free to arrange your own finance elsewhere — it makes no difference to the price we quote.',
+        'Yes. We arrange finance through nationalised and private banks. You are free to arrange your own ' +
+        'finance elsewhere — it makes no difference to the price we quote.',
     },
     {
       question: 'Will you buy or part-exchange my existing car?',
       answer:
-        'Yes. Bring your car to AM Business Park in Jammu and we will value it while you wait, then offset that ' +
+        `Yes. Bring your car to ${PRIMARY_LOCATION.shortName} in ${PRIMARY_LOCATION.city} and we will value it, then offset that ` +
         'against whichever car you are buying. Bring the registration certificate, insurance and service records if you have them.',
     },
     {
-      question: 'Which areas do you deliver to?',
+      question: 'Where can I see the cars?',
       answer:
-        'We serve buyers across Jammu, Srinagar, Kathua and Udhampur. Cars are held centrally and can be moved to ' +
-        'whichever location is convenient for your inspection.',
+        `At our ${LOCATIONS.length} used-car locations in Jammu: ${locationNames()}. Call ${PHONE} before you ` +
+        'travel and we will confirm which site the car you want is at.',
     },
   )
 
@@ -179,7 +182,7 @@ export function buildVehicleFaqs(v: InventoryVehicle): FaqItem[] {
       answer:
         `The asking price is ${v.priceLabel}` +
         `${v.originalPriceLabel ? `, against an originally listed price of ${v.originalPriceLabel}` : ''}. ` +
-        `This is the showroom price at AM Group Jammu; registration transfer and insurance are quoted separately.`,
+        `Registration transfer and insurance are quoted separately.`,
     })
   }
 
@@ -210,19 +213,20 @@ export function buildVehicleFaqs(v: InventoryVehicle): FaqItem[] {
       question: 'Is this car still available?',
       answer:
         'This page reflects live stock — if the car is shown here it has not been sold. Stock moves quickly, so we ' +
-        'recommend calling +91 94191 00000 or submitting an enquiry to confirm before travelling.',
+        `recommend calling ${PHONE} or sending an enquiry to confirm before travelling.`,
     },
     {
       question: 'Can I see this car before buying?',
       answer:
-        'Yes. The car can be inspected at AM Business Park, N-H 1 Bye-Pass Road, Jammu. You are welcome to bring ' +
-        'your own mechanic, and we will arrange a test drive on request.',
+        `Yes. Our used cars are kept at ${LOCATIONS.length} Jammu locations (${locationNames()}). Call ${PHONE} ` +
+        'and we will tell you which site this car is at. You are welcome to bring your own mechanic, and we ' +
+        'will arrange a test drive on request.',
     },
     {
       question: 'Is finance available on this car?',
       answer:
-        'Yes. We can arrange finance through leading nationalised and private banks, and handle the RC transfer, ' +
-        'insurance transfer and hypothecation paperwork in-house.',
+        'Yes. We can arrange finance through nationalised and private banks, and we handle the RC transfer ' +
+        'and insurance transfer.',
     },
   )
 
@@ -235,7 +239,7 @@ export function buildSellerNotes(v: InventoryVehicle): string[] {
   const name = `${v.year ? `${v.year} ` : ''}${v.title}`
 
   const opening = [
-    `This ${name} is available now at AM Group Jammu`,
+    `This ${name} is available now from AM Group in Jammu`,
     v.condition ? ` and is listed as ${v.condition.toLowerCase()}` : '',
     v.mileage !== null ? `, having covered ${v.mileageLabel}` : '',
     '.',
@@ -261,8 +265,8 @@ export function buildSellerNotes(v: InventoryVehicle): string[] {
 
   paras.push(
     `Documentation has been checked and the vehicle is ready for transfer. Our team can arrange finance, value your ` +
-      `existing car for part-exchange, and complete the RC and insurance transfer in-house. To arrange an inspection or ` +
-      `a test drive, submit an enquiry above or call +91 94191 00000.`,
+      `present car for exchange, and complete the RC and insurance transfer. To arrange an inspection or ` +
+      `a test drive, send an enquiry above or call ${PHONE}.`,
   )
 
   return paras

@@ -119,7 +119,8 @@ export const LOCATIONS: Location[] = [
     city: 'Jammu',
     streetAddress: 'Nanak Nagar',
     landmark: 'Nanak Nagar, Jammu',
-    areasServed: ['Nanak Nagar', 'Gandhi Nagar', 'Digiana', 'Sanjay Nagar', 'Shastri Nagar'],
+    // Not supplied by the company — left empty rather than guessed.
+    areasServed: [],
     region: 'Jammu and Kashmir',
     postalCode: '',
     addressConfirmed: false,
@@ -143,7 +144,8 @@ export const LOCATIONS: Location[] = [
     city: 'Jammu',
     streetAddress: 'AM Auto Square, Gangyal',
     landmark: 'Gangyal, Jammu',
-    areasServed: ['Gangyal', 'Digiana', 'Bari Brahmana', 'Kunjwani', 'Satwari'],
+    // Not supplied by the company — left empty rather than guessed.
+    areasServed: [],
     region: 'Jammu and Kashmir',
     postalCode: '',
     addressConfirmed: false,

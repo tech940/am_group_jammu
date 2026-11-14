@@ -1,53 +1,75 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { LOCATIONS, PRIMARY_LOCATION, formatAddress, formatHours } from "@/lib/locations"
+import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
 import { getInventory } from "@/lib/inventory/server"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { FaqSection } from "@/components/seo/faq-section"
+import { HPromiseLine } from "@/components/seo/h-promise-line"
 import { Button } from "@/components/ui/button"
+import { PhoneGlyph } from "@/components/system/marks"
+import {
+  closedSundays,
+  locationAddressLine,
+  locationAddressLines,
+  locationHeading,
+  locationNames,
+} from "@/lib/seo/locations"
+import { pageSocial } from "@/lib/seo/site"
+
+const COUNT = LOCATIONS.length
+
+const title = "Used Car Locations in Jammu"
+const description =
+  `AM Group sells used cars at ${COUNT} locations in Jammu: ${locationNames()}. ` +
+  `Open ${formatHours(PRIMARY_LOCATION)}. Call ${PRIMARY_LOCATION.phone} for directions and to check which cars are at each site.`
 
 export const metadata: Metadata = {
-  title: "Our Showrooms in Jammu & Srinagar | Visit AM Group",
-  description:
-    "Find your nearest AM Group car showroom. Visit us at AM Business Park on the N-H 1 Bye-Pass Road in Jammu, or AM Tower at Hyderpora Bye-Pass in Srinagar. Open Mon–Sat, 9:30 am – 6:30 pm.",
+  title,
+  description,
   alternates: { canonical: "/locations" },
+  ...pageSocial({ title, description, path: "/locations" }),
 }
 
 export default async function LocationsPage() {
   const { total } = await getInventory()
 
+  const confirmed = LOCATIONS.filter((l) => l.addressConfirmed)
+  const unconfirmed = LOCATIONS.filter((l) => !l.addressConfirmed)
+
   const faqs = [
     {
-      question: "Where is the nearest AM Group car showroom?",
+      question: "Where can I see AM Group used cars in Jammu?",
       answer:
-        "We have two locations in Jammu & Kashmir. Our main used-car showroom is at AM Business Park on the " +
-        "N-H 1 Bye-Pass Road in Jammu, directly opposite the railway station. Our Kashmir Valley office is at " +
-        "AM Tower on the Hyderpora Bye-Pass in Srinagar. Both are open Monday to Saturday, 9:30 am to 6:30 pm.",
+        `At ${COUNT} locations in Jammu: ${locationNames()}. ` +
+        confirmed.map((l) => `${l.shortName} is at ${locationAddressLine(l)}.`).join(" ") +
+        (unconfirmed.length
+          ? ` For ${unconfirmed.map((l) => l.shortName).join(" and ")}, call ${PRIMARY_LOCATION.phone} and we will give you exact directions.`
+          : ""),
     },
     {
-      question: "Do I need an appointment to visit?",
+      question: "What are the opening hours?",
       answer:
-        "No. You are welcome to walk into the Jammu showroom during opening hours and inspect any car in stock. " +
-        `For Srinagar we recommend calling ahead on ${PRIMARY_LOCATION.phone} so we can have the specific car you want on site.`,
+        `${formatHours(PRIMARY_LOCATION)}` +
+        `${closedSundays(PRIMARY_LOCATION) ? ". We are closed on Sundays" : ""}. ` +
+        `Call ${PRIMARY_LOCATION.phone} if you need to check before you travel.`,
     },
     {
-      question: "Can I see a car from the Jammu stock in Srinagar?",
+      question: "Is every car at every location?",
       answer:
-        "Yes. Stock is held centrally in Jammu but cars can be moved to Srinagar for inspection. Give us a day or " +
-        "two's notice and we will arrange it at no cost to you.",
+        `No. Each car is kept at one of the ${COUNT} sites. Call ${PRIMARY_LOCATION.phone} or send an enquiry from ` +
+        "the car's page and we will tell you where it is before you set out.",
     },
     {
-      question: "Is there parking at the showroom?",
+      question: "Can I sell my car at any of these locations?",
       answer:
-        "Yes, there is customer parking on site at both locations. The Jammu site is directly on the bye-pass road " +
-        "opposite the railway station, so it is easy to reach from either direction.",
+        "Yes. Bring the car with its registration certificate and insurance and we will value it. " +
+        "You can also start from the Sell your car page and we will call you back.",
     },
     {
-      question: "Which areas do you serve?",
+      question: "What should I bring for a test drive?",
       answer:
-        "We regularly serve buyers across Jammu, Srinagar, Kathua and Udhampur, and the surrounding localities — " +
-        "including Channi Himmat, Gandhi Nagar, Trikuta Nagar, Bahu Plaza and Satwari around Jammu, and Hyderpora, " +
-        "Rawalpora, Bemina and Sanat Nagar around Srinagar.",
+        "A valid driving licence. If you are exchanging your present car, bring its registration certificate, " +
+        "insurance and service records as well.",
     },
   ]
 
@@ -56,110 +78,148 @@ export default async function LocationsPage() {
       <Breadcrumbs items={[{ label: "Locations" }]} />
 
       <section className="border-b border-line bg-ground-2">
-        <div className="container mx-auto px-4 md:px-8 py-10 md:py-14">
-          <h1 className="font-display text-h1 text-ink mb-5 max-w-4xl">
-            Find Your Nearest AM Group Showroom
+        <div className="container mx-auto px-4 py-10 md:px-8 md:py-14">
+          <h1 className="mb-5 max-w-4xl font-display text-h1 text-ink">
+            Used Car Locations in Jammu
           </h1>
           <div className="max-w-3xl space-y-3">
             <p className="text-body text-ink-2">
-              AM Group has been trading in Jammu &amp; Kashmir since 1968. We have two locations — our main
-              used-car showroom in Jammu and our Kashmir Valley office in Srinagar — and{" "}
-              {total > 0 ? (
-                <span data-num>{total} certified pre-owned cars</span>
-              ) : (
-                "certified pre-owned cars"
-              )}{" "}
-              currently in stock.
+              AM Group sells used cars at {COUNT} locations in Jammu — {locationNames()}
+              {total > 0 && (
+                <>
+                  {" "}
+                  — with <span data-num>{total}</span> {total === 1 ? "car" : "cars"} in stock right now
+                </>
+              )}
+              . You can also bring your own car to any of them for a valuation.
             </p>
             <p className="text-body text-ink-2">
-              Walk in during opening hours, or call{" "}
-              <a
-                href={`tel:${PRIMARY_LOCATION.phoneE164}`}
-                data-track-location="locations-hub-hero"
-                className="font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent"
-              >
-                {PRIMARY_LOCATION.phone}
-              </a>{" "}
-              and we will tell you exactly what is on the forecourt today.
+              Each car is kept at one site. Call before you travel and we will tell you where the car
+              you want is.
             </p>
           </div>
+
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Button asChild variant="primary" size="lg">
+              <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="locations-hub-hero">
+                <PhoneGlyph /> Call {PRIMARY_LOCATION.phone}
+              </a>
+            </Button>
+            <Button asChild variant="secondary" size="lg">
+              <a
+                href={whatsappUrl("Hi AM Group, which of your Jammu locations should I visit to see used cars?")}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-track-location="locations-hub-hero"
+              >
+                WhatsApp
+              </a>
+            </Button>
+          </div>
+          <HPromiseLine track="locations-hub-hpromise" className="mt-4" />
         </div>
       </section>
 
-      <section className="py-14">
+      <section aria-labelledby="sites-title" className="py-14">
         <div className="container mx-auto px-4 md:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <h2 id="sites-title" className="sr-only">
+            Our {COUNT} Jammu locations
+          </h2>
+          <ul className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {LOCATIONS.map((loc) => (
-              <div
+              <li
                 key={loc.slug}
-                className="flex flex-col border border-line bg-surface p-6"
+                className="flex flex-col rounded-md border border-line bg-surface p-6"
               >
-                <div className="flex items-start justify-between gap-4 mb-5">
-                  <div>
-                    <h2 className="font-display text-h2 text-ink">{loc.shortName}</h2>
-                    <p className="text-meta uppercase text-accent-text-light mt-1">
-                      {loc.isPrimary ? "Main showroom" : "Valley office"}
-                    </p>
-                  </div>
-                </div>
+                <h3 className="font-display text-h2 text-ink">
+                  <Link
+                    href={`/locations/${loc.slug}`}
+                    className="transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                  >
+                    {loc.shortName}
+                  </Link>
+                </h3>
+                <p className="mt-1 text-small text-ink-2">{locationHeading(loc)}</p>
 
-                <p className="text-body text-ink-2 mb-6">{loc.blurb}</p>
-
-                <dl className="space-y-3 mb-6">
+                <dl className="mt-5 space-y-4">
                   <div>
-                    <dt className="sr-only">Address</dt>
-                    <dd className="text-body text-ink">
-                      {formatAddress(loc)}
-                      <span className="block text-small text-ink-2 mt-0.5">{loc.landmark}</span>
+                    <dt className="text-label text-ink">Address</dt>
+                    <dd className="mt-1 text-body text-ink-2">
+                      <address className="not-italic">
+                        {locationAddressLines(loc).map((line) => (
+                          <span key={line} className="block">
+                            {line}
+                          </span>
+                        ))}
+                      </address>
+                      {!loc.addressConfirmed && (
+                        <span className="mt-1 block font-semibold text-ink">
+                          Call for exact directions
+                        </span>
+                      )}
                     </dd>
                   </div>
                   <div>
-                    <dt className="sr-only">Opening hours</dt>
-                    <dd className="text-body text-ink">{formatHours(loc)}</dd>
+                    <dt className="text-label text-ink">Hours</dt>
+                    <dd className="mt-1 text-body text-ink-2">
+                      {formatHours(loc)}
+                      {closedSundays(loc) && <span className="block">Closed Sundays</span>}
+                    </dd>
                   </div>
                   <div>
-                    <dt className="sr-only">Phone</dt>
+                    <dt className="text-label text-ink">Phone</dt>
                     <dd>
                       <a
                         href={`tel:${loc.phoneE164}`}
                         data-track-location={`locations-hub-${loc.slug}`}
-                        className="inline-flex min-h-11 items-center font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent"
+                        data-num
+                        className="inline-flex min-h-11 items-center font-semibold text-ink transition-colors duration-(--duration-1) hover:text-accent-text-light"
                       >
                         {loc.phone}
                       </a>
                     </dd>
                   </div>
-                  <div>
-                    <dt className="sr-only">Email</dt>
-                    <dd>
-                      <a
-                        href={`mailto:${loc.email}`}
-                        data-track-location={`locations-hub-${loc.slug}`}
-                        className="inline-flex min-h-11 items-center text-ink transition-colors duration-(--duration-1) hover:text-accent"
-                      >
-                        {loc.email}
-                      </a>
-                    </dd>
-                  </div>
                 </dl>
 
-                <div className="mt-auto flex flex-wrap gap-2.5">
-                  <Button asChild variant="primary" className="flex-1 min-w-[140px]">
-                    <Link href={`/locations/${loc.slug}`}>Branch details</Link>
+                <div className="mt-auto flex flex-wrap gap-2.5 pt-6">
+                  <Button asChild variant="primary" className="flex-1">
+                    <Link href={`/locations/${loc.slug}`}>Details</Link>
                   </Button>
-                  <Button asChild variant="secondary" className="flex-1 min-w-[140px]">
-                    <a href={loc.mapUrl} target="_blank" rel="noopener noreferrer">
-                      Directions
-                    </a>
-                  </Button>
+                  {loc.addressConfirmed ? (
+                    <Button asChild variant="secondary" className="flex-1">
+                      <a
+                        href={loc.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        data-track-location={`locations-hub-${loc.slug}`}
+                      >
+                        Directions
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button asChild variant="secondary" className="flex-1">
+                      <a href={`tel:${loc.phoneE164}`} data-track-location={`locations-hub-${loc.slug}`}>
+                        Call for directions
+                      </a>
+                    </Button>
+                  )}
                 </div>
-              </div>
+              </li>
             ))}
+          </ul>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Button asChild variant="secondary" size="lg">
+              <Link href="/inventory">See all used cars</Link>
+            </Button>
+            <Button asChild variant="secondary" size="lg">
+              <Link href="/sell-your-car">Sell your car</Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      <FaqSection items={faqs} title="Visiting AM Group — FAQs" />
+      <FaqSection items={faqs} title="Visiting AM Group in Jammu — FAQs" />
     </div>
   )
 }

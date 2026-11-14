@@ -1,137 +1,151 @@
 import Link from "next/link"
-import { Band, Head } from "@/components/system/page-kit"
-import { RevealGroup, RevealItem } from "@/components/system/reveal"
-import { Grain, GridLines, WaveRibbons } from "@/components/system/backdrops"
-import { EnquireCta } from "@/components/system/enquire-cta"
+import { Band } from "@/components/system/page-kit"
 import { Button } from "@/components/ui/button"
-import { LOCATIONS, formatHours, whatsappUrl } from "@/lib/locations"
+import { ArrowGlyph } from "@/components/system/marks"
+import {
+  H_PROMISE,
+  LOCATIONS,
+  PRIMARY_LOCATION,
+  formatHours,
+  whatsappUrl,
+} from "@/lib/locations"
+import type { Ground } from "@/components/system/page-kit"
+import { SectionHead, TIGHT_BAND } from "./section-head"
 
 /**
- * Where the group actually is, and the last lead path on the page.
+ * The three used-car sites in Jammu.
  *
  * Name, address, phone and hours all come from lib/locations.ts and are never
- * retyped here. Local ranking depends on this text matching the Google Business
- * Profile character for character, and the surest way to break that is a second
- * copy of the address living in a component.
+ * retyped here. Local ranking depends on this text matching the Google
+ * Business Profile, and the surest way to break that is a second copy of an
+ * address living in a component.
+ *
+ * UNCONFIRMED ADDRESSES ARE SHOWN AS UNCONFIRMED. Only AM Business Park has a
+ * street address on record. For a site with `addressConfirmed: false` this
+ * prints the locality and "exact address on request", and offers a call
+ * instead of a Directions button — that site's `mapUrl` is a search query,
+ * not a pin, and sending a customer to a guessed spot is worse than asking
+ * them to ring.
+ *
+ * ONE CONTACT ROW, NOT THREE. All three sites answer on the same switchboard,
+ * so the phone, WhatsApp and email appear once under the list rather than
+ * three times inside it. The H Promise line is printed only when the number
+ * has actually been supplied (H_PROMISE is null until then).
+ *
+ * Used on the homepage and on /sell-your-car; `source` keeps the two apart in
+ * call tracking.
  */
-export function Visit() {
+export function Visit({
+  title = `${LOCATIONS.length} sites in Jammu, open six days`,
+  lede = "Stock is spread across all of them. Call to confirm which site a car is at before you set out.",
+  source = "home-visit",
+  ground = "ground",
+}: {
+  title?: string
+  lede?: string
+  /** Prefix for data-track-location. */
+  source?: string
+  ground?: Ground
+}) {
   return (
-    <Band
-      ground="ground"
-      labelledBy="visit-title"
-      id="visit"
-      backdrop={
-        <>
-          <WaveRibbons id="visit" tone="light" layers={4} strength={0.7} />
-          <GridLines cell={80} strength={0.03} fade="top" />
-          <Grain />
-        </>
-      }
-    >
-      <Head
-        id="visit-title"
-        label="Come and see"
-        title="Two offices, open six days"
-        lede="All certified pre-owned stock is held in Jammu and can be inspected without an appointment. Cars can be moved to Srinagar on request — call ahead."
-      />
+    <Band ground={ground} labelledBy="visit-title" id="visit" className={TIGHT_BAND}>
+      <SectionHead id="visit-title" title={title} lede={lede} />
 
-      <RevealGroup className="mt-14 grid grid-cols-1 gap-10 border-t border-line-strong pt-10 md:grid-cols-2 md:gap-14">
-        {LOCATIONS.map((location) => {
-          const waMessage = `Hi AM Group, I'd like to visit your ${location.city} office. What are your timings?`
-
-          return (
-            <RevealItem key={location.slug}>
-              <h3 className="font-display text-h2 uppercase text-ink">
+      <ul className="mt-7 grid grid-cols-1 border-t border-line-strong md:mt-10 md:grid-cols-3 md:gap-x-10">
+        {LOCATIONS.map((location) => (
+          <li
+            key={location.slug}
+            className="flex flex-col border-b border-line py-6 md:border-b-0 md:py-8"
+          >
+            <h3 className="font-display text-h2 uppercase text-ink">
+              <Link
+                href={`/locations/${location.slug}`}
+                className="inline-flex min-h-11 items-center transition-colors duration-(--duration-1) hover:text-accent"
+              >
                 {location.shortName}
-              </h3>
+              </Link>
+            </h3>
 
-              <address className="mt-4 not-italic text-body text-ink-2">
-                {location.streetAddress}
-                <br />
-                {location.city}, {location.region} {location.postalCode}
-                <br />
-                {/* ink-2, not ink-3: this band carries a gradient backdrop, and ink-3
-                    measures 3.8:1 at the deepest point of it. See DESIGN.md, Backdrops. */}
-                <span className="text-ink-2">{location.landmark}</span>
-              </address>
+            <address className="mt-2 flex-1 not-italic text-body text-ink-2">
+              {location.addressConfirmed ? (
+                <>
+                  {location.streetAddress}
+                  <br />
+                  {[location.city, location.postalCode].filter(Boolean).join(" ")}
+                  <br />
+                  {location.landmark}
+                </>
+              ) : (
+                <>
+                  {location.landmark}
+                  <br />
+                  Exact address on request — call for directions.
+                </>
+              )}
+            </address>
 
-              <dl className="mt-6 border-t border-line">
-                <div className="flex justify-between gap-6 border-b border-line py-3">
-                  <dt className="text-meta uppercase text-ink-2">Hours</dt>
-                  <dd className="text-right text-small text-ink">{formatHours(location)}</dd>
-                </div>
-                <div className="flex justify-between gap-6 border-b border-line py-3">
-                  <dt className="text-meta uppercase text-ink-2">Phone</dt>
-                  <dd className="text-right text-small">
-                    <a
-                      href={`tel:${location.phoneE164}`}
-                      data-track-location={`home-visit-${location.slug}`}
-                      className="text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light hover:underline"
-                    >
-                      {location.phone}
-                    </a>
-                  </dd>
-                </div>
-                <div className="flex justify-between gap-6 border-b border-line py-3">
-                  <dt className="text-meta uppercase text-ink-2">Email</dt>
-                  <dd className="text-right text-small">
-                    <a
-                      href={`mailto:${location.email}`}
-                      data-track-location={`home-visit-${location.slug}`}
-                      className="text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent-text-light hover:underline"
-                    >
-                      {location.email}
-                    </a>
-                  </dd>
-                </div>
-              </dl>
+            <p className="mt-3 text-small text-ink-2">{formatHours(location)}</p>
 
-              <p className="mt-5 text-small text-ink-2">{location.blurb}</p>
-
-              <div className="mt-6 flex flex-wrap gap-2.5">
-                <Button asChild variant="secondary">
-                  <a
-                    href={`tel:${location.phoneE164}`}
-                    data-track-location={`home-visit-${location.slug}`}
-                  >
-                    Call {location.shortName}
-                  </a>
-                </Button>
-                <Button asChild variant="secondary">
-                  <a
-                    href={whatsappUrl(waMessage)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-track-location={`home-visit-${location.slug}`}
-                  >
-                    WhatsApp
-                  </a>
-                </Button>
+            <div className="mt-4">
+              {location.addressConfirmed ? (
                 <Button asChild variant="secondary">
                   <a
                     href={location.mapUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    data-track-location={`home-visit-${location.slug}`}
+                    data-track-location={`${source}-${location.slug}`}
                   >
                     Directions
                   </a>
                 </Button>
-              </div>
-            </RevealItem>
-          )
-        })}
-      </RevealGroup>
+              ) : (
+                <Button asChild variant="secondary">
+                  <a
+                    href={`tel:${location.phoneE164}`}
+                    data-track-location={`${source}-${location.slug}`}
+                  >
+                    Call for directions
+                  </a>
+                </Button>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
 
-      {/* Closing path — the form, for anyone who would rather write than call. */}
-      <div className="mt-14 flex flex-wrap items-center gap-3 border-t border-line-strong pt-10">
-        <EnquireCta sourceLabel="home-closing" label="Send an enquiry" />
-        <Button asChild variant="secondary" size="lg">
-          <Link href="/contact">Contact page</Link>
+      {/* One switchboard for all three sites. */}
+      <div className="mt-6 flex flex-wrap items-center gap-3 md:mt-2 md:border-t md:border-line md:pt-8">
+        <Button asChild variant="primary" size="lg">
+          <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location={source}>
+            Call {PRIMARY_LOCATION.phone}
+          </a>
         </Button>
         <Button asChild variant="secondary" size="lg">
-          <Link href="/locations">All branches</Link>
+          <a
+            href={whatsappUrl(
+              "Hi AM Group, I'd like to visit one of your used-car sites in Jammu. Which one should I come to?",
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-track-location={source}
+          >
+            WhatsApp
+          </a>
         </Button>
+        {H_PROMISE && (
+          <Button asChild variant="secondary" size="lg">
+            <a href={`tel:${H_PROMISE.phoneE164}`} data-track-location={`${source}-h-promise`}>
+              H Promise {H_PROMISE.phone}
+            </a>
+          </Button>
+        )}
+        <Link
+          href="/locations"
+          className="inline-flex min-h-11 items-center gap-2 px-2 text-button text-accent transition-colors duration-(--duration-1) hover:text-accent-hover"
+        >
+          All locations
+          <ArrowGlyph />
+        </Link>
       </div>
     </Band>
   )

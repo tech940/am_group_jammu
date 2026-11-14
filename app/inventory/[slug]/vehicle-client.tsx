@@ -1,10 +1,8 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronGlyph } from "@/components/system/marks"
+import { ChatGlyph, ChevronGlyph, PhoneGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/feedback"
 import { VehicleCard } from "@/components/ui/vehicle-card"
@@ -17,7 +15,15 @@ import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
 import type { VehicleNeighbour } from "@/lib/inventory/server"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { pushEvent, vehicleParams } from "@/lib/analytics/gtm"
-import { whatsappUrl, PRIMARY_LOCATION } from "@/lib/locations"
+import { whatsappUrl, H_PROMISE, LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
+import { VehicleGallery } from "./vehicle-gallery"
+
+const pagerLink =
+  "h-11 px-3 rounded-sm border border-line-strong flex items-center text-meta uppercase text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
+const pagerOff =
+  "h-11 px-3 rounded-sm border border-line bg-ground-2 flex items-center text-meta uppercase text-ink-3"
+const contactLink =
+  "flex min-h-11 items-center gap-2 text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)"
 
 export default function VehicleClient({
   vehicle,
@@ -25,7 +31,6 @@ export default function VehicleClient({
   sellerNotes,
   faqs,
   frequentSearches,
-  seoGroups,
   position,
   total,
   prev,
@@ -43,13 +48,6 @@ export default function VehicleClient({
   next: VehicleNeighbour | null
 }) {
   const { onOpen } = useEnquiryModal()
-  const [currentImage, setCurrentImage] = useState(0)
-
-  const images = vehicle.images
-  const hasImages = images.length > 0
-
-  const nextImage = () => setCurrentImage((p) => (p + 1) % images.length)
-  const prevImage = () => setCurrentImage((p) => (p - 1 + images.length) % images.length)
 
   /* Every spec is conditional — this listing only shows what it actually has. */
   const specs = [
@@ -63,7 +61,14 @@ export default function VehicleClient({
     vehicle.engine && { label: "Engine", value: vehicle.engine },
   ].filter(Boolean) as { label: string; value: string }[]
 
-  // Keyed on vehicle.id, not []: the prev/next links swap the vehicle without
+  /* The three facts a buyer checks first, shown directly under the title. */
+  const keyFacts = [
+    vehicle.mileage !== null ? vehicle.mileageLabel : null,
+    vehicle.fuel,
+    vehicle.transmission,
+  ].filter(Boolean) as string[]
+
+  // Keyed on the vehicle, not []: the prev/next links swap the vehicle without
   // remounting this component, so an empty dep array would miss those views.
   useEffect(() => {
     pushEvent("view_item", {
@@ -74,6 +79,14 @@ export default function VehicleClient({
   }, [vehicle, position, total])
 
   const heading = `${vehicle.year ? `${vehicle.year} ` : ""}${vehicle.title}`
+
+  const whatsappHref = whatsappUrl(
+    `Hi AM Group, I'm interested in the ${heading}` +
+      `${vehicle.price !== null ? ` listed at ${vehicle.priceLabel}` : ""}. ` +
+      `Is it still available? (Ref #${vehicle.id})`,
+  )
+
+  const showHPromise = H_PROMISE !== null && vehicle.make?.toLowerCase() === "hyundai"
 
   return (
     <div className="min-h-screen bg-ground">
@@ -87,14 +100,17 @@ export default function VehicleClient({
         ]}
       />
 
-      {/* Back link + prev/next through the full listing */}
-      <div className="container mx-auto px-6 md:px-12 pt-2">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="container mx-auto flex flex-col px-6 md:px-12">
+        {/* Back link + prev/next through the full listing. On a phone this row
+            sits under the car, so the photo, price and enquiry button are what
+            the first screen shows. */}
+        <div className="order-2 flex flex-wrap items-center justify-between gap-3 pb-8 md:order-none md:pb-0 md:pt-2">
           <Link
             href="/inventory"
-            className="inline-flex min-h-11 items-center text-body font-medium text-ink-2 hover:text-ink transition-colors duration-(--duration-1)"
+            className="inline-flex min-h-11 items-center gap-1 text-body font-medium text-ink-2 hover:text-ink transition-colors duration-(--duration-1)"
           >
-            Back to Inventory
+            <ChevronGlyph direction="left" />
+            All used cars
           </Link>
 
           <nav aria-label="Vehicle pagination" className="flex items-center gap-2">
@@ -103,14 +119,12 @@ export default function VehicleClient({
                 href={`/inventory/${prev.slug}`}
                 rel="prev"
                 title={`${prev.year ?? ""} ${prev.title}`.trim()}
-                className="h-11 px-3 rounded-sm border border-line-strong flex items-center text-meta uppercase text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
+                className={pagerLink}
               >
                 Prev
               </Link>
             ) : (
-              <span className="h-11 px-3 rounded-sm border border-line bg-ground-2 flex items-center text-meta uppercase text-ink-3">
-                Prev
-              </span>
+              <span className={pagerOff}>Prev</span>
             )}
 
             <span className="text-meta text-ink-2 px-1 whitespace-nowrap" data-num>
@@ -122,124 +136,132 @@ export default function VehicleClient({
                 href={`/inventory/${next.slug}`}
                 rel="next"
                 title={`${next.year ?? ""} ${next.title}`.trim()}
-                className="h-11 px-3 rounded-sm border border-line-strong flex items-center text-meta uppercase text-ink hover:bg-ground-2 transition-colors duration-(--duration-1)"
+                className={pagerLink}
               >
                 Next
               </Link>
             ) : (
-              <span className="h-11 px-3 rounded-sm border border-line bg-ground-2 flex items-center text-meta uppercase text-ink-3">
-                Next
-              </span>
+              <span className={pagerOff}>Next</span>
             )}
           </nav>
         </div>
-      </div>
 
-      <div className="container mx-auto px-6 md:px-12 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-          {/* MAIN COLUMN */}
-          <div className="lg:col-span-3 space-y-12">
-            {/* Gallery */}
-            <div className="relative h-[380px] md:h-[560px] bg-ground-2 border border-line overflow-hidden">
-              {hasImages ? (
-                <>
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={images[currentImage]}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
-                      className="absolute inset-0"
-                    >
-                      <Image
-                        src={images[currentImage]}
-                        alt={`${heading} — photo ${currentImage + 1} of ${images.length}`}
-                        fill
-                        priority
-                        sizes="(max-width: 1024px) 100vw, 60vw"
-                        className="object-cover"
-                      />
-                    </motion.div>
-                  </AnimatePresence>
+        <div className="order-1 grid grid-cols-1 gap-x-12 gap-y-5 pt-2 pb-8 md:order-none md:gap-y-10 md:py-4 lg:grid-cols-5">
+          {/* PHOTOS — keyed so moving to the next car starts at its first photo. */}
+          <div className="min-w-0 lg:col-span-3 lg:row-start-1">
+            <VehicleGallery key={vehicle.id} images={vehicle.images} heading={heading} />
+          </div>
 
-                  {images.length > 1 && (
-                    <>
-                      <div className="absolute inset-x-6 top-1/2 -translate-y-1/2 flex justify-between z-20">
-                        <button type="button" onClick={prevImage} aria-label="Previous photo"
-                          className="h-11 w-11 rounded-sm border border-line bg-surface text-ink flex items-center justify-center hover:bg-ground-2 transition-colors duration-(--duration-1) cursor-pointer">
-                          <ChevronGlyph direction="left" />
-                        </button>
-                        <button type="button" onClick={nextImage} aria-label="Next photo"
-                          className="h-11 w-11 rounded-sm border border-line bg-surface text-ink flex items-center justify-center hover:bg-ground-2 transition-colors duration-(--duration-1) cursor-pointer">
-                          <ChevronGlyph direction="right" />
-                        </button>
-                      </div>
-
-                      {/* Scrim over photography — legitimate, so the count stays readable. */}
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 bg-ink/80 px-3 py-1 rounded-sm">
-                        <span className="text-on-deep text-caption" data-num>
-                          {currentImage + 1} / {images.length}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-ink-3">
-                  <span className="text-meta uppercase">
-                    Photos for this car are coming soon
-                  </span>
-                </div>
+          {/* SUMMARY — title, price and the enquiry actions. Directly under the
+              photo on a phone, top of the right-hand column on a desktop. */}
+          <div className="min-w-0 lg:col-span-2 lg:col-start-4 lg:row-start-1">
+            <div className="flex flex-wrap items-center gap-3">
+              {(vehicle.year || vehicle.make) && (
+                <span className="text-meta uppercase text-ink-2" data-num>
+                  {[vehicle.year, vehicle.make].filter(Boolean).join(" • ")}
+                </span>
               )}
+              {vehicle.condition && <Badge tone="info">{vehicle.condition}</Badge>}
             </div>
 
-            {/* Thumbnail strip */}
-            {images.length > 1 && (
-              <div className="grid grid-cols-4 sm:grid-cols-6 gap-3 -mt-6">
-                {images.map((src, i) => (
-                  <button
-                    key={src}
-                    type="button"
-                    onClick={() => setCurrentImage(i)}
-                    aria-label={`View photo ${i + 1}`}
-                    aria-pressed={i === currentImage}
-                    className={`relative aspect-4/3 rounded-sm overflow-hidden border-2 transition-colors duration-(--duration-1) cursor-pointer ${
-                      i === currentImage ? "border-accent" : "border-transparent hover:border-line-strong"
-                    }`}
-                  >
-                    <Image src={src} alt="" fill sizes="120px" className="object-cover" />
-                  </button>
-                ))}
-              </div>
+            <h1 className="mt-2 font-display text-h2 text-ink md:mt-3 md:text-h1">{vehicle.title}</h1>
+
+            {keyFacts.length > 0 && (
+              <p className="mt-1 text-body text-ink-2 md:mt-2" data-num>
+                {keyFacts.join(" · ")}
+              </p>
             )}
 
-            {/* Specifications */}
-            {specs.length > 0 && (
-              <div className="bg-surface p-8 md:p-12 border border-line">
-                <h2 className="font-display text-h2 text-ink mb-10 flex items-center gap-3">
-                  <span aria-hidden className="h-7 w-1 bg-accent shrink-0" />
-                  Vehicle Specifications
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-16 gap-y-1">
-                  {specs.map((spec) => (
-                    <div key={spec.label} className="flex justify-between items-center py-4 border-b border-line">
-                      <span className="text-meta uppercase text-ink-2">
-                        {spec.label}
+            <div className="mt-3 md:mt-6 md:border md:border-line md:bg-surface md:p-8">
+              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="sr-only">{vehicle.price === null ? "Price" : "Asking price"}</span>
+                <span className="font-display text-h1 text-ink" data-num>
+                  {vehicle.priceLabel}
+                </span>
+                {vehicle.originalPriceLabel && (
+                  <>
+                    <span className="text-small text-ink-3 line-through" data-num>
+                      {vehicle.originalPriceLabel}
+                    </span>
+                    {vehicle.discountPercent !== null && (
+                      <span className="px-2 py-0.5 rounded-sm bg-accent text-on-accent text-meta uppercase" data-num>
+                        {vehicle.discountPercent}% off
                       </span>
-                      <span className="text-body font-semibold text-ink text-right" data-num>{spec.value}</span>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="mt-3 space-y-2 md:mt-6 md:space-y-3">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  full
+                  onClick={() => onOpen(vehicle, { intent: "Vehicle Enquiry", sourceLabel: "vdp-hero" })}
+                >
+                  Get best price
+                </Button>
+
+                {/* Call and WhatsApp are how most buyers here actually enquire.
+                    The WhatsApp message is prefilled with this exact car. */}
+                <div className="grid grid-cols-2 gap-2 md:gap-3">
+                  <Button asChild variant="secondary" size="md" full>
+                    <a
+                      href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                      data-track-location="vdp-hero"
+                      aria-label={`Call ${PRIMARY_LOCATION.phone}`}
+                    >
+                      <PhoneGlyph />
+                      Call
+                    </a>
+                  </Button>
+                  <Button asChild variant="secondary" size="md" full>
+                    <a
+                      href={whatsappHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-track-location="vdp-hero"
+                    >
+                      <ChatGlyph />
+                      WhatsApp
+                    </a>
+                  </Button>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="md"
+                  full
+                  onClick={() => onOpen(vehicle, { intent: "Test Drive", sourceLabel: "vdp-test-drive" })}
+                >
+                  Book a test drive
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* DETAILS */}
+          <div className="min-w-0 space-y-10 lg:col-span-3 lg:row-start-2">
+            {specs.length > 0 && (
+              <section className="border border-line bg-surface p-6 md:p-10">
+                <h2 className="mb-4 font-display text-h2 text-ink md:mb-6">Car details</h2>
+                <dl className="grid grid-cols-1 gap-x-16 sm:grid-cols-2">
+                  {specs.map((spec) => (
+                    <div key={spec.label} className="flex items-center justify-between gap-4 border-b border-line py-4">
+                      <dt className="text-meta uppercase text-ink-2">{spec.label}</dt>
+                      <dd className="text-right text-body font-semibold text-ink" data-num>
+                        {spec.value}
+                      </dd>
                     </div>
                   ))}
-                </div>
-              </div>
+                </dl>
+              </section>
             )}
 
-            {/* SELLER'S NOTES */}
             <section>
-              <h2 className="font-display text-h2 text-ink mb-6 flex items-center gap-3">
-                <span aria-hidden className="h-7 w-1 bg-accent shrink-0" />
-                Seller&apos;s Notes
-              </h2>
+              <h2 className="mb-4 font-display text-h2 text-ink">About this car</h2>
               <div className="space-y-4">
                 {sellerNotes.map((para, i) => (
                   <p key={i} className="text-body text-ink-2">
@@ -248,7 +270,7 @@ export default function VehicleClient({
                 ))}
               </div>
 
-              <dl className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <dl className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
                   { k: "Listing ID", v: `#${vehicle.id}` },
                   { k: "Condition", v: vehicle.condition ?? "Used" },
@@ -257,111 +279,88 @@ export default function VehicleClient({
                     k: "Listed",
                     v: vehicle.postedAt
                       ? new Date(vehicle.postedAt).toLocaleDateString("en-IN", {
-                          day: "numeric", month: "short", year: "numeric",
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                          timeZone: "Asia/Kolkata",
                         })
                       : "—",
                   },
                 ].map((item) => (
-                  <div key={item.k} className="bg-surface border border-line px-4 py-3">
+                  <div key={item.k} className="border border-line bg-surface px-4 py-3">
                     <dt className="text-meta uppercase text-ink-2">{item.k}</dt>
-                    <dd className="text-body font-semibold text-ink mt-0.5" data-num>{item.v}</dd>
+                    <dd className="mt-0.5 text-body font-semibold text-ink" data-num>
+                      {item.v}
+                    </dd>
                   </div>
                 ))}
               </dl>
             </section>
           </div>
 
-          {/* SIDEBAR */}
-          <div className="lg:col-span-2 space-y-6">
-            <div>
-              <div className="flex flex-wrap items-center gap-3 mb-4">
-                {(vehicle.year || vehicle.make) && (
-                  <span className="text-meta uppercase text-ink-2" data-num>
-                    {[vehicle.year, vehicle.make].filter(Boolean).join(" • ")}
-                  </span>
-                )}
-                {vehicle.condition && <Badge tone="info">{vehicle.condition}</Badge>}
-              </div>
-              <h1 className="font-display text-h1 text-ink mb-4">{vehicle.title}</h1>
-            </div>
+          {/* SIDE COLUMN */}
+          <aside className="min-w-0 space-y-6 lg:col-span-2 lg:col-start-4 lg:row-start-2">
+            {/* Where the car is, and who to ring. Stock is spread across three
+                sites, so the page does not claim a location for this car. */}
+            <section className="border border-line bg-surface p-6">
+              <h2 className="mb-2 font-display text-h3 text-ink">Where to see this car</h2>
+              <p className="text-body text-ink-2">
+                Available at our Jammu sites — call to confirm which location this car is at.
+              </p>
 
-            {/* Price */}
-            <div className="bg-surface p-8 border border-line">
-              <div className="text-center mb-6">
-                <span className="text-meta uppercase text-ink-2">
-                  {vehicle.price === null ? "Price" : "Asking Price"}
-                </span>
-                <div className="font-display text-h1 text-ink mt-2" data-num>{vehicle.priceLabel}</div>
-                {vehicle.originalPriceLabel && (
-                  <div className="mt-2 flex items-center justify-center gap-3">
-                    <span className="text-small text-ink-3 line-through" data-num>{vehicle.originalPriceLabel}</span>
-                    {vehicle.discountPercent !== null && (
-                      <span className="px-2 py-0.5 rounded-sm bg-accent text-on-accent text-meta uppercase" data-num>
-                        {vehicle.discountPercent}% off
+              <ul className="mt-4 border-t border-line">
+                {LOCATIONS.map((loc) => (
+                  <li key={loc.slug} className="border-b border-line">
+                    <Link
+                      href={`/locations/${loc.slug}`}
+                      className="group flex min-h-11 items-center justify-between gap-3 py-3"
+                    >
+                      <span className="min-w-0">
+                        <span className="block text-body font-semibold text-ink transition-colors duration-(--duration-1) group-hover:text-accent-text-light">
+                          {loc.shortName}
+                        </span>
+                        <span className="block text-small text-ink-2">
+                          {loc.addressConfirmed
+                            ? `${loc.streetAddress}, ${loc.landmark}`
+                            : `${loc.landmark} — exact address on request, call for directions`}
+                        </span>
                       </span>
-                    )}
-                  </div>
-                )}
-              </div>
+                      <ChevronGlyph className="text-ink-3" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
 
-              <div className="space-y-3">
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="lg"
-                  full
-                  onClick={() => onOpen(vehicle, { intent: "Vehicle Enquiry", sourceLabel: "vdp-best-price" })}
+              <div className="mt-2 flex flex-col">
+                <a
+                  href={`tel:${PRIMARY_LOCATION.phoneE164}`}
+                  data-track-location="vdp-contact"
+                  className={contactLink}
+                  data-num
                 >
-                  Get Best Price
-                </Button>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="lg"
-                  full
-                  onClick={() => onOpen(vehicle, { intent: "Test Drive", sourceLabel: "vdp-test-drive" })}
-                >
-                  Schedule Test Drive
-                </Button>
-
-                {/* WhatsApp is usually the highest-volume enquiry channel for a
-                    J&K dealership — prefilled with this exact car so the buyer
-                    does not have to describe it. */}
-                <Button asChild variant="secondary" size="lg" full>
-                  <a
-                    href={whatsappUrl(
-                      `Hi AM Group, I'm interested in the ${heading}` +
-                        `${vehicle.price !== null ? ` listed at ${vehicle.priceLabel}` : ""}. ` +
-                        `Is it still available? (Ref #${vehicle.id})`,
-                    )}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-track-location="vdp-whatsapp"
-                  >
-                    WhatsApp Us
-                  </a>
-                </Button>
-              </div>
-            </div>
-
-            {/* Quick contact */}
-            <div className="bg-surface p-6 border border-line">
-              <h2 className="font-display text-h3 text-ink mb-4">Quick Contact</h2>
-              <div className="flex flex-col">
-                <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="vdp-quick-contact" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)" data-num>
+                  <PhoneGlyph />
                   {PRIMARY_LOCATION.phone}
                 </a>
-                <a href="mailto:info@amgroupind.com" className="flex min-h-11 items-center text-body text-ink hover:text-accent-text-light transition-colors duration-(--duration-1)">
-                  info@amgroupind.com
+                {showHPromise && H_PROMISE && (
+                  <a
+                    href={`tel:${H_PROMISE.phoneE164}`}
+                    data-track-location="vdp-hpromise"
+                    className={contactLink}
+                  >
+                    <PhoneGlyph />
+                    <span>
+                      H Promise line: <span data-num>{H_PROMISE.phone}</span>
+                    </span>
+                  </a>
+                )}
+                <a href={`mailto:${PRIMARY_LOCATION.email}`} className={contactLink}>
+                  {PRIMARY_LOCATION.email}
                 </a>
-                <address className="not-italic py-3 text-body text-ink-2">
-                  AM Business Park, N-H 1 Bye-Pass Road, Jammu
-                </address>
               </div>
-            </div>
+            </section>
 
-            <div className="bg-surface p-6 border border-line">
-              <h2 className="font-display text-h3 text-ink mb-4">Why Buy From Us</h2>
+            <section className="border border-line bg-surface p-6">
+              <h2 className="mb-4 font-display text-h3 text-ink">Why buy from us</h2>
               <ul className="border-t border-line">
                 {[
                   "Verified documentation & history",
@@ -373,11 +372,11 @@ export default function VehicleClient({
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
 
             {/* Related browse links keep this page connected to the wider site */}
-            <div className="bg-surface p-6 border border-line">
-              <h2 className="font-display text-h3 text-ink mb-4">Browse similar</h2>
+            <section className="border border-line bg-surface p-6">
+              <h2 className="mb-4 font-display text-h3 text-ink">Browse similar</h2>
               <div className="flex flex-wrap gap-2">
                 {(
                   [
@@ -398,8 +397,8 @@ export default function VehicleClient({
                   </Link>
                 ))}
               </div>
-            </div>
-          </div>
+            </section>
+          </aside>
         </div>
       </div>
 
@@ -407,7 +406,7 @@ export default function VehicleClient({
       {similar.length > 0 && (
         <div className="container mx-auto px-6 md:px-12 pb-16">
           <div className="border-t border-line pt-12">
-            <h2 className="font-display text-h2 text-ink mb-8">Similar Vehicles</h2>
+            <h2 className="font-display text-h2 text-ink mb-8">Similar cars</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {similar.map((v, index) => (
                 <VehicleCard
@@ -430,6 +429,31 @@ export default function VehicleClient({
       />
 
       <FrequentSearches searches={frequentSearches} />
+
+      {/* Phone action bar. `sticky`, not `fixed`: it rides directly above the
+          site-wide tab bar (4rem + the home-indicator inset) for the whole car
+          page, then comes to rest at the end of the page instead of covering
+          the footer — so it takes its own space and no extra padding is needed.
+          Hidden from md up, where the price panel is already on screen. */}
+      <div className="sticky bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-surface md:hidden">
+        <div className="flex items-center justify-between gap-4 px-6 py-2">
+          <div className="min-w-0">
+            <span className="block truncate text-caption text-ink-2">{heading}</span>
+            <span className="block font-display text-h3 text-ink" data-num>
+              {vehicle.priceLabel}
+            </span>
+          </div>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="shrink-0"
+            onClick={() => onOpen(vehicle, { intent: "Vehicle Enquiry", sourceLabel: "vdp-sticky-bar" })}
+          >
+            Get best price
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

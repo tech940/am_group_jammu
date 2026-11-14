@@ -6,7 +6,8 @@ import { applyInventoryQuery, filtersFromSearchParams } from "@/lib/inventory/fi
 import { EMPTY_FILTERS } from "@/store/use-inventory-store"
 import type { SortKey } from "@/store/use-inventory-store"
 import { buildListingCopy, buildListingFaqs } from "@/lib/seo/content"
-import { getFrequentSearches, getSeoLinks } from "@/lib/seo/links"
+import { getFrequentSearches } from "@/lib/seo/links"
+import { SITE_URL } from "@/lib/seo/site"
 
 export const PAGE_SIZE = 9
 
@@ -81,7 +82,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     // still reach the listings, but out of the index.
     //
     // `follow` is deliberate: equity flows on to the vehicle pages.
-    alternates: { canonical: isFiltered ? "/inventory" : buildPageHref(sp, page) },
+    // Built from the page number alone. Passing the query string through let
+    // ?fbclid= and ?utm_ links mint their own canonical URLs.
+    alternates: { canonical: isFiltered || page <= 1 ? "/inventory" : `/inventory?page=${page}` },
     robots: isFiltered || page > 1 ? { index: false, follow: true } : undefined,
   }
 }
@@ -106,7 +109,7 @@ export default async function Page({ searchParams }: Props) {
 
   const copy = buildListingCopy(facets, vehicles.length)
   const faqs = buildListingFaqs(facets, vehicles.length)
-  const [frequentSearches, seoLinks] = await Promise.all([getFrequentSearches(40), getSeoLinks()])
+  const frequentSearches = await getFrequentSearches(40)
 
   // ItemList so Google can read the listing grid as a product collection.
   const jsonLd = {
@@ -114,14 +117,14 @@ export default async function Page({ searchParams }: Props) {
     "@type": "CollectionPage",
     name: "Used Cars for Sale in Jammu",
     description: copy.intro[0],
-    url: `https://amgroupind.com${buildPageHref(sp, page)}`,
+    url: `${SITE_URL}${page > 1 ? `/inventory?page=${page}` : "/inventory"}`,
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: matched.length,
       itemListElement: pageItems.map((v, i) => ({
         "@type": "ListItem",
         position: (page - 1) * PAGE_SIZE + i + 1,
-        url: `https://amgroupind.com/inventory/${v.slug}`,
+        url: `${SITE_URL}/inventory/${v.slug}`,
         name: `${v.year ?? ""} ${v.title}`.trim(),
       })),
     },
@@ -150,7 +153,6 @@ export default async function Page({ searchParams }: Props) {
         copy={copy}
         faqs={faqs}
         frequentSearches={frequentSearches}
-        seoGroups={seoLinks.groups}
       />
     </>
   )

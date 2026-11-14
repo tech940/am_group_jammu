@@ -2,9 +2,13 @@ import { MetadataRoute } from "next"
 import { getInventory } from "@/lib/inventory/server"
 import { getAllLandingSlugs } from "@/lib/seo/landing"
 import { LOCATIONS } from "@/lib/locations"
+import { slugify } from "@/lib/inventory/adapter"
+import { SITE_URL } from "@/lib/seo/site"
 
 /**
- * Only indexable URLs belong here.
+ * Only live, indexable URLs belong here: home, the inventory, sell-your-car,
+ * the locations hub and its three location pages, contact, every vehicle,
+ * brand and landing page with stock behind it, and the two legal pages.
  *
  * Filtered /inventory views are deliberately excluded: they are noindex, so
  * listing them would just ask Google to crawl pages it has been told not to
@@ -12,7 +16,7 @@ import { LOCATIONS } from "@/lib/locations"
  * instead.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://amgroupind.com"
+  const baseUrl = SITE_URL
   const [{ vehicles, facets }, landings] = await Promise.all([
     getInventory(),
     getAllLandingSlugs(),
@@ -49,15 +53,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Brand pages only for makes we actually stock — a brand page with no stock
   // is a thin page and should not be advertised.
   const brandUrls: MetadataRoute.Sitemap = facets.makes.map((m) => ({
-    url: `${baseUrl}/brands/${m.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")}`,
+    url: `${baseUrl}/brands/${slugify(m.value)}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.7,
   }))
 
-  // Budget / model / body / fuel / transmission / city landing pages. Each one
-  // is only generated when it has stock behind it.
-  const landingUrls: MetadataRoute.Sitemap = landings.map(({ slug, kind }) => ({
+  // Budget / model / body / fuel / transmission landing pages plus the Jammu
+  // city page. With no stock at all the city page is noindex, so nothing is
+  // listed.
+  const landingUrls: MetadataRoute.Sitemap = (vehicles.length > 0 ? landings : []).map(({ slug, kind }) => ({
     url: `${baseUrl}/used-cars/${slug}`,
     lastModified: new Date(),
     changeFrequency: "daily",

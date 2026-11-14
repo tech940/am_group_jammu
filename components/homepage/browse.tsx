@@ -1,6 +1,7 @@
 import Link from "next/link"
-import { Band, Head } from "@/components/system/page-kit"
+import { Band } from "@/components/system/page-kit"
 import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
+import { SectionHead, TIGHT_BAND } from "./section-head"
 
 /**
  * Shop by budget, body type, make and fuel — the four ways people actually
@@ -12,9 +13,10 @@ import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
  * makes go to their /brands page, which is the indexable landing for that
  * make.
  *
- * Four lists, deliberately not four matching cards: the lists are different
- * lengths because the stock is, and padding them to match would mean
- * inventing rows.
+ * Chips, not rows. The previous version listed every option as a full-width
+ * 48px row, which on a phone was some twenty rows stacked — the longest band
+ * on the page. Chips wrap, so the same links take a quarter of the height and
+ * each is still a 44px target.
  */
 const BUDGETS = [3, 5, 7, 10, 15]
 
@@ -28,19 +30,18 @@ function Group({
   if (items.length === 0) return null
   return (
     <div>
-      <h3 className="border-b border-line-strong pb-3 text-meta uppercase text-ink-2">{title}</h3>
-      <ul>
+      <h3 className="font-display text-h3 uppercase text-ink">{title}</h3>
+      <ul className="mt-3 flex flex-wrap gap-2">
         {items.map((item) => (
           <li key={item.href}>
             <Link
               href={item.href}
-              className="group flex min-h-12 items-center justify-between gap-4 border-b border-line py-3 transition-colors duration-(--duration-1) hover:bg-surface"
+              className="inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-line-strong bg-surface px-3.5 text-body text-ink transition-colors duration-(--duration-1) hover:border-accent hover:text-accent"
             >
-              <span className="font-display text-h4 uppercase text-ink transition-colors duration-(--duration-1) group-hover:text-accent">
-                {item.label}
-              </span>
-              <span className="shrink-0 text-small text-ink-2" data-num>
-                {item.count} {item.count === 1 ? "car" : "cars"}
+              {item.label}
+              <span className="text-small text-ink-2" data-num>
+                {item.count}
+                <span className="sr-only">{item.count === 1 ? " car" : " cars"}</span>
               </span>
             </Link>
           </li>
@@ -86,14 +87,13 @@ export function Browse({
   ]
 
   return (
-    <Band ground="ground-2" labelledBy="browse-title" id="browse">
-      <Head
+    <Band ground="ground" labelledBy="browse-title" id="browse" className={TIGHT_BAND}>
+      <SectionHead
         id="browse-title"
-        label="Find your car"
-        title="Start with what matters to you"
-        lede="Counts are from today's stock. If a number is here, those cars are on the forecourt right now."
+        title="Find your car"
+        lede="The number on each button is how many cars match in today's stock."
       />
-      <div className="mt-12 grid grid-cols-1 gap-x-12 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-7 grid grid-cols-1 gap-x-12 gap-y-7 md:mt-10 md:grid-cols-2 md:gap-y-10">
         <Group title="By budget" items={budgets} />
         <Group title="By body type" items={bodies} />
         <Group title="By make" items={makes} />

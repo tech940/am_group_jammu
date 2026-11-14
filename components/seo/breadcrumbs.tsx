@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { SITE_URL } from "@/lib/seo/site"
 
 export interface Crumb {
   label: string
@@ -6,7 +7,7 @@ export interface Crumb {
   href?: string
 }
 
-const SITE = "https://amgroupind.com"
+const SITE = SITE_URL
 
 /**
  * Server-rendered breadcrumbs with BreadcrumbList schema.
