@@ -36,6 +36,27 @@ const fieldClass =
   "h-12 w-full rounded-sm border border-line-strong bg-surface text-body-lg text-ink " +
   "placeholder:text-body placeholder:text-ink-3"
 
+/**
+ * A hand-drawn stroke under one word, in the action colour. Decorative: the
+ * word reads the same without it, so the stroke is hidden from assistive tech.
+ */
+function Underlined({ children }: { children: string }) {
+  return (
+    <span className="relative inline-block">
+      {children}
+      <svg
+        aria-hidden
+        viewBox="0 0 200 14"
+        preserveAspectRatio="none"
+        className="absolute -bottom-[0.14em] left-0 h-[0.16em] w-full text-pop"
+        fill="none"
+      >
+        <path d="M3 9C40 3 92 2 197 7" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+      </svg>
+    </span>
+  )
+}
+
 export function UsedHero({
   total,
   degraded,
@@ -58,10 +79,12 @@ export function UsedHero({
       <h1 id="hero-title" className="font-display text-display uppercase text-on-deep">
         {live ? (
           <>
-            <span data-num>{total}</span> used cars in Jammu
+            <span data-num>{total}</span> used cars in <Underlined>Jammu</Underlined>
           </>
         ) : (
-          "Used cars in Jammu"
+          <>
+            Used cars in <Underlined>Jammu</Underlined>
+          </>
         )}
       </h1>
 

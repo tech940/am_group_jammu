@@ -28,8 +28,8 @@ import { ChatGlyph, HomeGlyph, KeyGlyph, PhoneGlyph, TagGlyph } from "@/componen
  */
 const tab =
   "flex h-16 flex-col items-center justify-center gap-1.5 text-on-deep " +
-  "transition-colors duration-(--duration-1) active:bg-accent/10 " +
-  "aria-[current=page]:font-semibold aria-[current=page]:text-accent-bright"
+  "transition-colors duration-(--duration-1) active:bg-pop/15 " +
+  "aria-[current=page]:font-semibold aria-[current=page]:text-pop-text"
 
 // 11px, the system's floor. Sentence case and normal tracking, not the
 // uppercase meta style: five columns on a 320px phone are 64px each, and

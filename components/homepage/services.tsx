@@ -30,7 +30,7 @@ import { EnquireTile } from "./enquire-tile"
 const tile =
   "group flex min-h-28 w-full cursor-pointer flex-col items-center justify-center gap-2 rounded-md " +
   "border border-line bg-surface px-2 py-3 text-center text-label text-ink " +
-  "transition-colors duration-(--duration-1) hover:border-accent md:min-h-32"
+  "transition-colors duration-(--duration-1) hover:border-pop md:min-h-32"
 
 function Face({ glyph, label }: { glyph: ReactNode; label: string }) {
   return (
@@ -38,7 +38,7 @@ function Face({ glyph, label }: { glyph: ReactNode; label: string }) {
       {/* Glyphs are sized in em, so the wrapper's font-size is the icon size. */}
       <span
         aria-hidden
-        className="grid h-12 w-12 place-items-center rounded-full bg-info-bg text-h3 leading-none text-accent transition-colors duration-(--duration-1) group-hover:bg-accent group-hover:text-on-accent"
+        className="grid h-12 w-12 place-items-center rounded-full bg-pop-bg text-h3 leading-none text-pop-text transition-colors duration-(--duration-1) group-hover:bg-pop group-hover:text-on-pop"
       >
         {glyph}
       </span>

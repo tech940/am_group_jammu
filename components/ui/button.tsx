@@ -22,9 +22,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // Accent fill. The one loud control on a screen; if two are competing,
-        // one of them is the wrong variant.
-        primary: "bg-accent text-on-accent hover:bg-accent-hover",
+        // The action colour. The one loud control on a screen; if two are
+        // competing, one of them is the wrong variant.
+        primary: "bg-pop text-on-pop hover:bg-pop-hover",
         // Default action on a light ground.
         secondary: "border border-line-strong bg-surface text-ink hover:bg-ground-2",
         // The loud control on a DARK ground. `primary`'s deep blue measures

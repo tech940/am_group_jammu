@@ -88,6 +88,23 @@
   --color-accent-bright-hover: #e4f1f8;
   --color-on-accent-bright: #0f4e6d;   /* label on a bright fill — 10.6:1 */
 
+  /* POP — the action colour (2026-11-14, from the owner's mock-up).
+
+     The blue is the brand and the ground. This teal is for the thing you are
+     meant to press: primary buttons, the header's Enquire, and a few marks
+     that point at an action. It is NOT a second decorative colour — badges,
+     chips, selected states and links stay blue, or the teal stops meaning
+     "press here".
+
+     The label on a teal fill is dark, not white: white on this teal measures
+     2.96:1. `pop-text` is the deeper teal for small text and glyphs on light
+     grounds (5.4:1 on white), and `pop-bg` is the mint disc behind a glyph. */
+  --color-pop: #12a594;
+  --color-pop-hover: #2bbcab;
+  --color-on-pop: #04231f;
+  --color-pop-text: #0a786d;
+  --color-pop-bg: #d5f2ec;
+
   /* The ground-specific names the rest of the app already addresses. They are
      aliases of the two ends above, so no call site had to change. */
   --color-accent-text-light: var(--color-accent);
@@ -472,9 +489,10 @@
     --color-on-deep-2: var(--color-ink-2);
     --color-line-on-deep: var(--color-line);
     --color-line-deep: var(--color-line-strong);
-    --color-accent-bright: var(--color-accent);
-    --color-accent-bright-hover: var(--color-accent-hover);
-    --color-on-accent-bright: var(--color-on-accent);
+    /* The loud control inside a panel is the action colour. */
+    --color-accent-bright: var(--color-pop);
+    --color-accent-bright-hover: var(--color-pop-hover);
+    --color-on-accent-bright: var(--color-on-pop);
     /* Small accent text on glass uses the deeper end: 6:1 or better on the
        composited panel, where the base accent can dip under 4.5:1. */
     --color-accent-text-dark: var(--color-accent-hover);
@@ -577,9 +595,9 @@
   .photo-scrim {
     background-image: linear-gradient(
       to bottom,
-      rgb(20 98 135 / 0.36) 0%,
-      rgb(20 98 135 / 0.6) 45%,
-      rgb(15 78 109 / 0.86) 100%
+      rgb(15 78 109 / 0.22) 0%,
+      rgb(15 78 109 / 0.4) 50%,
+      rgb(15 78 109 / 0.78) 100%
     );
   }
 
@@ -732,3 +750,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-ink-2);
 }
+

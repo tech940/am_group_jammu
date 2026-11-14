@@ -78,13 +78,13 @@ export function Doors({
 
           <Link
             href="/sell-your-car"
-            className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-md border border-line bg-surface p-4 text-ink shadow-raised transition-colors duration-(--duration-1) hover:border-accent md:min-h-56 md:flex-row md:items-end md:p-7"
+            className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-md border border-line bg-surface p-4 text-ink shadow-raised transition-colors duration-(--duration-1) hover:border-pop md:min-h-56 md:flex-row md:items-end md:p-7"
           >
             <IlloSell className="-mr-2 -mt-1 h-24 w-auto self-end md:order-2 md:h-44" />
             <span>
               <span className="flex items-center gap-2 font-display text-h2 uppercase md:text-h1">
                 Sell your car
-                <ArrowGlyph className="text-body-lg text-accent transition-transform duration-(--duration-2) group-hover:translate-x-1" />
+                <ArrowGlyph className="text-body-lg text-pop-text transition-transform duration-(--duration-2) group-hover:translate-x-1" />
               </span>
               <span className="mt-1 block text-small text-ink-2 md:text-body">
                 Free valuation while you wait

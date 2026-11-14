@@ -187,7 +187,7 @@ export function SiteNav() {
             <button
               type="button"
               onClick={enquire}
-              className="inline-flex h-11 items-center rounded-sm bg-accent-bright px-5 text-button text-on-accent-bright transition-colors duration-(--duration-1) hover:bg-accent-bright-hover"
+              className="inline-flex h-11 items-center rounded-sm bg-pop px-5 text-button text-on-pop transition-colors duration-(--duration-1) hover:bg-pop-hover"
             >
               Enquire
             </button>
@@ -242,7 +242,7 @@ export function SiteNav() {
               <button
                 type="button"
                 onClick={enquire}
-                className="inline-flex h-12 items-center justify-center rounded-sm bg-accent-bright px-6 text-button text-on-accent-bright transition-colors duration-(--duration-1) hover:bg-accent-bright-hover"
+                className="inline-flex h-12 items-center justify-center rounded-sm bg-pop px-6 text-button text-on-pop transition-colors duration-(--duration-1) hover:bg-pop-hover"
               >
                 Enquire
               </button>
