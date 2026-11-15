@@ -87,13 +87,11 @@ const MAIN_PHONE = '+91 94694 44456'
 const MAIN_PHONE_E164 = '+919469444456'
 
 /**
- * WhatsApp is NOT moved with the calls. The owner's instruction was about
- * calls, and a wa.me link to a number that has no WhatsApp account opens a
- * dead "invalid number" screen. It stays on the number it has always used
- * until the owner confirms the new one is on WhatsApp; set
- * NEXT_PUBLIC_WHATSAPP_NUMBER to change it without a code change.
+ * WhatsApp uses the same number as calls. The owner confirmed on 2026-11-15
+ * that +91 94694 44456 is on WhatsApp. NEXT_PUBLIC_WHATSAPP_NUMBER still
+ * overrides it if the WhatsApp line ever differs.
  */
-const WHATSAPP_DEFAULT = '919484200000'
+const WHATSAPP_DEFAULT = MAIN_PHONE_E164.replace(/\D/g, '')
 
 // "Used car sales", not "Certified pre-owned car sales": nothing on record
 // says who certifies the cars or against what checklist, and this label is
@@ -284,8 +282,12 @@ export const LOCATIONS: Location[] = [
 // variable still overrides it, so the number can change without a deploy.
 const HPROMISE_DEFAULT = '9469444456'
 const hpDigits = (process.env.NEXT_PUBLIC_HPROMISE_PHONE || HPROMISE_DEFAULT).replace(/\D/g, '').slice(-10)
+// The H Promise line and the main number are now the same line, so a separate
+// "H Promise" button would be a second button dialling the same number. The
+// owner asked for the duplicate to go (2026-11-15). It comes back by itself if
+// NEXT_PUBLIC_HPROMISE_PHONE is ever set to a different number.
 export const H_PROMISE: { phone: string; phoneE164: string } | null =
-  hpDigits.length === 10
+  hpDigits.length === 10 && `+91${hpDigits}` !== MAIN_PHONE_E164
     ? { phone: `+91 ${hpDigits.slice(0, 5)} ${hpDigits.slice(5)}`, phoneE164: `+91${hpDigits}` }
     : null
 
