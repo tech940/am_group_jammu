@@ -1,5 +1,6 @@
 "use client"
 
+import { AutoEnquiry } from "@/components/modals/auto-enquiry"
 import React, { useEffect } from "react"
 import Link from "next/link"
 import { ChatGlyph, ChevronGlyph, PhoneGlyph } from "@/components/system/marks"
@@ -145,6 +146,9 @@ export default function VehicleClient({
 
   return (
     <div className="min-h-screen bg-ground">
+      {/* Opens the enquiry form for THIS car once, a few seconds after
+          landing. Not for a sold car: there is nothing to enquire about. */}
+      {!sold && <AutoEnquiry vehicle={vehicle} />}
       {/* The trail is resolved on the server (page.tsx) so that every level
           is a page that exists and may be indexed: the brand page and the
           model page, never a filtered search. */}

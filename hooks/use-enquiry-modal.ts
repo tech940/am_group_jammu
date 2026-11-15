@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import type { InventoryVehicle } from '@/lib/inventory/types'
 import type { LeadIntent } from '@/lib/leads/types'
 import { pushEvent } from '@/lib/analytics/gtm'
+import { markEnquiryShown } from '@/lib/leads/enquiry-memory'
 
 interface OpenOptions {
   /** What the visitor is actually asking for. */
@@ -47,6 +48,10 @@ export const useEnquiryModal = create<EnquiryModalStore>((set) => ({
       price: vehicle?.price ?? undefined,
       currency: 'INR',
     })
+
+    // Seen once, by whatever route: the timed pop-up will not open it again
+    // in this visit.
+    markEnquiryShown()
 
     set({ isOpen: true, vehicle, intent, sourceLabel })
   },

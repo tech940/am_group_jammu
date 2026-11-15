@@ -50,7 +50,7 @@ export function Visit({
     <StoreBand ground={ground} labelledBy="visit-title" id="visit">
       <SectionHead id="visit-title" title={title} lede={lede} />
 
-      <ul className="mt-7 grid grid-cols-1 border-t border-line-strong md:mt-10 md:grid-cols-3 md:gap-x-10">
+      <ul className="mt-7 grid grid-cols-1 border-t border-line-strong md:mt-10 md:grid-cols-3 xl:grid-cols-5 md:gap-x-10">
         {LOCATIONS.map((location) => (
           <li
             key={location.slug}

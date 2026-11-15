@@ -1,5 +1,6 @@
 "use client"
 
+import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { useActionState, useEffect, useId, useMemo, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
@@ -285,6 +286,8 @@ export function ValuationWizard({ sourceLabel = "sell-wizard" }: { sourceLabel?:
     if (reported.current === state) return
     reported.current = state
     if (state.status === "success") {
+      // Someone who has just sent this is not shown the timed enquiry form.
+      rememberEnquirySent()
       if (state.leadId !== "ignored" && !state.duplicate) {
         pushEvent("generate_lead", {
           lead_intent: "Sell Your Car",

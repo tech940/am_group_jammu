@@ -1,5 +1,7 @@
 "use client"
 
+import { AutoEnquiry } from "@/components/modals/auto-enquiry"
+import { siteCountWord } from "@/lib/seo/locations"
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { CloseGlyph, SearchGlyph } from "@/components/system/marks"
@@ -270,6 +272,8 @@ export default function InventoryClient({
 
   return (
     <div className="min-h-screen bg-ground text-ink">
+      {/* Opens the enquiry form once, a few seconds after landing. */}
+      <AutoEnquiry />
       <Breadcrumbs items={[{ label: "All used cars in stock" }]} />
 
       {/* The H1 says what this page is: the whole stock list, to filter.
@@ -530,7 +534,7 @@ export default function InventoryClient({
 
             <div className="rounded-md border border-line bg-surface p-6 md:p-8">
               <h3 className="font-display text-h3 text-ink mb-2">
-                {LOCATIONS.length === 3 ? "Three" : LOCATIONS.length} used-car locations in Jammu
+                {siteCountWord().replace(/^./, (c) => c.toUpperCase())} used-car locations in Jammu
               </h3>
               <p className="text-body text-ink-2">
                 {locationList}. Call before you come and we will tell you which location the

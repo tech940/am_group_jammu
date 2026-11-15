@@ -1,10 +1,12 @@
 /**
  * The site's public origin, in exactly one place.
  *
- * The production domain is not settled yet (the site currently runs on a
- * vercel.app URL while the code assumed amgroupind.com). Every canonical URL,
- * sitemap entry, structured-data @id and llms.txt link is built from SITE_URL,
- * so switching domain is one environment variable:
+ * The site's own domain is usedcarsjammu.com, bought by the owner on
+ * 2026-11-15. (Before that the code assumed amgroupind.com, which is the
+ * group's old WordPress site - so every canonical link pointed search
+ * engines at a different website.) Every canonical URL, sitemap entry,
+ * structured-data @id and llms.txt link is built from SITE_URL, so a change
+ * of domain is one environment variable:
  *
  *   NEXT_PUBLIC_SITE_URL=https://example.com
  *
@@ -13,17 +15,18 @@
  * Free of any `next/*` or alias import so the scripts that load lib/seo
  * directly can use it too.
  */
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://amgroupind.com').replace(/\/+$/, '')
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://usedcarsjammu.com').replace(/\/+$/, '')
 
 /**
- * True only when the owner has named the origin on purpose. While it is false
- * SITE_URL is a guess (the old WordPress domain), so nothing may punish a
- * request for arriving on a "wrong" host: next.config.ts reads this before it
- * marks other hosts noindex.
+ * True only when NEXT_PUBLIC_SITE_URL is set in the hosting environment. That
+ * is the owner's signal that the domain is connected and live: only then are
+ * requests arriving on any other host (the vercel.app address) marked
+ * noindex. Setting it before the domain's DNS points here would hide the
+ * only working address from search engines.
  */
 export const SITE_URL_IS_EXPLICIT = Boolean(process.env.NEXT_PUBLIC_SITE_URL)
 
-/** Host part of SITE_URL ("amgroupind.com"), for host comparisons. */
+/** Host part of SITE_URL ("usedcarsjammu.com"), for host comparisons. */
 export const SITE_HOST = SITE_URL.replace(/^https?:\/\//, '').replace(/\/.*$/, '')
 
 /** Short name, used by the title template ("… | AM Group"). */

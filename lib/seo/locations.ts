@@ -85,6 +85,11 @@ export function serviceLabel(service: string): string {
  * Null for a site whose address is not confirmed: a map of a guessed place is
  * worse than no map.
  */
+/** "five" for 5: small counts read better as words inside a sentence. */
+export function siteCountWord(count: number = LOCATIONS.length): string {
+  return ({ 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' } as Record<number, string>)[count] ?? String(count)
+}
+
 export function locationMapQuery(location: Location): string | null {
   if (!location.addressConfirmed) return null
   // With a verified pin the map is centred on the pin itself. Searching the

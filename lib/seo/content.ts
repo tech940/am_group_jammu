@@ -305,7 +305,7 @@ export function buildSellerNotes(v: InventoryVehicle): string[] {
 /* -------------------------------------------------------------------------- */
 
 const SITES = LOCATIONS.length
-const SITES_WORD = SITES === 3 ? 'three' : String(SITES)
+const SITES_WORD = ({ 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six' } as Record<number, string>)[SITES] ?? String(SITES)
 
 /** "9:30 am" from "09:30". */
 function clock(t: string): string {

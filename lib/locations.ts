@@ -97,7 +97,7 @@ const USED_CAR_SERVICES = [
 ]
 
 /**
- * The three used-car sites, all in Jammu.
+ * The used-car sites, all in Jammu (five since 2026-11-15).
  *
  * This list used to hold a Jammu site and a Srinagar office. The managing
  * director's instruction of 2026-11-14 is that used cars are sold from three
@@ -199,6 +199,65 @@ export const LOCATIONS: Location[] = [
     blurb:
       'AM Auto Square at Gangyal. Call before you come and we will confirm which cars are on ' +
       'site and give you exact directions.',
+  },
+  {
+    // Asked for by the managing director on 2026-11-15 ("add AM Hyundai Paloura
+    // location too"). Name, address, pin and opening days are copied from the
+    // company's own Google listing "AM Hyundai Paloura" (read the same day), so
+    // the website and the listing agree. The listing's phone number is the
+    // new-car showroom's; this site's used-car calls go to the main number
+    // until the company says otherwise.
+    slug: 'paloura',
+    name: 'AM Hyundai Paloura',
+    shortName: 'AM Hyundai Paloura',
+    city: 'Jammu',
+    streetAddress: 'Akhnoor Road, Manorama Vihar, Paloura',
+    landmark: 'Paloura',
+    // Not supplied by the company - left empty rather than guessed.
+    areasServed: [],
+    region: 'Jammu and Kashmir',
+    postalCode: '180005',
+    addressConfirmed: true,
+    phone: MAIN_PHONE,
+    phoneE164: MAIN_PHONE_E164,
+    email: 'info@amgroupind.com',
+    geo: { latitude: 32.7488076, longitude: 74.8233309, verified: true },
+    mapUrl: 'https://www.google.com/maps/place/AM+Hyundai+Paloura/@32.7488076,74.8233309,17z/data=!4m6!3m5!1s0x391e851ba39c8ee9:0xe6a1cfe447f83bf5!8m2!3d32.7488076!4d74.8233309!16s%2Fg%2F11fjb16182',
+    hours: STANDARD_HOURS,
+    services: USED_CAR_SERVICES,
+    isPrimary: false,
+    blurb:
+      'Used cars at the AM Hyundai showroom on Akhnoor Road, Paloura. Call before you come and ' +
+      'we will confirm which cars are on site.',
+  },
+  {
+    // Asked for by the managing director on 2026-11-15 ("Kia Certified Pre
+    // Owned at AM Kia"). Address, pin and opening days are copied from the
+    // company's own Google listing "AM Kia Jammu" (read the same day), which
+    // shows the showroom open all seven days. Calls go to the main used-car
+    // number until the company supplies one for this desk.
+    slug: 'am-kia',
+    name: 'Kia Certified Pre-Owned at AM Kia',
+    shortName: 'AM Kia (Kia Certified Pre-Owned)',
+    city: 'Jammu',
+    streetAddress: 'Ground Floor, Akhnoor Road, opposite Pillar No 52, Toph Sherkhanian',
+    landmark: 'Toph Sherkhanian',
+    // Not supplied by the company - left empty rather than guessed.
+    areasServed: [],
+    region: 'Jammu and Kashmir',
+    postalCode: '180001',
+    addressConfirmed: true,
+    phone: MAIN_PHONE,
+    phoneE164: MAIN_PHONE_E164,
+    email: 'info@amgroupind.com',
+    geo: { latitude: 32.7411295, longitude: 74.8327803, verified: true },
+    mapUrl: 'https://www.google.com/maps/place/AM+Kia+Jammu/@32.7411295,74.8327803,17z/data=!4m6!3m5!1s0x391e8580525689bb:0x49aa80a14531d07b!8m2!3d32.7411295!4d74.8327803!16s%2Fg%2F11lys3wrz6',
+    hours: EVERY_DAY_HOURS,
+    services: USED_CAR_SERVICES,
+    isPrimary: false,
+    blurb:
+      'Kia Certified Pre-Owned cars at the AM Kia showroom on Akhnoor Road, Toph Sherkhanian. ' +
+      'Call before you come and we will confirm which cars are on site.',
   },
 ]
 

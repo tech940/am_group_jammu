@@ -45,6 +45,9 @@ const fieldClass =
   "h-12 w-full rounded-sm border border-line-strong bg-surface text-body-lg text-ink " +
   "placeholder:text-body placeholder:text-ink-3"
 
+/** Small counts read better as words in a sentence. */
+const NUMBER_WORDS: Record<number, string> = { 2: "two", 3: "three", 4: "four", 5: "five", 6: "six" }
+
 /**
  * A hand-drawn stroke under one word, in the action colour. Decorative: the
  * word reads the same without it, so the stroke is hidden from assistive tech.
@@ -94,7 +97,7 @@ export function UsedHero({
         <>
           <p className="mt-4 text-body text-on-deep-2 md:text-body-lg">
             <span data-num>{total}</span> used {total === 1 ? "car" : "cars"} in stock today at{" "}
-            {LOCATIONS.length === 3 ? "three" : LOCATIONS.length} sites in Jammu
+            {NUMBER_WORDS[LOCATIONS.length] ?? LOCATIONS.length} sites in Jammu
             {facets.priceRange.max > 0 && (
               <>
                 , from <span data-num>{formatINRShort(facets.priceRange.min)}</span> to{" "}

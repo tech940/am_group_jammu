@@ -144,7 +144,7 @@ export function SiteFooter({ seoLinks }: { seoLinks: SeoLinks }) {
           <p id="footer-locations" className="text-label text-on-deep">
             Used-car locations in Jammu
           </p>
-          <ul className="mt-5 grid grid-cols-1 gap-8 md:grid-cols-3">
+          <ul className="mt-5 grid grid-cols-1 gap-8 md:grid-cols-3 xl:grid-cols-5">
             {LOCATIONS.map((l) => (
               <li key={l.slug}>
                 <Link

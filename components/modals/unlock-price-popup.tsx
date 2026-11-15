@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Alert, Spinner } from "@/components/ui/feedback"
 import { ChevronGlyph } from "@/components/system/marks"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
+import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { submitLead } from "@/lib/leads/actions"
 import { validateLead } from "@/lib/leads/validation"
 import { CONSENT_TEXT } from "@/lib/leads/types"
@@ -377,6 +378,8 @@ function EnquiryDialog({
     // repeat (no new row). Counting either would make GA4 disagree with the
     // admin lead table.
     const isRealNewLead = state.leadId !== "ignored" && !state.duplicate
+    // Someone who has just enquired is not shown the timed form again.
+    rememberEnquirySent()
     if (isRealNewLead) {
       // The lead's row id is deliberately not sent: it would tie the analytics
       // record, and the session recording, to a named person in the lead

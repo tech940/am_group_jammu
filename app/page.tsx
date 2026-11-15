@@ -1,3 +1,4 @@
+import { siteCountWord } from "@/lib/seo/locations"
 import type { Metadata } from "next"
 import { getHomeInventory, getInventory } from "@/lib/inventory/server"
 import { formatINRShort } from "@/lib/inventory/adapter"
@@ -10,7 +11,7 @@ import { pageSocial } from "@/lib/seo/site"
 export async function generateMetadata(): Promise<Metadata> {
   const { total, facets, degraded } = await getHomeInventory()
   const live = !degraded && total > 0
-  const sites = LOCATIONS.length === 3 ? "three" : String(LOCATIONS.length)
+  const sites = siteCountWord()
 
   // ONE PAGE PER SEARCH. Three pages used to chase "used cars in Jammu":
   //   /                  the dealer, and "buy or sell a used car in Jammu"

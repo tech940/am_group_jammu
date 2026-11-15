@@ -1,5 +1,6 @@
 "use client"
 
+import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { useRef, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -99,6 +100,7 @@ export function ContactForm() {
       }
 
       setForm(EMPTY)
+      rememberEnquirySent()
       setSent(true)
     } catch {
       pushEvent("form_error", {

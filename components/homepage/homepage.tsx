@@ -1,4 +1,5 @@
 import { UsedHero } from "./used-hero"
+import { AutoEnquiry } from "@/components/modals/auto-enquiry"
 import { Doors } from "./doors"
 import { Stock } from "./stock"
 import { Browse } from "./browse"
@@ -66,6 +67,8 @@ export function Homepage({
 
   return (
     <>
+      {/* Opens the enquiry form once, a few seconds after landing. */}
+      <AutoEnquiry />
       <UsedHero total={total} degraded={degraded} facets={facets} vehicles={vehicles} />
       <Doors total={total} priceFrom={facets.priceRange.min} live={live} />
       <Stock vehicles={latest} bestValue={bestValue} total={total} degraded={degraded} />

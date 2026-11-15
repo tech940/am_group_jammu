@@ -36,7 +36,7 @@ export function Stock({
       <SectionHead
         id="stock-title"
         title={available ? "Just arrived" : "Used cars in stock"}
-        lede="The photographs, odometer readings and prices are our own. Stock is spread across three sites in Jammu, so call to confirm which site a car is at."
+        lede="The photographs, odometer readings and prices are our own. Stock is spread across several sites in Jammu, so call to confirm which site a car is at."
       />
 
       <div className="mt-7 md:mt-10">
