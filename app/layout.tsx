@@ -39,6 +39,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  // Search Console and Bing ownership checks. Each prints a <meta> tag only when
+  // its code is set, so nothing is emitted until the owner adds one. The DNS
+  // method needs neither.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
   title: {
     default: SITE_TITLE,
     template: `%s | ${SITE_NAME}`,
