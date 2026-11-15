@@ -193,7 +193,7 @@ export function ContactPage() {
               <h3 className="font-display text-h2 uppercase text-ink">
                 <Link
                   href={`/locations/${location.slug}`}
-                  className="transition-colors duration-(--duration-1) hover:text-accent"
+                  className="inline-flex min-h-11 items-center transition-colors duration-(--duration-1) hover:text-accent"
                 >
                   {location.shortName}
                 </Link>

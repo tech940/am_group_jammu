@@ -147,7 +147,7 @@ export default async function LocationsPage() {
                 <h3 className="font-display text-h2 text-ink">
                   <Link
                     href={`/locations/${loc.slug}`}
-                    className="transition-colors duration-(--duration-1) hover:text-accent-text-light"
+                    className="inline-flex min-h-11 items-center transition-colors duration-(--duration-1) hover:text-accent-text-light"
                   >
                     {loc.shortName}
                   </Link>

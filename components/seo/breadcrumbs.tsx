@@ -49,7 +49,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
       >
         <Link
           href="/"
-          className="text-meta uppercase transition-colors duration-(--duration-1) hover:text-ink"
+          className="inline-flex min-h-11 items-center md:min-h-0 text-meta uppercase transition-colors duration-(--duration-1) hover:text-ink"
         >
           Home
         </Link>
@@ -71,7 +71,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
               ) : (
                 <Link
                   href={crumb.href}
-                  className="text-meta uppercase transition-colors duration-(--duration-1) hover:text-ink"
+                  className="inline-flex min-h-11 items-center md:min-h-0 text-meta uppercase transition-colors duration-(--duration-1) hover:text-ink"
                 >
                   {crumb.label}
                 </Link>

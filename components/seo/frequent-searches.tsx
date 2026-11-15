@@ -26,7 +26,7 @@ export function FrequentSearches({
             <span key={s.href + i} className="flex items-center gap-3">
               <Link
                 href={s.href}
-                className="text-small text-ink-2 hover:text-accent-text-light hover:underline transition-colors duration-(--duration-1)"
+                className="inline-flex min-h-11 items-center md:min-h-0 text-small text-ink-2 hover:text-accent-text-light hover:underline transition-colors duration-(--duration-1)"
               >
                 {s.label}
               </Link>
@@ -66,7 +66,7 @@ export function SeoLinkDirectory({
               <span key={link.href} className="flex items-center gap-2.5">
                 <Link
                   href={link.href}
-                  className="text-caption text-ink hover:text-accent-text-light hover:underline transition-colors duration-(--duration-1)"
+                  className="inline-flex min-h-11 items-center md:min-h-0 text-caption text-ink hover:text-accent-text-light hover:underline transition-colors duration-(--duration-1)"
                 >
                   {link.label}
                   {typeof link.count === "number" && (
