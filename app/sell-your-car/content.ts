@@ -65,3 +65,23 @@ export const SELL_FAQS: FaqItem[] = [
       "Not a firm one. An honest figure depends on seeing the car, so the price is given after the evaluator has looked at it.",
   },
 ]
+
+/**
+ * Facts about the group, exactly as the company states them on its own
+ * valuation page (app.amautomotivegroup.com/sell-used-car, read 2026-11-15).
+ * They are the company's figures, not ours to round or update: change them
+ * only when the company does.
+ */
+export const GROUP_FACTS = { since: 1968, hyundaiSince: 2008, showrooms: 26 } as const
+
+/** The group's dealerships, from the same page, in the same order. */
+export const DEALERSHIPS: { name: string; sells: string; logo: string }[] = [
+  { name: "AM Hyundai", sells: "Hyundai cars", logo: "/brand-logos/hyundai.svg" },
+  { name: "AM Hyundai Paloura", sells: "Hyundai cars", logo: "/brand-logos/hyundai.svg" },
+  { name: "AM Kia", sells: "Kia cars", logo: "/brand-logos/kia.svg" },
+  { name: "AM Tata", sells: "Tata cars", logo: "/brand-logos/tata.svg" },
+  { name: "AM MG", sells: "MG cars", logo: "/brand-logos/mg.svg" },
+  { name: "AM Diamond Honda", sells: "Honda two-wheelers", logo: "/brand-logos/diamond-honda.png" },
+  { name: "AM KTM", sells: "KTM motorcycles", logo: "/brand-logos/ktm.svg" },
+  { name: "AM Bajaj", sells: "Bajaj motorcycles", logo: "/brand-logos/bajaj.svg" },
+]

@@ -201,7 +201,11 @@ export const LOCATIONS: Location[] = [
  * 10-digit mobile number and every surface that reads H_PROMISE picks it up;
  * while it is unset nothing renders, so no page shows a guessed number.
  */
-const hpDigits = (process.env.NEXT_PUBLIC_HPROMISE_PHONE || '').replace(/\D/g, '').slice(-10)
+// Confirmed by the owner on 2026-11-15: +91 94694 44456, the number of the
+// AM Hyundai Gandhi Nagar used-car showroom, is the H Promise line. The env
+// variable still overrides it, so the number can change without a deploy.
+const HPROMISE_DEFAULT = '9469444456'
+const hpDigits = (process.env.NEXT_PUBLIC_HPROMISE_PHONE || HPROMISE_DEFAULT).replace(/\D/g, '').slice(-10)
 export const H_PROMISE: { phone: string; phoneE164: string } | null =
   hpDigits.length === 10
     ? { phone: `+91 ${hpDigits.slice(0, 5)} ${hpDigits.slice(5)}`, phoneE164: `+91${hpDigits}` }

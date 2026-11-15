@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { Band } from "@/components/system/page-kit"
 import { Button } from "@/components/ui/button"
@@ -13,7 +14,7 @@ import { Visit } from "@/components/homepage/visit"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
 import { pageSocial } from "@/lib/seo/site"
 import { jsonLdString, sellServiceSchema } from "@/lib/seo-schemas"
-import { SELL_FAQS, SELL_STEPS } from "./content"
+import { DEALERSHIPS, GROUP_FACTS, SELL_FAQS, SELL_STEPS } from "./content"
 
 /**
  * Sell your car — the second of the two things this site is for.
@@ -77,12 +78,64 @@ export default function SellYourCarPage() {
               <strong className="font-semibold text-ink">AM Group, Jammu</strong> evaluates any car, any
               brand, free. Sell it, or put it towards a used car from our stock.
             </p>
-            <IlloSell className="mt-6 hidden h-56 w-auto lg:block" />
+            {/* The company's own drawing of an evaluator, pointing at the form.
+                Shown from desktop width only: on a phone the form is the next
+                thing on screen and needs no pointing at. */}
+            <div className="relative mt-4 hidden lg:block">
+              <p
+                aria-hidden
+                className="absolute right-6 top-2 max-w-[11ch] -rotate-6 text-right font-display text-h3 text-pop-text"
+              >
+                Get your car&rsquo;s value in a minute
+              </p>
+              <Image
+                src="/sell/sell-evaluator.webp"
+                alt="An AM Group evaluator in the company sweatshirt, pointing at the form"
+                width={1060}
+                height={1180}
+                sizes="320px"
+                loading="eager"
+                className="h-80 w-auto"
+              />
+            </div>
           </div>
 
           <div id="valuation" className="scroll-mt-24">
             <ValuationWizard />
           </div>
+        </div>
+      </section>
+
+      {/* Who is asking for the car. The sentence and the dealership list are
+          the company's own, from its valuation page; the owner asked for them
+          here on 2026-11-15. This is the one place on this site that names the
+          group's new-vehicle dealerships, because a seller is trusting the
+          group with their car, not just a used-car desk. */}
+      <section aria-label="About AM Group" className="bg-ground-2">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-8 px-4 py-10 md:grid-cols-[1fr_minmax(0,28rem)] md:px-10 md:py-14">
+          <p className="max-w-[40ch] text-body-lg text-ink-2">
+            AM Group has been in Jammu since{" "}
+            <strong className="font-semibold text-ink" data-num>
+              {GROUP_FACTS.since}
+            </strong>
+            , has sold Hyundai cars since{" "}
+            <strong className="font-semibold text-ink" data-num>
+              {GROUP_FACTS.hyundaiSince}
+            </strong>
+            , and runs{" "}
+            <strong className="font-semibold text-ink" data-num>
+              {GROUP_FACTS.showrooms}
+            </strong>{" "}
+            showrooms across Jammu &amp; Kashmir.
+          </p>
+          <Image
+            src="/sell/am-hyundai-showroom.webp"
+            alt="The front of the AM Hyundai showroom, with Hyundai cars on display behind the glass"
+            width={920}
+            height={546}
+            sizes="(max-width: 767px) 100vw, 448px"
+            className="h-auto w-full rounded-md border border-line"
+          />
         </div>
       </section>
 
@@ -144,6 +197,32 @@ export default function SellYourCarPage() {
             <ArrowGlyph />
           </Link>
         </div>
+      </Band>
+
+      <Band ground="ground-2" labelledBy="group-title" id="dealerships" className={TIGHT_BAND}>
+        <SectionHead
+          id="group-title"
+          title={`One group, ${DEALERSHIPS.length === 8 ? "eight" : DEALERSHIPS.length} dealerships`}
+          lede="AM Group sells new cars and two-wheelers across Jammu & Kashmir, and the same group evaluates your car."
+        />
+        <ul className="mt-7 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-4 md:gap-4">
+          {DEALERSHIPS.map((d) => (
+            <li key={d.name} className="rounded-md border border-line bg-surface p-4 md:p-5">
+              {/* The makers' own marks, shown as the dealer of each. Decorative:
+                  the name beside it says the same thing. */}
+              <Image
+                src={d.logo}
+                alt=""
+                width={96}
+                height={40}
+                unoptimized={d.logo.endsWith(".svg")}
+                className="h-8 w-auto max-w-24 object-contain object-left"
+              />
+              <p className="mt-4 text-h4 text-ink">{d.name}</p>
+              <p className="mt-0.5 text-small text-ink-2">{d.sells}</p>
+            </li>
+          ))}
+        </ul>
       </Band>
 
       <Visit
