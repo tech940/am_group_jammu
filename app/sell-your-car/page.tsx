@@ -81,10 +81,10 @@ export default function SellYourCarPage() {
             {/* The company's own drawing of an evaluator, pointing at the form.
                 Shown from desktop width only: on a phone the form is the next
                 thing on screen and needs no pointing at. */}
-            <div className="relative mt-4 hidden lg:block">
+            <div className="relative mt-4 hidden w-fit lg:block">
               <p
                 aria-hidden
-                className="absolute right-6 top-2 max-w-[11ch] -rotate-6 text-right font-display text-h3 text-pop-text"
+                className="absolute left-full top-10 ml-3 w-[11ch] -rotate-6 font-display text-h3 text-pop-text"
               >
                 Get your car&rsquo;s value in a minute
               </p>
