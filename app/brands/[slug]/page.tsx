@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -344,7 +345,7 @@ async function SoldOutBrand({ brandName, path }: { brandName: string; path: stri
             </p>
             <p className="text-body text-ink-2">
               Tell us you are looking for a {brandName} and we will call you when one arrives. You can
-              also ring {PRIMARY_LOCATION.phone} and ask what is due in.
+              also ring {linkPhones(PRIMARY_LOCATION.phone, "inline-text")} and ask what is due in.
             </p>
           </div>
 

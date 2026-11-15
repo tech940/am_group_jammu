@@ -1,5 +1,6 @@
 "use client"
 
+import { linkPhones } from "@/components/system/phone-text"
 import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { useActionState, useEffect, useId, useMemo, useRef, useState } from "react"
 import { usePathname } from "next/navigation"
@@ -635,7 +636,7 @@ export function ValuationWizard({ sourceLabel = "sell-wizard" }: { sourceLabel?:
 
             {formError && (
               <p role="alert" className="mt-3 rounded-sm border border-danger-line bg-danger-bg px-3 py-2 text-small text-danger-text">
-                {formError} You can also call {PRIMARY_LOCATION.phone}.
+                {formError} You can also call {linkPhones(PRIMARY_LOCATION.phone, "inline-text")}.
               </p>
             )}
 
@@ -654,7 +655,7 @@ export function ValuationWizard({ sourceLabel = "sell-wizard" }: { sourceLabel?:
 
       <noscript>
         <p className="mt-4 text-small text-ink-2">
-          This form needs JavaScript. You can call or WhatsApp us instead on {PRIMARY_LOCATION.phone}.
+          This form needs JavaScript. You can call or WhatsApp us instead on {linkPhones(PRIMARY_LOCATION.phone, "inline-text")}.
         </p>
       </noscript>
 

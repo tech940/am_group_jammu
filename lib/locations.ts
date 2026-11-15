@@ -78,12 +78,22 @@ const STANDARD_HOURS = [
 ]
 
 /**
- * The switchboard number published on amgroupind.com (header, footer, schema
- * and the WhatsApp widget all use it). It replaced a sequential dummy number
- * (+91 94191 00000) on 2026-11-14.
+ * The one number for every call. Set by the owner on 2026-11-15: "All calls
+ * should go to +919469444456". Every site, the header, the tab bar, the
+ * footer and the structured data read it from here. (It replaced
+ * +91 94842 00000, the group switchboard.)
  */
-const MAIN_PHONE = '+91 94842 00000'
-const MAIN_PHONE_E164 = '+919484200000'
+const MAIN_PHONE = '+91 94694 44456'
+const MAIN_PHONE_E164 = '+919469444456'
+
+/**
+ * WhatsApp is NOT moved with the calls. The owner's instruction was about
+ * calls, and a wa.me link to a number that has no WhatsApp account opens a
+ * dead "invalid number" screen. It stays on the number it has always used
+ * until the owner confirms the new one is on WhatsApp; set
+ * NEXT_PUBLIC_WHATSAPP_NUMBER to change it without a code change.
+ */
+const WHATSAPP_DEFAULT = '919484200000'
 
 // "Used car sales", not "Certified pre-owned car sales": nothing on record
 // says who certifies the cars or against what checklist, and this label is
@@ -160,8 +170,8 @@ export const LOCATIONS: Location[] = [
     region: 'Jammu and Kashmir',
     postalCode: '180004',
     addressConfirmed: true,
-    phone: '+91 94694 44456',
-    phoneE164: '+919469444456',
+    phone: MAIN_PHONE,
+    phoneE164: MAIN_PHONE_E164,
     email: 'info@amgroupind.com',
     // The pin of the Google listing above.
     geo: { latitude: 32.7020528, longitude: 74.871094, verified: true },
@@ -312,8 +322,7 @@ export function formatHours(location: Location): string {
  * the WhatsApp line differs from the switchboard.
  */
 export const WHATSAPP_NUMBER =
-  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, '') ||
-  PRIMARY_LOCATION.phoneE164.replace(/\D/g, '')
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.replace(/\D/g, '') || WHATSAPP_DEFAULT
 
 /** Build a wa.me link with a prefilled message. */
 export function whatsappUrl(message: string): string {

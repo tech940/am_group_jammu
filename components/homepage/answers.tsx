@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import { FaqList } from "@/components/seo/faq-section"
 import { buildDealerFacts, buildHomeFaqs } from "@/lib/seo/content"
 import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
@@ -34,7 +35,7 @@ export function Answers({
   return (
     <StoreBand ground="ground-2" labelledBy="answers-title" id="answers">
       <SectionHead id="answers-title" title="Questions buyers ask" />
-      <p className="mt-5 max-w-[72ch] text-body-lg text-ink">{buildDealerFacts(facets, total)}</p>
+      <p className="mt-5 max-w-[72ch] text-body-lg text-ink">{linkPhones(buildDealerFacts(facets, total), "home-answers")}</p>
       <div className="mt-7 max-w-4xl md:mt-10">
         <FaqList items={buildHomeFaqs(facets, vehicles, total)} />
       </div>

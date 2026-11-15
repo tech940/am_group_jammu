@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { PRIMARY_LOCATION } from "@/lib/locations"
@@ -93,7 +94,7 @@ export default async function UsedCarsIndexPage() {
               </p>
             ) : (
               <p className="text-body text-ink-2">
-                Our stock list is not loading right now. Call {PRIMARY_LOCATION.phone} and we will tell you
+                Our stock list is not loading right now. Call {linkPhones(PRIMARY_LOCATION.phone, "inline-text")} and we will tell you
                 what is in stock today.
               </p>
             )}

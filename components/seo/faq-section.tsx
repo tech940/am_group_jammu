@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import { jsonLdString } from "@/lib/seo-schemas"
 
 export interface FaqItem {
@@ -52,7 +53,7 @@ export function FaqList({ items }: { items: FaqItem[] }) {
                 +
               </span>
             </summary>
-            <p className="mt-3 text-body text-ink-2 pr-8">{faq.answer}</p>
+            <p className="mt-3 text-body text-ink-2 pr-8">{linkPhones(faq.answer, "faq")}</p>
           </details>
         ))}
       </div>
@@ -76,7 +77,7 @@ export function FaqSection({
     <section className="py-16 bg-ground border-t border-line">
       <div className="container mx-auto px-4 md:px-8 max-w-4xl">
         <h2 className="font-display text-h2 text-ink mb-3">{title}</h2>
-        {intro && <p className="text-body text-ink-2 mb-8 max-w-2xl">{intro}</p>}
+        {intro && <p className="text-body text-ink-2 mb-8 max-w-2xl">{linkPhones(intro, "faq")}</p>}
         <FaqList items={items} />
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import type { ReactNode } from "react"
 import { Settle } from "@/components/system/motion"
 
@@ -24,7 +25,7 @@ export function SectionHead({
       <h2 id={id} className="max-w-[22ch] font-display text-h1 uppercase text-ink">
         {title}
       </h2>
-      {lede && <p className="max-w-[48ch] text-body text-ink-2 md:text-body-lg">{lede}</p>}
+      {lede && <p className="max-w-[48ch] text-body text-ink-2 md:text-body-lg">{typeof lede === "string" ? linkPhones(lede, "section-lede") : lede}</p>}
     </div>
   )
 }

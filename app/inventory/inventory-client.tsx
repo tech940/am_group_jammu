@@ -1,5 +1,6 @@
 "use client"
 
+import { linkPhones } from "@/components/system/phone-text"
 import { AutoEnquiry } from "@/components/modals/auto-enquiry"
 import { siteCountWord } from "@/lib/seo/locations"
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from "react"
@@ -486,7 +487,7 @@ export default function InventoryClient({
                     i === 0
                       ? "text-body-lg font-semibold text-ink"
                       : "text-body text-ink-2"
-                  }>{p}</p>
+                  }>{linkPhones(p, "inventory-text")}</p>
                 ))}
               </div>
             </div>
@@ -500,7 +501,7 @@ export default function InventoryClient({
           {copy.outro.map((block) => (
             <article key={block.heading}>
               <h2 className="font-display text-h2 text-ink mb-3">{block.heading}</h2>
-              <p className="text-body text-ink-2">{block.body}</p>
+              <p className="text-body text-ink-2">{linkPhones(block.body, "inventory-text")}</p>
             </article>
           ))}
         </div>

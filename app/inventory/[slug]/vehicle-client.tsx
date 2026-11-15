@@ -1,5 +1,6 @@
 "use client"
 
+import { linkPhones } from "@/components/system/phone-text"
 import { AutoEnquiry } from "@/components/modals/auto-enquiry"
 import React, { useEffect } from "react"
 import Link from "next/link"
@@ -338,7 +339,7 @@ export default function VehicleClient({
                 from facts the stock record holds. Under the buttons so that
                 on a phone the photo, price and enquiry stay on the first
                 screen. */}
-            <p className="mt-4 text-body text-ink-2 md:mt-6">{summary}</p>
+            <p className="mt-4 text-body text-ink-2 md:mt-6">{linkPhones(summary, "vdp-text")}</p>
           </div>
 
           {/* DETAILS */}
@@ -367,12 +368,12 @@ export default function VehicleClient({
               <div className="space-y-4">
                 {dealerNotes.map((para, i) => (
                   <p key={`dealer-${i}`} className="text-body text-ink">
-                    {para}
+                    {linkPhones(para, "vdp-text")}
                   </p>
                 ))}
                 {sellerNotes.map((para, i) => (
                   <p key={i} className="text-body text-ink-2">
-                    {para}
+                    {linkPhones(para, "vdp-text")}
                   </p>
                 ))}
               </div>
@@ -490,7 +491,7 @@ export default function VehicleClient({
                   "Finance & exchange assistance",
                 ].map((text) => (
                   <li key={text} className="border-b border-line py-3 text-body text-ink-2">
-                    {text}
+                    {linkPhones(text, "vdp-text")}
                   </li>
                 ))}
               </ul>

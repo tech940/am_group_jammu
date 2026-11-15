@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -156,7 +157,7 @@ export default async function UsedCarsLandingPage({ params }: Props) {
           <div className="max-w-3xl space-y-3">
             {landing.intro.map((p, i) => (
               <p key={i} className="text-body text-ink-2">
-                {p}
+                {linkPhones(p, "landing-text")}
               </p>
             ))}
           </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { linkPhones } from "@/components/system/phone-text"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useActionState, useEffect, useId, useRef, useState } from "react"
@@ -513,7 +514,7 @@ function EnquiryDialog({
             // the Clarity project is later set to.
             data-clarity-mask="true"
           >
-            {formError && <Alert tone="danger">{formError}</Alert>}
+            {formError && <Alert tone="danger">{linkPhones(formError, "enquiry-form-error")}</Alert>}
 
             <Field label="Name" required error={fields.name}>
               {(p) => (

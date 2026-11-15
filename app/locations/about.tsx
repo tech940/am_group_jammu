@@ -1,3 +1,4 @@
+import { linkPhones } from "@/components/system/phone-text"
 import { ABOUT_HEADING, ABOUT_PARAGRAPHS } from "./about-facts"
 
 /**
@@ -18,7 +19,7 @@ export function AboutDealer() {
         <div className="space-y-4">
           {ABOUT_PARAGRAPHS.map((p) => (
             <p key={p} className="text-body text-ink-2">
-              {p}
+              {linkPhones(p, "about-text")}
             </p>
           ))}
         </div>

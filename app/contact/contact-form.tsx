@@ -1,5 +1,6 @@
 "use client"
 
+import { linkPhones } from "@/components/system/phone-text"
 import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { useRef, useState } from "react"
 import Link from "next/link"
@@ -242,7 +243,7 @@ export function ContactForm() {
         onChange={(e) => setForm({ ...form, consent: e.target.checked })}
       />
 
-      {error && <Alert tone="danger">{error}</Alert>}
+      {error && <Alert tone="danger">{linkPhones(error, "contact-form-error")}</Alert>}
 
       <Button type="submit" size="lg" full disabled={submitting}>
         {submitting ? (
