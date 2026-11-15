@@ -69,35 +69,51 @@ export default function SellYourCarPage() {
           press before starting. A light ground, not the photograph: a form
           over a picture is harder to read, and this page is the form. */}
       <section aria-labelledby="sell-title" className="sky-ground relative">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-start gap-8 px-4 pb-12 pt-8 md:px-10 md:pb-20 md:pt-14 lg:grid-cols-[1fr_minmax(0,30rem)] lg:gap-14">
+        {/* Three columns on a wide screen, as on the company's own page: the
+            question, the evaluator, the form - so his hand points straight at
+            the form. Below that width there is no room for him beside it, and
+            he is left out rather than squeezed under the text. */}
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-start gap-8 px-4 pb-12 pt-8 md:px-10 md:pb-20 md:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:gap-10 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,30rem)] xl:gap-6">
           <div className="lg:pt-6">
-            <h1 id="sell-title" className="font-display text-display uppercase text-ink">
+            <h1
+              id="sell-title"
+              className="font-display text-display uppercase text-ink xl:text-[length:4.25rem]"
+            >
               What&rsquo;s your car worth?
             </h1>
             <p className="mt-4 max-w-[44ch] text-body-lg text-ink-2">
               <strong className="font-semibold text-ink">AM Group, Jammu</strong> evaluates any car, any
               brand, free. Sell it, or put it towards a used car from our stock.
             </p>
-            {/* The company's own drawing of an evaluator, pointing at the form.
-                Shown from desktop width only: on a phone the form is the next
-                thing on screen and needs no pointing at. */}
-            <div className="relative mt-4 hidden w-fit lg:block">
-              <p
-                aria-hidden
-                className="absolute left-full top-10 ml-3 w-[11ch] -rotate-6 font-display text-h3 text-pop-text"
-              >
-                Get your car&rsquo;s value in a minute
-              </p>
-              <Image
-                src="/sell/sell-evaluator.webp"
-                alt="An AM Group evaluator in the company sweatshirt, pointing at the form"
-                width={1060}
-                height={1180}
-                sizes="320px"
-                loading="eager"
-                className="h-80 w-auto"
-              />
-            </div>
+          </div>
+
+          {/* The company's own drawing of an evaluator. Decorative here: the
+              heading and the form already say everything he is pointing at. */}
+          <div aria-hidden className="relative hidden self-end xl:block">
+            <p className="absolute -right-2 -top-2 w-[10ch] -rotate-6 text-right font-display text-h3 leading-tight text-pop-text">
+              Get your car&rsquo;s value in a minute
+            </p>
+            <svg
+              viewBox="0 0 60 40"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="absolute -right-4 top-24 h-8 w-12 text-pop-text"
+            >
+              <path d="M4 6c14 22 30 26 50 22" />
+              <path d="m46 20 9 8-11 5" />
+            </svg>
+            <Image
+              src="/sell/sell-evaluator.webp"
+              alt=""
+              width={1060}
+              height={1180}
+              sizes="290px"
+              loading="eager"
+              className="mt-20 h-80 w-auto"
+            />
           </div>
 
           <div id="valuation" className="scroll-mt-24">
