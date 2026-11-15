@@ -68,13 +68,15 @@ const TEXT_LINK =
   "inline-flex min-h-11 items-center text-label text-ink underline underline-offset-4 " +
   "transition-colors duration-(--duration-1) hover:text-accent cursor-pointer"
 
-/** The next seven days the dealership is open (it is closed on Sundays). */
+/**
+ * The next seven days. Sundays are included: AM Hyundai Gandhi Nagar is open
+ * on Sundays (owner-confirmed, 2026-11-15), so a seller can be seen then.
+ */
 function openDays(): { value: string; top: string; bottom: string }[] {
   const out: { value: string; top: string; bottom: string }[] = []
   const day = new Date()
   for (let i = 0; out.length < 7 && i < 14; i++) {
     const d = new Date(day.getFullYear(), day.getMonth(), day.getDate() + i)
-    if (d.getDay() === 0) continue
     const date = d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })
     const weekday = d.toLocaleDateString("en-IN", { weekday: "short" })
     const top = i === 0 ? "Today" : i === 1 ? "Tomorrow" : weekday

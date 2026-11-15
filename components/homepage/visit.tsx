@@ -34,7 +34,8 @@ import { SectionHead, StoreBand } from "./section-head"
  * call tracking.
  */
 export function Visit({
-  title = `${LOCATIONS.length} sites in Jammu, open six days`,
+  // Not "open six days": one site is open all seven.
+  title = `${LOCATIONS.length} sites in Jammu`,
   lede = "Stock is spread across all of them. Call to confirm which site a car is at before you set out.",
   source = "home-visit",
   ground = "ground",

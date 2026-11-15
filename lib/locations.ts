@@ -60,6 +60,15 @@ export interface Location {
   blurb: string
 }
 
+/** Open all seven days. Confirmed by the owner for AM Hyundai Gandhi Nagar on 2026-11-15. */
+const EVERY_DAY_HOURS = [
+  {
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    opens: '09:30',
+    closes: '18:30',
+  },
+]
+
 const STANDARD_HOURS = [
   {
     days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
@@ -157,9 +166,9 @@ export const LOCATIONS: Location[] = [
     // The pin of the Google listing above.
     geo: { latitude: 32.7020528, longitude: 74.871094, verified: true },
     mapUrl: 'https://maps.app.goo.gl/YGc4xjvaL5MHUuvn8',
-    // The Google listing shows this site open on Sundays too. Left at the
-    // standard Monday-Saturday hours until the company confirms which is right.
-    hours: STANDARD_HOURS,
+    // Open on Sundays too: the Google listing says so and the owner confirmed
+    // it on 2026-11-15. The other two sites are Monday to Saturday.
+    hours: EVERY_DAY_HOURS,
     services: USED_CAR_SERVICES,
     isPrimary: false,
     blurb:
@@ -222,7 +231,7 @@ export function formatHours(location: Location): string {
   return location.hours
     .map((h) => {
       const span =
-        h.days.length > 1 ? `${h.days[0].slice(0, 3)}–${h.days[h.days.length - 1].slice(0, 3)}` : h.days[0].slice(0, 3)
+        h.days.length === 7 ? 'Every day' : h.days.length > 1 ? `${h.days[0].slice(0, 3)}–${h.days[h.days.length - 1].slice(0, 3)}` : h.days[0].slice(0, 3)
       const to12 = (t: string) => {
         const [hh, mm] = t.split(':').map(Number)
         const suffix = hh >= 12 ? 'pm' : 'am'
