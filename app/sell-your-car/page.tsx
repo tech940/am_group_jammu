@@ -3,39 +3,36 @@ import Link from "next/link"
 import { Band } from "@/components/system/page-kit"
 import { Button } from "@/components/ui/button"
 import { ClosingCall } from "@/components/system/closing-call"
-import { EnquireCta } from "@/components/system/enquire-cta"
 import { ArrowGlyph } from "@/components/system/marks"
 import { IlloPapers, IlloSell, IlloShowroom } from "@/components/system/illustrations"
 import { FaqSection } from "@/components/seo/faq-section"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
-import { PhotoHero } from "@/components/homepage/photo-hero"
+import { ValuationWizard } from "./valuation-wizard"
 import { SectionHead, TIGHT_BAND } from "@/components/homepage/section-head"
 import { Visit } from "@/components/homepage/visit"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
 import { pageSocial } from "@/lib/seo/site"
 import { jsonLdString, sellServiceSchema } from "@/lib/seo-schemas"
-import { SELL_FAQS, SELL_SITE_NAMES, SELL_STEPS } from "./content"
+import { SELL_FAQS, SELL_STEPS } from "./content"
 
 /**
  * Sell your car — the second of the two things this site is for.
  *
- * WHAT THIS PAGE DOES NOT SAY. It names no price, no "best price", no payment
- * time and no doorstep pickup. None of those is established anywhere in the
- * project, and a promise the forecourt cannot keep costs more than the lead it
- * wins. What IS established — in lib/locations.ts and content.ts — is that
- * each site sells or exchanges cars, values a car while the owner waits, and
- * handles payment, RC transfer and insurance transfer in-house. The page says
- * exactly that and nothing wider.
+ * The page follows the company's own valuation page, which the owner gave as
+ * the reference: the headline is the seller's question, the three-step form
+ * is the opener, then how it works, where to bring the car, and questions.
  *
- * Server-rendered throughout; the only client code is the enquiry button.
+ * WHAT THIS PAGE DOES NOT SAY. It shows no price and promises no "best
+ * price" or payment time: the form collects the car's details and a number,
+ * an evaluator calls, and the price follows a look at the car.
+ *
+ * Server-rendered except the form (valuation-wizard.tsx).
  */
 
-const SITE_NAMES = SELL_SITE_NAMES
-
-const TITLE = "Sell Your Car in Jammu | Free Valuation | AM Group"
+const TITLE = "Sell Your Car in Jammu | Free Car Valuation | AM Group"
 const DESCRIPTION =
-  `Sell or exchange your car at AM Group in Jammu. Free valuation while you wait at ${SITE_NAMES.length} sites. ` +
-  `Payment and RC transfer handled in-house. Call ${PRIMARY_LOCATION.phone}.`
+  `What is your car worth? AM Group in Jammu evaluates any car, any brand, free. Tell us the make, model, ` +
+  `year and kilometres and an evaluator calls you. Call ${PRIMARY_LOCATION.phone}.`
 
 export function generateMetadata(): Metadata {
   return {
@@ -66,40 +63,38 @@ export default function SellYourCarPage() {
         }}
       />
 
-      <PhotoHero labelledBy="sell-title">
-        <h1 id="sell-title" className="font-display text-display uppercase text-on-deep">
-          Sell your car in Jammu
-        </h1>
-        <p className="mt-4 text-body text-on-deep-2 md:text-body-lg">
-          Bring it to one of our {SITE_NAMES.length} sites. We inspect it while you wait and
-          make you an offer. The valuation is free.
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <EnquireCta
-            label="Get a free valuation"
-            intent="Sell Your Car"
-            sourceLabel="sell-hero"
-            variant="bright"
-          />
-          <Button asChild variant="onDeep" size="lg">
-            <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="sell-hero">
-              Call {PRIMARY_LOCATION.phone}
-            </a>
-          </Button>
-        </div>
-      </PhotoHero>
+      {/* The opener is the form. The headline asks the seller's own question
+          and the first step is already on screen, so there is nothing to
+          press before starting. A light ground, not the photograph: a form
+          over a picture is harder to read, and this page is the form. */}
+      <section aria-labelledby="sell-title" className="sky-ground relative">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-start gap-8 px-4 pb-12 pt-8 md:px-10 md:pb-20 md:pt-14 lg:grid-cols-[1fr_minmax(0,30rem)] lg:gap-14">
+          <div className="lg:pt-6">
+            <h1 id="sell-title" className="font-display text-display uppercase text-ink">
+              What&rsquo;s your car worth?
+            </h1>
+            <p className="mt-4 max-w-[44ch] text-body-lg text-ink-2">
+              <strong className="font-semibold text-ink">AM Group, Jammu</strong> evaluates any car, any
+              brand, free. Sell it, or put it towards a used car from our stock.
+            </p>
+            <IlloSell className="mt-6 hidden h-56 w-auto lg:block" />
+          </div>
 
-      {/* Under the hero so the photograph stays full-bleed at the top. This
-          one component draws the trail and writes the matching BreadcrumbList,
-          so the two cannot disagree (the page used to emit the list with no
-          visible trail at all). */}
+          <div id="valuation" className="scroll-mt-24">
+            <ValuationWizard />
+          </div>
+        </div>
+      </section>
+
+      {/* One component draws the trail and writes the matching BreadcrumbList,
+          so the two cannot disagree. */}
       <Breadcrumbs items={[{ label: "Sell your car" }]} />
 
-      <Band ground="ground" labelledBy="valuation-title" id="valuation" className={TIGHT_BAND}>
+      <Band ground="ground" labelledBy="how-title" id="how-it-works" className={TIGHT_BAND}>
         <SectionHead
-          id="valuation-title"
-          title="How selling works"
-          lede="Three steps, all at the dealership. We do not quote a price before we have seen the car."
+          id="how-title"
+          title="How it works"
+          lede="Three steps. We do not quote a price before we have seen the car."
         />
 
         <ol className="mt-7 grid grid-cols-1 gap-3 md:mt-10 md:grid-cols-3 md:gap-5">
@@ -121,11 +116,14 @@ export default function SellYourCarPage() {
         </ol>
 
         <div className="mt-6 flex flex-wrap items-center gap-3 md:mt-8">
-          <EnquireCta
-            label="Ask for a valuation"
-            intent="Sell Your Car"
-            sourceLabel="sell-steps"
-          />
+          <Button asChild size="lg">
+            <a href="#valuation">Get my car&rsquo;s price</a>
+          </Button>
+          <Button asChild variant="secondary" size="lg">
+            <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location="sell-steps">
+              Call {PRIMARY_LOCATION.phone}
+            </a>
+          </Button>
           <Button asChild variant="secondary" size="lg">
             <a
               href={whatsappUrl(
@@ -149,7 +147,7 @@ export default function SellYourCarPage() {
       </Band>
 
       <Visit
-        title="Where to bring your car"
+        title="Or bring the car to us"
         lede="Any of these sites can value your car. Call first and we will tell you which is best for you and how to get there."
         source="sell-visit"
         ground="ground-2"

@@ -153,7 +153,7 @@ export function LeadDetailClient({
               </div>
               <div className="flex justify-between border-b border-line py-2">
                 <dt className="text-meta uppercase text-ink-2">Source page</dt>
-                <dd className="text-body text-ink-2 truncate max-w-[220px]">{lead.sourcePath ?? "—"}</dd>
+                <dd className="text-body text-ink-2 truncate max-w-[220px]">{[lead.sourcePath, lead.sourceLabel].filter(Boolean).join(" · ") || "—"}</dd>
               </div>
               <div className="flex justify-between gap-4 border-b border-line py-2">
                 <dt className="text-meta uppercase text-ink-2">Consent</dt>

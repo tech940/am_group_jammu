@@ -41,10 +41,14 @@ export function normalizePhone(raw: string): string | null {
   const digits = (raw ?? '').replace(/\D/g, '')
   if (!digits) return null
 
+  // Strip whatever a person puts in front of the ten digits: 00, a country
+  // code (typed once, or twice when the form already shows "+91" beside the
+  // box), and a trunk 0. Each is removed only while more than ten digits
+  // remain, so a real number that happens to begin 91 is never cut short.
   let local = digits
-  if (local.length === 12 && local.startsWith('91')) local = local.slice(2)
-  else if (local.length === 11 && local.startsWith('0')) local = local.slice(1)
-  else if (local.length === 13 && local.startsWith('091')) local = local.slice(3)
+  if (local.length > 10 && local.startsWith('00')) local = local.slice(2)
+  while (local.length > 10 && local.startsWith('91')) local = local.slice(2)
+  if (local.length > 10 && local.startsWith('0')) local = local.slice(1)
 
   // Indian mobile numbers are 10 digits starting 6-9.
   if (!/^[6-9]\d{9}$/.test(local)) return null

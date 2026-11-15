@@ -99,7 +99,11 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
         duplicate.id,
         'note',
         `${REPEAT_NOTE_PREFIX} from the same number${clean.sourcePath ? ` on ${clean.sourcePath}` : ''}. ` +
-          `${origin ? `How they found us. ${origin}. ` : ''}Consent: ${consentNote}.`,
+          `${origin ? `How they found us. ${origin}. ` : ''}Consent: ${consentNote}.` +
+          // The second form can carry different answers (a second car from the
+          // valuation form, corrected kilometres). There is no new lead row to
+          // hold them, so they are kept here rather than dropped.
+          (clean.message && clean.message !== duplicate.message ? ` Their message this time: ${clean.message}` : ''),
         null,
       )
       return { ok: true, data: { id: duplicate.id, duplicate: true } }

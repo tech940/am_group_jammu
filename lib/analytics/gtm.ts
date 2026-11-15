@@ -79,6 +79,7 @@ export type AnalyticsEventName =
   | 'enquiry_modal_close'
   | 'form_start'
   | 'form_error'
+  | 'sell_form_step'
   | 'generate_lead'
   | 'generate_lead_duplicate'
   // contact

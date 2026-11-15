@@ -25,9 +25,9 @@ import { SectionHead, StoreBand } from "./section-head"
  * not a pin, and sending a customer to a guessed spot is worse than asking
  * them to ring.
  *
- * ONE CONTACT ROW, NOT THREE. All three sites answer on the same switchboard,
- * so the phone, WhatsApp and email appear once under the list rather than
- * three times inside it. The H Promise line is printed only when the number
+ * ONE MAIN CONTACT ROW. The main number, WhatsApp and email appear once
+ * under the list. A site that has its own number (AM Hyundai Gandhi Nagar
+ * does, since 2026-11-15) also shows that number in its own entry. The H Promise line is printed only when the number
  * has actually been supplied (H_PROMISE is null until then).
  *
  * Used on the homepage and on /sell-your-car; `source` keeps the two apart in
@@ -83,6 +83,16 @@ export function Visit({
             </address>
 
             <p className="mt-3 text-small text-ink-2">{formatHours(location)}</p>
+            {location.phoneE164 !== PRIMARY_LOCATION.phoneE164 && (
+              <a
+                href={`tel:${location.phoneE164}`}
+                data-track-location={`${source}-${location.slug}`}
+                data-num
+                className="mt-1 inline-flex min-h-11 items-center text-body font-semibold text-ink underline-offset-4 transition-colors duration-(--duration-1) hover:text-accent hover:underline"
+              >
+                {location.phone}
+              </a>
+            )}
 
             <div className="mt-4">
               {location.addressConfirmed ? (
@@ -111,7 +121,7 @@ export function Visit({
         ))}
       </ul>
 
-      {/* One switchboard for all three sites. */}
+      {/* The main number. */}
       <div className="mt-6 flex flex-wrap items-center gap-3 md:mt-2 md:border-t md:border-line md:pt-8">
         <Button asChild variant="primary" size="lg">
           <a href={`tel:${PRIMARY_LOCATION.phoneE164}`} data-track-location={source}>

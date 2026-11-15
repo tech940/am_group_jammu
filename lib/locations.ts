@@ -132,29 +132,39 @@ export const LOCATIONS: Location[] = [
       'to see used cars and get your own car valued.',
   },
   {
+    // Supplied by the company on 2026-11-15 (Aryan, by message): the phone
+    // number and this Google Maps listing, https://maps.app.goo.gl/YGc4xjvaL5MHUuvn8
+    // The listing is named "AM Hyundai Gandhi Nagar", category "Used car
+    // dealer", at Zorawar Singh Chowk, Guru Nanak Nagar - this is the site the
+    // managing director called "Nanak Nagar". The name and address below are
+    // copied from that listing exactly, because the website and the Google
+    // listing have to agree for local search. The slug is unchanged so the
+    // page's address did not move.
     slug: 'nanak-nagar',
-    name: 'AM Group Used Cars — Nanak Nagar',
-    shortName: 'Nanak Nagar',
+    name: 'AM Hyundai Gandhi Nagar',
+    shortName: 'AM Hyundai Gandhi Nagar',
     city: 'Jammu',
-    streetAddress: 'Nanak Nagar',
-    landmark: 'Nanak Nagar, Jammu',
-    // Not supplied by the company — left empty rather than guessed.
+    streetAddress: 'Zorawar Singh Chowk, Guru Nanak Nagar',
+    landmark: 'Gandhi Nagar',
+    // Not supplied by the company - left empty rather than guessed.
     areasServed: [],
     region: 'Jammu and Kashmir',
-    postalCode: '',
-    addressConfirmed: false,
-    phone: MAIN_PHONE,
-    phoneE164: MAIN_PHONE_E164,
+    postalCode: '180004',
+    addressConfirmed: true,
+    phone: '+91 94694 44456',
+    phoneE164: '+919469444456',
     email: 'info@amgroupind.com',
-    // Locality centre only — NOT a pin for the showroom. Replace before launch.
-    geo: { latitude: 32.7, longitude: 74.866, verified: false },
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=AM+Group+Nanak+Nagar+Jammu',
+    // The pin of the Google listing above.
+    geo: { latitude: 32.7020528, longitude: 74.871094, verified: true },
+    mapUrl: 'https://maps.app.goo.gl/YGc4xjvaL5MHUuvn8',
+    // The Google listing shows this site open on Sundays too. Left at the
+    // standard Monday-Saturday hours until the company confirms which is right.
     hours: STANDARD_HOURS,
     services: USED_CAR_SERVICES,
     isPrimary: false,
     blurb:
-      'Our used-car location in Nanak Nagar. Call before you come and we will confirm which ' +
-      'cars are on site and give you exact directions.',
+      'Our used-car showroom at Zorawar Singh Chowk, Guru Nanak Nagar (Gandhi Nagar). Call before ' +
+      'you come and we will confirm which cars are on site.',
   },
   {
     slug: 'gangyal',

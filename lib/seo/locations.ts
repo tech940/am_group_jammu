@@ -87,6 +87,10 @@ export function serviceLabel(service: string): string {
  */
 export function locationMapQuery(location: Location): string | null {
   if (!location.addressConfirmed) return null
+  // With a verified pin the map is centred on the pin itself. Searching the
+  // street text alone drops the marker on the junction ("Zorawar Singh
+  // Chowk"), not on the showroom.
+  if (location.geo.verified) return `${location.geo.latitude},${location.geo.longitude}`
   return [location.streetAddress, location.city, location.postalCode].filter(Boolean).join(', ')
 }
 
