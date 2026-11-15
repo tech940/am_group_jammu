@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   // tab bar, so the browser's own bars continue it. A <meta> value cannot read
   // a CSS variable, so this is the one place the token is repeated as a
   // literal. If the token changes, change this with it.
-  themeColor: "#146287",
+  themeColor: "#1b4130",
   width: "device-width",
   initialScale: 1,
 };

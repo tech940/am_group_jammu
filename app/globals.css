@@ -41,11 +41,11 @@
      are a hair cool, and the only colour in the system is an ice blue that
      behaves like a light source rather than a fill. Every value was measured
      against WCAG before it was written; ratios are in DESIGN.md. */
-  --color-ground: #f3f7fa;      /* page background */
-  --color-ground-2: #e4eef5;    /* alternating band */
-  --color-surface: #ffffff;     /* data surfaces: cards, tables, modals */
-  --color-deep: #146287;        /* the BLUE ground: bands, tiles, admin rail */
-  --color-deep-2: #0f4e6d;      /* deeper blue: footer, header, scrim base */
+  --color-ground: #f3ecdf;      /* page background */
+  --color-ground-2: #e8dfcd;    /* alternating band */
+  --color-surface: #fffcf6;     /* data surfaces: cards, tables, modals */
+  --color-deep: #24523d;        /* the BLUE ground: bands, tiles, admin rail */
+  --color-deep-2: #1b4130;      /* deeper blue: footer, header, scrim base */
 
   /* Aliases left from the retired homepage "story world"; nothing routed uses
      them, and they resolve onto the deep family so the unrouted
@@ -55,16 +55,16 @@
   --color-graphite: var(--color-deep);
 
   /* Ink */
-  --color-ink: #0d2433;         /* primary text on light   — 17.1:1 on ground */
-  --color-ink-2: #41566a;       /* secondary text on light —  7.1:1 on ground */
-  --color-ink-3: #566a7a;       /* tertiary text, placeholders — 5.2:1 on ground */
+  --color-ink: #14241c;         /* primary text on light   — 17.1:1 on ground */
+  --color-ink-2: #43544a;       /* secondary text on light —  7.1:1 on ground */
+  --color-ink-3: #4f6056;       /* tertiary text, placeholders — 5.2:1 on ground */
   --color-on-deep: #ffffff;     /* primary text on dark    — 16.6:1 on deep */
-  --color-on-deep-2: #dcecf5;   /* secondary text on dark  —  9.3:1 on deep */
+  --color-on-deep-2: #d7e6dc;   /* secondary text on dark  —  9.3:1 on deep */
 
   /* Line */
-  --color-line: rgb(13 36 51 / 0.12);        /* hairline rules, table borders */
-  --color-line-strong: rgb(13 36 51 / 0.24); /* input borders */
-  --color-line-deep: #a9cde0;                /* rules on dark grounds — 4.1:1 */
+  --color-line: rgb(20 36 28 / 0.13);        /* hairline rules, table borders */
+  --color-line-strong: rgb(20 36 28 / 0.26); /* input borders */
+  --color-line-deep: #9dbfaa;                /* rules on dark grounds — 4.1:1 */
   --color-line-on-deep: rgb(255 255 255 / 0.26);
 
   /* Accent — one hue, two ends, because an ice blue cannot do both jobs.
@@ -80,33 +80,32 @@
      `accent` on `deep` measures 2.7:1 and `accent-bright` on `ground` measures
      1.6:1. Neither is a usable pairing; picking the wrong end is a defect, not
      a style choice. */
-  --color-accent: #146287;             /* 6.3:1 on ground, 5.7:1 on ground-2 */
-  --color-accent-hover: #0f4e6d;
+  --color-accent: #24523d;             /* 6.3:1 on ground, 5.7:1 on ground-2 */
+  --color-accent-hover: #1b4130;
   --color-on-accent: #ffffff;          /* label on an accent fill — 6.3:1 */
 
   --color-accent-bright: #ffffff;      /* 9.8:1 on deep, 10.6:1 on deep-2 */
-  --color-accent-bright-hover: #e4f1f8;
-  --color-on-accent-bright: #0f4e6d;   /* label on a bright fill — 10.6:1 */
+  --color-accent-bright-hover: #eaf2ec;
+  --color-on-accent-bright: #1b4130;   /* label on a bright fill — 10.6:1 */
 
-  /* POP — the action colour (2026-11-14, from the owner's mock-up).
+  /* POP - the 10%: the action colour.
 
-     The blue is the brand and the ground. This teal is for the thing you are
-     meant to press: primary buttons, the header's Enquire, and a few marks
-     that point at an action. It is NOT a second decorative colour — badges,
-     chips, selected states and links stay blue, or the teal stops meaning
-     "press here".
+     Tomato red, from the owner's 60-30-10 reference (2026-11-16): oat for the
+     grounds, forest green for the structure, tomato for the thing to press.
+     It is for primary buttons, the header's Enquire, and a few marks that
+     point at an action. Badges, chips, selected states and links are green,
+     or the red stops meaning "press here".
 
-     The label on a teal fill is WHITE (the owner's call, 2026-11-15). The
-     first teal, #12a594, measured 2.96:1 under white, so the fill was deepened
-     to the lightest teal that holds 4.5:1 with a white label (4.58:1). Hover
-     goes darker, never lighter, for the same reason. `pop-text` is the deeper
-     teal for small text and glyphs on light grounds (5.4:1 on white), and
-     `pop-bg` is the mint disc behind a glyph. */
-  --color-pop: #0b8478;
-  --color-pop-hover: #0a786d;
+     The reference tomato is #F2462E. White on that measures 3.69:1, so the
+     fill is the lightest tomato that holds 4.5:1 under a white label
+     (#D63A20, 4.68:1). Hover goes darker. `pop-text` is the deeper tomato for
+     small text and glyphs on light grounds (5.5:1 on the page ground), and
+     `pop-bg` is the pale disc behind a glyph. */
+  --color-pop: #d63a20;
+  --color-pop-hover: #bd3019;
   --color-on-pop: #ffffff;
-  --color-pop-text: #0a786d;
-  --color-pop-bg: #d5f2ec;
+  --color-pop-text: #b02c16;
+  --color-pop-bg: #fbe2da;
 
   /* The ground-specific names the rest of the app already addresses. They are
      aliases of the two ends above, so no call site had to change. */
@@ -134,10 +133,10 @@
   --color-danger-line: #e5bfb9;
   --color-danger-text: #95291f;
 
-  --color-info: #146287;
-  --color-info-bg: #e4eef4;
-  --color-info-line: #b7d2e1;
-  --color-info-text: #0f4e6d;
+  --color-info: #24523d;
+  --color-info-bg: #e3ede6;
+  --color-info-line: #b9d1c1;
+  --color-info-text: #1b4130;
 
   /* ---------------------------------------------------------------------------
      TYPE SCALE — weights are 400/500/600/700 only. Nothing below 11px.
@@ -219,8 +218,8 @@
      ELEVATION — exactly two, and only for surfaces that float over content.
      Page content is flat: depth comes from ground swaps and hairlines.
      --------------------------------------------------------------------------- */
-  --shadow-overlay: 0 24px 48px -12px rgb(15 78 109 / 0.22);
-  --shadow-raised: 0 8px 20px -6px rgb(15 78 109 / 0.16);
+  --shadow-overlay: 0 24px 48px -12px rgb(27 65 48 / 0.22);
+  --shadow-raised: 0 8px 20px -6px rgb(27 65 48 / 0.14);
 
   /* ---------------------------------------------------------------------------
      MOTION — one easing family, four durations, no exceptions.
@@ -328,15 +327,15 @@
      ground) and simply vary the alpha. An intermediate blue invented inside a
      component is palette drift, which is the defect DESIGN.md's "raw hex in a
      component" rule exists to catch. */
-  --backdrop-bright: 143 199 232;  /* = accent-bright #8fc7e8 */
-  --backdrop-accent: 20 98 135;    /* = accent        #146287 */
-  --backdrop-ink: 13 36 51;        /* = ink           #0d2433 */
-  --backdrop-paper: 243 247 250;   /* = ground        #f3f7fa */
+  --backdrop-bright: 168 201 180;  /* soft sage, the pale end of the green */
+  --backdrop-accent: 36 82 61;    /* = accent  #24523d */
+  --backdrop-ink: 20 36 28;        /* = ink     #14241c */
+  --backdrop-paper: 243 236 223;   /* = ground  #f3ecdf */
 
   /* Illustration set (components/system/illustrations.tsx): the pale pool a
      drawing sits on, and its outline when the drawing is on a blue tile. */
-  --il-pool: #d6e9f4;
-  --il-line-on-blue: #0a3247;
+  --il-pool: #dde8dc;
+  --il-line-on-blue: #0f2a1f;
 
   --grain-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -465,17 +464,17 @@
   /* LIGHT glass. White at 80%: measured against the worst thing it can sit
      over (a black part of a photograph) ink still holds above 9:1, and over the
      blue wash it holds above 11:1. Ratios are in DESIGN.md. */
-  --glass-tint: rgb(255 255 255 / 0.8);
+  --glass-tint: rgb(255 252 246 / 0.82);
   /* What the same panel becomes with no blur available, or when the reader has
      asked for reduced transparency. */
-  --glass-solid: rgb(250 252 253 / 0.96);
+  --glass-solid: rgb(255 252 246 / 0.97);
   /* The lit edge: a white highlight, not a coloured border. */
-  --glass-edge: rgb(255 255 255 / 0.82);
-  --glass-edge-strong: rgb(20 98 135 / 0.5);
-  --glass-shadow: 0 12px 36px -12px rgb(15 78 109 / 0.32), inset 0 1px 0 rgb(255 255 255 / 0.9);
+  --glass-edge: rgb(255 252 246 / 0.85);
+  --glass-edge-strong: rgb(36 82 61 / 0.5);
+  --glass-shadow: 0 12px 36px -12px rgb(27 65 48 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.9);
   /* The blue bar (header). The logo is white artwork, so the header is blue. */
-  --glass-blue-tint: rgb(15 78 109 / 0.86);
-  --glass-blue-solid: rgb(15 78 109 / 0.98);
+  --glass-blue-tint: rgb(27 65 48 / 0.9);
+  --glass-blue-solid: rgb(27 65 48 / 0.98);
 }
 
 @layer components {
@@ -546,7 +545,7 @@
 
   @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .glass-bar {
-      background-color: rgb(255 255 255 / 0.84);
+      background-color: rgb(255 252 246 / 0.86);
       -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
       backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
     }
@@ -598,9 +597,9 @@
   .photo-scrim {
     background-image: linear-gradient(
       to bottom,
-      rgb(15 78 109 / 0.22) 0%,
-      rgb(15 78 109 / 0.4) 50%,
-      rgb(15 78 109 / 0.78) 100%
+      rgb(27 65 48 / 0.2) 0%,
+      rgb(27 65 48 / 0.4) 50%,
+      rgb(27 65 48 / 0.8) 100%
     );
   }
 
@@ -609,9 +608,9 @@
   .sky-ground {
     background-color: var(--color-ground-2);
     background-image:
-      radial-gradient(60% 80% at 8% 0%, rgb(143 199 232 / 0.55) 0%, transparent 70%),
-      radial-gradient(50% 70% at 96% 100%, rgb(143 199 232 / 0.42) 0%, transparent 70%),
-      linear-gradient(180deg, #eef6fb 0%, #dcebf4 100%);
+      radial-gradient(60% 80% at 8% 0%, rgb(168 201 180 / 0.45) 0%, transparent 70%),
+      radial-gradient(50% 70% at 96% 100%, rgb(214 58 32 / 0.07) 0%, transparent 70%),
+      linear-gradient(180deg, #f6f0e4 0%, #eae1cf 100%);
   }
 }
 

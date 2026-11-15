@@ -579,3 +579,38 @@ one drawing works on white and on a blue tile. Every drawing is decorative and
 pale blue disc.
 
 **Action colour (teal).** `pop #0B8478` with a white label (4.58:1), hover `#0A786D`. (It began as `#12A594` with a dark label; the owner asked for white, and white on that teal was 2.96:1, so the fill was deepened.) `pop-text #0A786D` for small teal text and glyphs on light grounds (5.4:1 on white), `pop-bg #D5F2EC` for the mint disc behind a glyph. Blue is the brand and the ground; teal is only for the control to press and for a mark that points at one (the stroke under a hero word, the arrow on a tile). `Button` `primary` is teal; inside a glass panel the `bright` variant becomes teal; on a plain blue band the loud control stays white. The photo wash was lightened (22% to 78%) so the showroom photograph reads.
+
+## Oat, forest, tomato (2026-11-16) - supersedes "Blue and light" for colour
+
+The owner's instruction: try the colour combination from a 60-30-10 reference
+(Oat Milk 60%, Forest Green 30%, Tomato Red 10%) and apply the rule. Radius,
+glass behaviour, illustration grammar and type are unchanged from the sections
+above; only the colours moved. Where this section disagrees with an earlier
+one about a colour, this one wins.
+
+**60% oat - the grounds.** `ground #F3ECDF`, `ground-2 #E8DFCD`, `surface
+#FFFCF6`. Most of any screen is one of these.
+
+**30% forest green - the structure.** `deep #24523D` and `deep-2 #1B4130`
+carry the header, footer, bands and the Buy tile, with white text (8.9:1 and
+11.4:1). `accent` is the same green and does links, chips, badges, selected
+states and the focus ring on light grounds (7.6:1 on ground).
+
+**10% tomato - the action.** `pop #D63A20` with a white label (4.68:1), hover
+`#BD3019`. `pop-text #B02C16` for small tomato text and glyphs on light
+grounds (5.5:1 on ground, 4.9:1 on ground-2), `pop-bg #FBE2DA` behind a glyph.
+The reference tomato is `#F2462E`; white on it measures 3.69:1, so the fill is
+the lightest tomato that keeps a white label readable.
+
+**Text.** `ink #14241C` (13.8:1 on ground), `ink-2 #43544A` (6.9:1, 6.1:1 on
+ground-2), `ink-3 #4F6056`. On green: white, and `on-deep-2 #D7E6DC` (6.9:1).
+
+**Glass** is an oat-white panel at 82% over the green photo wash; ink on the
+composited panel measures above 9.8:1 in the worst case. The header class is
+still called `.glass-blue`; it is green.
+
+**How to keep the ratio honest.** Count by area on a screen, not by element.
+If a band, a card fill or a heading is about to turn tomato, it is the wrong
+colour for it. A full-bleed green band is the 30%; two in a row is more than
+that.
+
