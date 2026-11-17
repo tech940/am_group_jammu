@@ -66,9 +66,9 @@ const RECORDING = USES_CLARITY || USES_GTM
 
 const TITLE = "Privacy Policy"
 const DESCRIPTION = ANY_TOOL
-  ? `What AM Group collects when you use this website or send an enquiry, the analytics${
+  ? `What AM Group collects on this website and in enquiries, the analytics${
       RECORDING ? " and session-recording" : ""
-    } tools it is set up to use, who receives the information, and how to refuse or ask for deletion.`
+    } tools it uses, who sees it, and how to refuse or ask for deletion.`
   : "What AM Group collects when you use this website or send an enquiry, who receives the information, and how to ask for it to be corrected or deleted."
 
 export const metadata: Metadata = {

@@ -1,3 +1,4 @@
+import { fitDescription } from "@/lib/seo/site"
 import { linkPhones } from "@/components/system/phone-text"
 import type { Metadata } from "next"
 import Link from "next/link"
@@ -90,15 +91,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // The layout appends " | AM Group"; past about 49 characters the count goes.
   const withCount = `Used ${brand.brandName} Cars in Jammu | ${brand.count} in Stock`
   const title = withCount.length <= 49 ? withCount : `Used ${brand.brandName} Cars in Jammu`
-  const description =
+  const description = fitDescription([
     `${brand.count} used ${brand.brandName} ${brand.count === 1 ? "car" : "cars"} for sale in Jammu at AM Group` +
-    (brand.models.length ? ` — ${list(brand.models)}` : "") +
-    (brand.priceLow !== null && brand.priceHigh !== null
+      (brand.models.length ? ` — ${list(brand.models)}` : "") +
+      ".",
+    brand.priceLow !== null && brand.priceHigh !== null
       ? brand.priceLow === brand.priceHigh
-        ? `. Priced at ${formatINR(brand.priceLow)}`
-        : `. Priced ${formatINR(brand.priceLow)} to ${formatINR(brand.priceHigh)}`
-      : "") +
-    `. Real photos, odometer readings, finance and exchange.`
+        ? `Priced at ${formatINR(brand.priceLow)}.`
+        : `Priced ${formatINR(brand.priceLow)} to ${formatINR(brand.priceHigh)}.`
+      : null,
+    "Real photos and odometer readings.",
+    "Finance and exchange.",
+  ])
   const path = `/brands/${brand.slug}`
 
   return {

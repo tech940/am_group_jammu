@@ -160,6 +160,11 @@ function dealerNode() {
     // The one site with a confirmed street address.
     address: postalAddress(PRIMARY_LOCATION),
     areaServed: { "@type": "City", name: PRIMARY_LOCATION.city },
+    // The group this dealership belongs to, and its own long-standing website.
+    // amgroupind.com now sends its used-car pages here (a 301 on the WordPress
+    // side, 2026-11-17), so naming it tells search engines the two are the
+    // same business rather than an unrelated new site.
+    parentOrganization: { "@type": "Organization", name: "AM Group", url: "https://amgroupind.com" },
     contactPoint: [
       {
         "@type": "ContactPoint",

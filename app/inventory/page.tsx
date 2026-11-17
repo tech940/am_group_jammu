@@ -1,3 +1,4 @@
+import { fitDescription } from "@/lib/seo/site"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import InventoryClient from "./inventory-client"
@@ -117,9 +118,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   // every car, and the company has not said what either covers.
   const description =
     vehicles.length > 0
-      ? `Browse ${isFiltered ? `${n}` : `all ${n}`} used ${scope ? `${scope} ` : ""}cars in stock at AM Group, Jammu` +
-        `${!isFiltered && makes ? `: ${makes}` : ""}. ${priceFrom && !isFiltered ? `Prices from ${priceFrom}. ` : ""}` +
-        `Filter by make, budget, fuel and gearbox. Real photos and odometer readings.`
+      ? fitDescription([
+          `Browse ${isFiltered ? `${n}` : `all ${n}`} used ${scope ? `${scope} ` : ""}cars in stock at AM Group, Jammu` +
+            `${!isFiltered && makes ? `: ${makes}` : ""}.`,
+          priceFrom && !isFiltered && `Prices from ${priceFrom}.`,
+          "Real photos and odometer readings.",
+          "Filter by make, budget, fuel and gearbox.",
+        ])
       : "Browse the used cars in stock at AM Group, Jammu. Real photos and odometer readings."
 
   const path = isFiltered || page <= 1 ? "/inventory" : `/inventory?page=${page}`

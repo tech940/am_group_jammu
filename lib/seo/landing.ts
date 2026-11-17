@@ -12,6 +12,7 @@
  * duplicate, not a landing page.
  */
 
+import { fitDescription } from './site.ts'
 import { unstable_cache } from 'next/cache'
 import { getInventory } from '../inventory/server.ts'
 import { formatINR, slugify } from '../inventory/adapter.ts'
@@ -644,9 +645,12 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
           `Used Cars in ${city} | Second Hand Cars for Sale`,
         ),
         description:
-          `Buy second hand cars in ${city} from AM Group. ${n} ${cars} in stock` +
-          `${makes.length ? ` — ${list(makes)}` : ''}${range ? `, ${priced}` : ''}. ` +
-          `Real photos, odometer readings, finance and exchange.`,
+          fitDescription([
+            `Buy second hand cars in ${city} from AM Group.`,
+            `${n} ${cars} in stock${makes.length ? ` — ${list(makes)}` : ''}${range ? `, ${priced}` : ''}.`,
+            'Real photos and odometer readings.',
+            'Finance and exchange.',
+          ]),
         stockHeading: `${n} used ${cars} in stock in ${city} today`,
         intro: [
           `AM Group has ${n} used ${cars} for sale in ${city} right now` +
@@ -700,8 +704,11 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
           `Used Cars Under ₹${label} in ${CITY}`,
         ),
         description:
-          `${n} second hand ${cars} under ₹${label} for sale in ${CITY}` +
-          `${makes.length ? ` — ${list(makes)}` : ''}. Real photos, odometer readings, finance and exchange at AM Group.`,
+          fitDescription([
+            `${n} second hand ${cars} under ₹${label} for sale in ${CITY}${makes.length ? ` — ${list(makes)}` : ''}.`,
+            'Real photos and odometer readings at AM Group.',
+            'Finance and exchange.',
+          ]),
         stockHeading: `${n} used ${cars} under ₹${label} in stock today`,
         intro: [
           `We have ${n} used ${cars} under ₹${label} in ${CITY} right now` +
@@ -752,8 +759,11 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
         heading: `Used ${name} in ${CITY} — ${n} for Sale`,
         title: fitTitle(`Used ${name} in ${CITY} | ${n} in Stock`, `Used ${name} in ${CITY}`),
         description:
-          `${n} second hand ${name} for sale in ${CITY}${range ? `, ${priced}` : ''}. ` +
-          `Real photos, odometer readings, finance and exchange at AM Group.`,
+          fitDescription([
+            `${n} second hand ${name} for sale in ${CITY}${range ? `, ${priced}` : ''}.`,
+            'Real photos and odometer readings at AM Group.',
+            'Finance and exchange.',
+          ]),
         stockHeading: `${n} used ${name} in stock today`,
         intro: [
           `We have ${n} used ${name} ${cars} for sale in ${CITY} right now` +
@@ -812,8 +822,11 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
         heading: `${nounTitle} in ${CITY} — ${n} in Stock`,
         title: fitTitle(`${nounTitle} in ${CITY} | ${n} in Stock`, `${nounTitle} in ${CITY}`),
         description:
-          `${n} second hand ${thing} for sale in ${CITY}` +
-          `${range ? `, ${priced}` : ''}. Real photos, odometer readings, finance and exchange at AM Group.`,
+          fitDescription([
+            `${n} second hand ${thing} for sale in ${CITY}${range ? `, ${priced}` : ''}.`,
+            'Real photos and odometer readings at AM Group.',
+            'Finance and exchange.',
+          ]),
         stockHeading: `${n} used ${thing} in stock today`,
         intro: [
           `We have ${n} used ${thing} in stock in ${CITY} right now` +

@@ -32,8 +32,8 @@ import { DEALERSHIPS, GROUP_FACTS, SELL_FAQS, SELL_STEPS } from "./content"
 
 const TITLE = "Sell Your Car in Jammu | Free Car Valuation | AM Group"
 const DESCRIPTION =
-  `What is your car worth? AM Group in Jammu evaluates any car, any brand, free. Tell us the make, model, ` +
-  `year and kilometres and an evaluator calls you. Call ${PRIMARY_LOCATION.phone}.`
+  `What is your car worth? AM Group, Jammu evaluates any car, any brand, free. ` +
+  `Tell us about it and an evaluator calls you. Call ${PRIMARY_LOCATION.phone}.`
 
 export function generateMetadata(): Metadata {
   return {

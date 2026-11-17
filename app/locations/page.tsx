@@ -1,3 +1,4 @@
+import { fitDescription } from "@/lib/seo/site"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
@@ -22,9 +23,14 @@ const COUNT = LOCATIONS.length
 
 const title = "Used Car Locations in Jammu"
 // Kept near 155 characters so the phone number is not cut off in a search result.
-const description =
-  `AM Group sells used cars at ${COUNT} sites in Jammu: ${locationNames()}. ` +
-  `Open ${formatHours(PRIMARY_LOCATION)}. Call ${PRIMARY_LOCATION.phone}.`
+// The list of site names no longer fits with five sites, so it gives way to
+// the phone number, which matters more in a search result.
+const description = fitDescription([
+  `AM Group sells used cars at ${COUNT} sites in Jammu.`,
+  `Call ${PRIMARY_LOCATION.phone}.`,
+  `Open ${formatHours(PRIMARY_LOCATION)}.`,
+  `Sites: ${locationNames()}.`,
+])
 
 export const metadata: Metadata = {
   title,

@@ -53,9 +53,26 @@ export function absoluteUrl(path = '/'): string {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
 }
 
+/**
+ * A search-result description built from sentences in order of importance,
+ * keeping only as many as fit. Google shows roughly 155-160 characters and
+ * cuts the rest mid-word; dropping a whole trailing sentence reads better than
+ * a sentence that stops halfway. The first sentence is always kept.
+ */
+export function fitDescription(sentences: (string | false | null | undefined)[], max = 158): string {
+  const parts = sentences.filter((x): x is string => Boolean(x && x.trim())).map((x) => x.trim())
+  let out = parts[0] ?? ''
+  for (const next of parts.slice(1)) {
+    if (`${out} ${next}`.length > max) continue
+    out = `${out} ${next}`
+  }
+  return out
+}
+
 /** The share image used when a page has no photograph of its own. */
 export const OG_IMAGE = {
-  // The existing logo on the blue ground (--color-deep), made with sharp.
+  // The logo on the forest green, with an oat strip and a tomato rule; made
+  // by scripts/make-brand-images.mjs (re-run it when the palette changes).
   // The file really is 1200x630 (the previous one was a 1024x1024 JPEG named
   // .png and declared as 1200x630).
   url: '/og-default.jpg',
