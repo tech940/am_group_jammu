@@ -129,6 +129,22 @@ if (trapped.kind === 'vehicle' && trapped.via !== 'id') {
   fail(`${trap} resolved via '${trapped.via}' to ${trapped.destination} — trailing digits misread as an ID`)
 }
 
+// A car that is gone (sold, or deleted in the admin) must land on its model's
+// page, and that page must be one that exists. WordPress slugs often omit the
+// make, so the make has to come from stock, not from the slug. Built only from
+// models in stock today, so it keeps working as stock changes.
+for (const model of facets.models.slice(0, 3)) {
+  const goneSlug = `${model.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-zz-test-trim-sold`
+  const r = resolveLegacyListing(goneSlug, vehicles, facets)
+  const car = vehicles.find((v) => v.model === model.value)
+  const expected = car?.make ? `-${model.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-in-jammu` : '-in-jammu'
+  if (r.kind === 'fallback' && r.via === 'model' && r.destination.startsWith('/used-cars/') && r.destination.endsWith(expected) && (!car?.make || r.destination.includes(car.make.toLowerCase().replace(/[^a-z0-9]+/g, '-')))) {
+    console.log(`  ok    gone car ${goneSlug} -> ${r.destination}`)
+  } else {
+    fail(`gone car ${goneSlug} resolved to ${r.destination} (${r.kind}/${r.via}) - model page must include the make`)
+  }
+}
+
 rule()
 console.log(failures === 0 ? `PASS — ${urls.length} legacy URLs, 0 failures` : `FAIL — ${failures} problem(s)`)
 process.exit(failures === 0 ? 0 : 1)

@@ -67,7 +67,11 @@ export type Resolution =
  * redirect topically honest. Tokens come from live facets, not a hardcoded
  * list, so this keeps working as the brand mix changes.
  */
-export function resolveFallback(asciiSlug: string, facets: InventoryFacets): Resolution {
+export function resolveFallback(
+  asciiSlug: string,
+  facets: InventoryFacets,
+  vehicles: Pick<InventoryVehicle, 'make' | 'model'>[] = [],
+): Resolution {
   const tokens = new Set(asciiSlug.split('-').filter(Boolean))
   const allPresent = (value: string) => {
     const parts = slugify(value).split('-').filter(Boolean)
@@ -76,8 +80,13 @@ export function resolveFallback(asciiSlug: string, facets: InventoryFacets): Res
 
   for (const model of facets.models) {
     if (!allPresent(model.value)) continue
-    const make = facets.makes.find((m) => allPresent(m.value))
-    const base = make ? `${slugify(make.value)}-${slugify(model.value)}` : slugify(model.value)
+    // The make comes from the cars in stock, not from the old slug: WordPress
+    // slugs often leave it out ("seltos-gtx-plus-at-1-5-diesel"), and model
+    // pages are addressed make-first ("/used-cars/kia-seltos-in-jammu"). Built
+    // from the slug alone this produced "/used-cars/seltos-in-jammu", a 404.
+    const stocked = vehicles.find((v) => v.model && slugify(v.model) === slugify(model.value))
+    const make = stocked?.make ?? facets.makes.find((m) => allPresent(m.value))?.value ?? null
+    const base = make ? `${slugify(make)}-${slugify(model.value)}` : slugify(model.value)
     return { kind: 'fallback', destination: `/used-cars/${base}-in-jammu`, via: 'model' }
   }
 
@@ -131,5 +140,5 @@ export function resolveLegacyListing(
     return { kind: 'vehicle', destination: `/inventory/${loose[0].slug}`, vehicle: loose[0], via: 'loose' }
   }
 
-  return resolveFallback(ascii, facets)
+  return resolveFallback(ascii, facets, vehicles)
 }
