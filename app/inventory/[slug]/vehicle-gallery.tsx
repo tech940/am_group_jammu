@@ -141,12 +141,15 @@ export function VehicleGallery({
     )
   }
 
+  // Shown on phones too (owner, 2026-11-17): swiping works, but nothing else
+  // on a phone said there was more than one photo. On a touch screen they are
+  // smaller and let the photo show through; with a mouse they are full size.
   const arrow =
-    "h-11 w-11 items-center justify-center rounded-sm border border-line bg-surface text-ink " +
+    "flex h-9 w-9 items-center justify-center rounded-sm border border-line bg-surface/85 text-ink " +
     "transition-colors duration-(--duration-1) hover:bg-ground-2 cursor-pointer " +
-    "disabled:cursor-default disabled:opacity-55 " +
-    // Finger users swipe; the arrows are for a mouse or trackpad.
-    "hidden [@media(hover:hover)_and_(pointer:fine)]:flex"
+    "disabled:cursor-default disabled:opacity-40 " +
+    "[@media(hover:hover)_and_(pointer:fine)]:h-11 [@media(hover:hover)_and_(pointer:fine)]:w-11 " +
+    "[@media(hover:hover)_and_(pointer:fine)]:bg-surface"
 
   return (
     <div>
@@ -187,7 +190,7 @@ export function VehicleGallery({
 
         {count > 1 && (
           <>
-            <div className="pointer-events-none absolute inset-x-4 top-1/2 flex -translate-y-1/2 justify-between">
+            <div className="pointer-events-none absolute inset-x-3 top-1/2 flex -translate-y-1/2 justify-between md:inset-x-4">
               <button
                 type="button"
                 onClick={() => goTo(current - 1, "arrow")}

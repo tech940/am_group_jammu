@@ -270,7 +270,7 @@ function ImageArea({
                   from tablet width up: hidden-until-hover arrows were not being
                   found. On a phone the swipe does the job and the arrows would
                   cover a third of the photo, so they are not shown. */}
-              <div className="pointer-events-none absolute inset-x-2.5 top-1/2 z-30 hidden -translate-y-1/2 justify-between md:flex">
+              <div className="pointer-events-none absolute inset-x-2.5 top-1/2 z-30 flex -translate-y-1/2 justify-between">
                 <button type="button" onClick={() => step(-1)} aria-label="Previous photo" className={ARROW}>
                   <ChevronGlyph direction="left" />
                 </button>
