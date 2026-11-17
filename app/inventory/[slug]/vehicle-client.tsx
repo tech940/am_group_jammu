@@ -149,7 +149,7 @@ export default function VehicleClient({
     <div className="min-h-screen bg-ground">
       {/* Opens the enquiry form for THIS car once, a few seconds after
           landing. Not for a sold car: there is nothing to enquire about. */}
-      {!sold && <AutoEnquiry vehicle={vehicle} />}
+      {!sold && <AutoEnquiry vehicle={vehicle} trigger="scroll" />}
       {/* The trail is resolved on the server (page.tsx) so that every level
           is a page that exists and may be indexed: the brand page and the
           model page, never a filtered search. */}

@@ -10,7 +10,7 @@ import { carFromPath } from "@/lib/analytics/gtm"
 /**
  * The analytics notice.
  *
- * A small panel, not a modal: it does not take focus, does not dim the page
+ * A slim strip, not a modal: it does not take focus, does not dim the page
  * and nothing waits on it. It says what is used and offers a real "No thanks",
  * which is stored in this browser (lib/analytics/consent.ts) and from then on
  * stops GA4 and Clarity from loading at all, on this visit and later ones.
@@ -45,32 +45,25 @@ const PHONE_BOTTOM = {
   carPage: "bottom-[calc(8.5rem+env(safe-area-inset-bottom))]",
 } as const
 
+/**
+ * One short line, so the notice is a strip and not a card. It still names
+ * every tool that is running (Meta's and Microsoft's terms require telling
+ * visitors), and the privacy policy carries the detail: what each records,
+ * that typing in forms is not recorded, and how to turn it off later.
+ * (Owner, 2026-11-17: the four-line card was "very blocky".)
+ */
 function sentence(): string {
-  const base = baseSentence()
-  // The Meta Pixel is an advertising tool, so it is named separately and plainly.
-  return ANALYTICS_MODE === "direct" && META_PIXEL_ID
-    ? `${base} We also use the Meta Pixel to measure our Facebook and Instagram ads.`
-    : base
-}
-
-function baseSentence(): string {
-  if (ANALYTICS_MODE === "direct" && GA_ID && CLARITY_ID) {
-    return "We use Google Analytics and Microsoft Clarity to see how this site is used. Clarity records clicks and scrolling. What you type into a form is not recorded."
-  }
-  if (ANALYTICS_MODE === "direct" && CLARITY_ID) {
-    return "We use Microsoft Clarity to see how this site is used. It records clicks and scrolling. What you type into a form is not recorded."
-  }
-  if (ANALYTICS_MODE === "direct" && GA_ID) {
-    return "We use Google Analytics to count visits and see which pages and cars are looked at."
-  }
-  // Through Tag Manager the site cannot see which tags the container holds,
-  // so it does not claim to.
-  return "We use analytics tools to see how this site is used. They can include recordings of clicks and scrolling."
+  const tools = [
+    ANALYTICS_MODE === "direct" && GA_ID ? "Google Analytics" : null,
+    ANALYTICS_MODE === "direct" && CLARITY_ID ? "Clarity" : null,
+    ANALYTICS_MODE === "direct" && META_PIXEL_ID ? "the Meta Pixel" : null,
+  ].filter(Boolean) as string[]
+  if (tools.length === 0) return "We use analytics tools to see how this site is used."
+  const list = tools.length === 1 ? tools[0] : `${tools.slice(0, -1).join(", ")} and ${tools[tools.length - 1]}`
+  return `We use ${list} to improve this site${META_PIXEL_ID && ANALYTICS_MODE === "direct" ? " and our ads" : ""}.`
 }
 
 export function ConsentNotice() {
-  // With analytics on by default the first button only acknowledges; with
-  // analytics off by default it is the button that turns them on.
   const acceptLabel = CONSENT_DEFAULT === "granted" ? "OK" : "Allow"
   const onCarPage = carFromPath(usePathname() ?? "") !== null
   const phoneBottom = onCarPage ? PHONE_BOTTOM.carPage : PHONE_BOTTOM.page
@@ -78,22 +71,19 @@ export function ConsentNotice() {
   return (
     <aside
       aria-label="Analytics on this site"
-      className={`fixed inset-x-3 ${phoneBottom} z-40 rounded-md border border-line bg-surface p-4 shadow-raised md:inset-x-auto md:bottom-4 md:left-4 md:max-w-sm`}
+      className={`fixed inset-x-3 ${phoneBottom} z-40 flex items-center gap-3 rounded-md border border-line bg-surface py-2 pl-3 pr-2 shadow-raised md:inset-x-auto md:bottom-4 md:left-4 md:max-w-md`}
     >
-      <p className="text-body text-ink-2">
+      <p className="min-w-0 flex-1 text-small text-ink-2">
         {sentence()}{" "}
-        <Link
-          href="/privacy-policy"
-          className="text-accent-text-light underline underline-offset-2"
-        >
-          Privacy policy
+        <Link href="/privacy-policy" className="text-accent-text-light underline underline-offset-2">
+          Privacy
         </Link>
       </p>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Button type="button" variant="secondary" onClick={() => writeChoice("granted")}>
+      <div className="flex shrink-0 gap-1.5">
+        <Button type="button" variant="secondary" size="sm" onClick={() => writeChoice("granted")}>
           {acceptLabel}
         </Button>
-        <Button type="button" variant="secondary" onClick={() => writeChoice("denied")}>
+        <Button type="button" variant="ghost" size="sm" onClick={() => writeChoice("denied")}>
           No thanks
         </Button>
       </div>
