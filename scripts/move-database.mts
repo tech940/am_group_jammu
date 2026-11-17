@@ -61,9 +61,19 @@ function env(name: string): string | undefined {
   return v ? v : undefined
 }
 
-const sourceUrl = (env('OLD_SUPABASE_URL') ?? env('NEXT_PUBLIC_SUPABASE_URL'))?.replace(/\/+$/, '')
+/** Just the project address: the dashboard's "API URL" adds /rest/v1/, which the client adds itself. */
+function projectOrigin(value: string | undefined): string | undefined {
+  if (!value) return undefined
+  try {
+    return new URL(value).origin
+  } catch {
+    fail(`"${value}" is not a web address.`)
+  }
+}
+
+const sourceUrl = projectOrigin(env('OLD_SUPABASE_URL') ?? env('NEXT_PUBLIC_SUPABASE_URL'))
 const sourceKey = env('OLD_SUPABASE_SERVICE_ROLE_KEY') ?? env('SUPABASE_SERVICE_ROLE_KEY')
-const targetUrl = env('NEW_SUPABASE_URL')?.replace(/\/+$/, '')
+const targetUrl = projectOrigin(env('NEW_SUPABASE_URL'))
 const targetKey = env('NEW_SUPABASE_SERVICE_ROLE_KEY')
 
 if (!sourceUrl || !sourceKey) fail('the current project is not configured (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).')
