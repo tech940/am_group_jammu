@@ -72,7 +72,7 @@ export const SELL_FAQS: FaqItem[] = [
  * They are the company's figures, not ours to round or update: change them
  * only when the company does.
  */
-export const GROUP_FACTS = { since: 1968, hyundaiSince: 2008, showrooms: 26 } as const
+export const GROUP_FACTS = { showrooms: 26 } as const
 
 /** The group's dealerships, from the same page, in the same order. */
 export const DEALERSHIPS: { name: string; sells: string; logo: string }[] = [

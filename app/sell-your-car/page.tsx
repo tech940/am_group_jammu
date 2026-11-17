@@ -85,6 +85,40 @@ export default function SellYourCarPage() {
               <strong className="font-semibold text-ink">AM Group, Jammu</strong> evaluates any car, any
               brand, free. Sell it, or put it towards a used car from our stock.
             </p>
+
+            {/* Below the three-column width the evaluator cannot stand beside
+                the form, so he and the note sit just above it instead (on a
+                phone) or under the heading next to it (on a tablet), smaller,
+                with the arrow pointing on to the form. Same drawing and the
+                same `sizes` as the wide version, so one file serves both. */}
+            <div aria-hidden className="mt-6 flex items-end justify-center gap-3 sm:justify-start xl:hidden">
+              <div className="mb-6 flex flex-col items-end">
+                <p className="w-[10ch] -rotate-6 text-right font-display text-h3 leading-tight text-pop-text">
+                  Get your car&rsquo;s value in a minute
+                </p>
+                <svg
+                  viewBox="0 0 60 40"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mt-3 h-8 w-12 text-pop-text"
+                >
+                  <path d="M4 6c14 22 30 26 50 22" />
+                  <path d="m46 20 9 8-11 5" />
+                </svg>
+              </div>
+              <Image
+                src="/sell/sell-evaluator.webp"
+                alt=""
+                width={1060}
+                height={1180}
+                sizes="290px"
+                loading="eager"
+                className="h-48 w-auto sm:h-56"
+              />
+            </div>
           </div>
 
           {/* The company's own drawing of an evaluator. Decorative here: the
@@ -130,15 +164,7 @@ export default function SellYourCarPage() {
       <section aria-label="About AM Group" className="bg-ground-2">
         <div className="mx-auto grid max-w-[1400px] grid-cols-1 items-center gap-8 px-4 py-10 md:grid-cols-[1fr_minmax(0,28rem)] md:px-10 md:py-14">
           <p className="max-w-[40ch] text-body-lg text-ink-2">
-            AM Group has been in Jammu since{" "}
-            <strong className="font-semibold text-ink" data-num>
-              {GROUP_FACTS.since}
-            </strong>
-            , has sold Hyundai cars since{" "}
-            <strong className="font-semibold text-ink" data-num>
-              {GROUP_FACTS.hyundaiSince}
-            </strong>
-            , and runs{" "}
+            AM Group is a Jammu company that sells Hyundai cars and runs{" "}
             <strong className="font-semibold text-ink" data-num>
               {GROUP_FACTS.showrooms}
             </strong>{" "}
