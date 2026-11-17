@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { LegalDocument, type LegalSection } from "@/components/sections/legal-document"
-import { ANALYTICS_MODE, CLARITY_ID, GA_ID } from "@/lib/analytics/config"
+import { ANALYTICS_MODE, CLARITY_ID, GA_ID, META_PIXEL_ID } from "@/lib/analytics/config"
 import { pageSocial } from "@/lib/seo/site"
 import { AnalyticsChoice } from "./analytics-choice"
 
@@ -58,9 +58,11 @@ import { AnalyticsChoice } from "./analytics-choice"
 const USES_GTM = ANALYTICS_MODE === "gtm"
 const USES_GA = ANALYTICS_MODE === "direct" && Boolean(GA_ID)
 const USES_CLARITY = ANALYTICS_MODE === "direct" && Boolean(CLARITY_ID)
+const USES_PIXEL = ANALYTICS_MODE === "direct" && Boolean(META_PIXEL_ID)
 const ANY_TOOL = ANALYTICS_MODE !== "off"
+const TOOL_COUNT = [USES_GA, USES_CLARITY, USES_PIXEL].filter(Boolean).length
 /** Exactly one named tool, so the sentences say "it" and not "they". */
-const ONE_TOOL = !USES_GTM && USES_GA !== USES_CLARITY
+const ONE_TOOL = !USES_GTM && TOOL_COUNT === 1
 /** Recording of clicks and scrolling is, or may be, part of what is used. */
 const RECORDING = USES_CLARITY || USES_GTM
 
@@ -131,7 +133,7 @@ function analyticsSections(): LegalSection[] {
     : {
         heading: SECTION_3_HEADING,
         paragraphs: [
-          `This website is set up to use ${ONE_TOOL ? "one analytics tool" : "two analytics tools"}:`,
+          `This website is set up to use ${ONE_TOOL ? "one tool" : `${TOOL_COUNT === 2 ? "two" : "three"} tools`} of this kind:`,
         ],
         bullets: [
           ...(USES_GA
@@ -144,6 +146,11 @@ function analyticsSections(): LegalSection[] {
                 "Microsoft Clarity, provided by Microsoft. It records how pages are used (clicks, taps, scrolling and mouse movement) and shows this to us as heatmaps and as replays of individual visits.",
               ]
             : []),
+          ...(USES_PIXEL
+            ? [
+                "The Meta Pixel, provided by Meta Platforms. It tells Meta which pages and cars are viewed, when a search is made, when an enquiry is sent and when the call or WhatsApp buttons are used, so that we can measure our adverts on Facebook and Instagram and show our cars again to people who have visited this website.",
+              ]
+            : []),
         ],
       }
 
@@ -154,8 +161,13 @@ function analyticsSections(): LegalSection[] {
   // The advertising signals belong to Google's Consent Mode, which the site
   // sets for gtag.js and for a Tag Manager container. With Clarity alone
   // there is no Google tag to tell, so the sentence is left out.
-  const noAdvertising =
-    USES_GA || USES_GTM
+  // Only true while no advertising tool is loaded. With the Meta Pixel on, the
+  // site does advertise, so the sentence names what is and is not used for it.
+  const noAdvertising = USES_PIXEL
+    ? USES_GA || USES_GTM
+      ? " Google Analytics is not used for advertising: the website tells Google that advertising storage and advertising personalisation are not permitted. The Meta Pixel is used for our Facebook and Instagram adverts, as described above."
+      : " The Meta Pixel is used for our Facebook and Instagram adverts, as described above."
+    : USES_GA || USES_GTM
       ? ` We do not use ${them} for advertising: the website tells Google that advertising storage and advertising personalisation are not permitted.`
       : ""
 
@@ -181,9 +193,11 @@ function analyticsSections(): LegalSection[] {
  * Where each provider publishes its own privacy terms. Google is always
  * listed, because the map comes from Google whatever else is configured.
  */
-const PROVIDER_POLICIES = USES_CLARITY
-  ? "Google’s privacy policy is at policies.google.com/privacy and Microsoft’s privacy statement is at privacy.microsoft.com/privacystatement."
-  : "Google’s privacy policy is at policies.google.com/privacy."
+const PROVIDER_POLICIES =
+  (USES_CLARITY
+    ? "Google’s privacy policy is at policies.google.com/privacy and Microsoft’s privacy statement is at privacy.microsoft.com/privacystatement."
+    : "Google’s privacy policy is at policies.google.com/privacy.") +
+  (USES_PIXEL ? " Meta’s privacy policy is at facebook.com/privacy/policy." : "")
 
 /** Section 4: who receives analytics information, if anyone does. */
 const ANALYTICS_RECIPIENTS: string[] = ANY_TOOL
@@ -191,12 +205,10 @@ const ANALYTICS_RECIPIENTS: string[] = ANY_TOOL
       `With ${
         USES_GTM
           ? "Google and the providers of the analytics tools, which receive"
-          : USES_GA && USES_CLARITY
-            ? "Google and Microsoft, which receive"
-            : USES_GA
-              ? "Google, which receives"
-              : "Microsoft, which receives"
-      } the analytics information described in section 3 unless you have refused it`,
+          : `${[USES_GA && "Google", USES_CLARITY && "Microsoft", USES_PIXEL && "Meta"]
+              .filter(Boolean)
+              .join(" and ")}, which ${TOOL_COUNT === 1 ? "receives" : "receive"}`
+      } the information described in section 3 unless you have refused it`,
     ]
   : []
 

@@ -30,7 +30,8 @@
  */
 
 import type { InventoryVehicle } from '../inventory/types.ts'
-import { ANALYTICS_MODE, CLARITY_ID, GA_ID, GTM_ID } from './config.ts'
+import { ANALYTICS_MODE, CLARITY_ID, GA_ID, GTM_ID, META_PIXEL_ID } from './config.ts'
+import { forwardToPixel, preparePixel, resumePixel, stopPixel } from './meta-pixel.ts'
 import { analyticsState } from './consent.ts'
 
 export { GTM_ID }
@@ -144,6 +145,10 @@ export function prepareTags(): void {
     window.gtag('config', GA_ID, { send_page_view: false })
   }
 
+  // The Meta Pixel's command queue; the script itself is requested by
+  // components/analytics/analytics.tsx.
+  if (META_PIXEL_ID) preparePixel(META_PIXEL_ID)
+
   if (CLARITY_ID && !window.clarity) {
     // The same queue the official Clarity snippet creates.
     const queue: ClarityFn = function clarity() {
@@ -184,12 +189,13 @@ export function stopTags(): void {
     // Not in Microsoft's reference, but part of the open-source clarity-js
     // API: ends the recording now rather than at the next page.
     window.clarity?.('stop')
+    stopPixel()
   } catch {
     // A tag that will not stop cleanly is still starved by pushEvent below.
   }
   for (const cookie of document.cookie.split(';')) {
     const name = cookie.split('=')[0].trim()
-    if (/^(_ga|_gid|_gat|_clck|_clsk)/.test(name)) expireCookie(name)
+    if (/^(_ga|_gid|_gat|_clck|_clsk|_fbp|_fbc)/.test(name)) expireCookie(name)
   }
 }
 
@@ -202,6 +208,7 @@ export function resumeTags(): void {
   if (typeof window === 'undefined') return
   if (GA_ID) (window as unknown as Record<string, unknown>)[`ga-disable-${GA_ID}`] = false
   window.gtag?.('consent', 'update', { analytics_storage: 'granted' })
+  resumePixel()
 }
 
 /** Events worth finding a recording by. Everything else would be noise. */
@@ -294,6 +301,7 @@ export function pushEvent(
   }
 
   forwardToClarity(event, clean)
+  if (ANALYTICS_MODE === 'direct' && META_PIXEL_ID) forwardToPixel(event, clean)
 }
 
 /* -------------------------------------------------------------------------- */

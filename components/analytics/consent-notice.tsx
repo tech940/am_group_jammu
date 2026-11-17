@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { ANALYTICS_MODE, CLARITY_ID, CONSENT_DEFAULT, GA_ID } from "@/lib/analytics/config"
+import { META_PIXEL_ID, ANALYTICS_MODE, CLARITY_ID, CONSENT_DEFAULT, GA_ID } from "@/lib/analytics/config"
 import { writeChoice } from "@/lib/analytics/consent"
 import { carFromPath } from "@/lib/analytics/gtm"
 
@@ -46,6 +46,14 @@ const PHONE_BOTTOM = {
 } as const
 
 function sentence(): string {
+  const base = baseSentence()
+  // The Meta Pixel is an advertising tool, so it is named separately and plainly.
+  return ANALYTICS_MODE === "direct" && META_PIXEL_ID
+    ? `${base} We also use the Meta Pixel to measure our Facebook and Instagram ads.`
+    : base
+}
+
+function baseSentence(): string {
   if (ANALYTICS_MODE === "direct" && GA_ID && CLARITY_ID) {
     return "We use Google Analytics and Microsoft Clarity to see how this site is used. Clarity records clicks and scrolling. What you type into a form is not recorded."
   }

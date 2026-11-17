@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import Script from "next/script"
 import { usePathname } from "next/navigation"
-import { ANALYTICS_MODE, CLARITY_ID, GA_ID, GTM_ID } from "@/lib/analytics/config"
+import { ANALYTICS_MODE, CLARITY_ID, GA_ID, GTM_ID, META_PIXEL_ID } from "@/lib/analytics/config"
 import {
   analyticsLive,
   setInternal,
@@ -215,6 +215,13 @@ export function Analytics() {
         <Script
           id="ga4"
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+      )}
+      {live && ANALYTICS_MODE === "direct" && META_PIXEL_ID && (
+        <Script
+          id="meta-pixel"
+          src="https://connect.facebook.net/en_US/fbevents.js"
           strategy="afterInteractive"
         />
       )}

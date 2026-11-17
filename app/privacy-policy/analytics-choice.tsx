@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react"
 import { Button } from "@/components/ui/button"
-import { ANALYTICS_MODE, CLARITY_ID, GA_ID } from "@/lib/analytics/config"
+import { ANALYTICS_MODE, CLARITY_ID, GA_ID, META_PIXEL_ID } from "@/lib/analytics/config"
 import {
   configuredHere,
   effectiveChoice,
@@ -53,6 +53,15 @@ const unknown = (): Status => "unknown"
  * tags the container holds, so it does not name any.
  */
 function tools(): { name: string; plural: boolean } {
+  const base = baseTools()
+  if (ANALYTICS_MODE === "direct" && META_PIXEL_ID) {
+    const others = base.name === "Analytics tools" ? "" : `${base.name.replace(" and ", ", ")} and `
+    return { name: `${others}the Meta Pixel`, plural: Boolean(others) }
+  }
+  return base
+}
+
+function baseTools(): { name: string; plural: boolean } {
   if (ANALYTICS_MODE === "direct" && GA_ID && CLARITY_ID) {
     return { name: "Google Analytics and Microsoft Clarity session recording", plural: true }
   }

@@ -48,12 +48,17 @@ function idFrom(value: string | undefined, shape: RegExp): string {
 export const GA_ID = idFrom(process.env.NEXT_PUBLIC_GA_ID, /^G-[A-Z0-9]{4,20}$/)
 /** Microsoft Clarity project id, about ten lower-case letters and digits. */
 export const CLARITY_ID = idFrom(process.env.NEXT_PUBLIC_CLARITY_ID, /^[a-z0-9]{4,24}$/i)
+/** Meta (Facebook / Instagram) Pixel id, a long number. Loaded in direct mode only. */
+// The owner's pixel, supplied 2026-11-17. It is public by nature (it is in
+// every page's source once it loads), so it is written here as the default;
+// NEXT_PUBLIC_META_PIXEL_ID overrides it.
+export const META_PIXEL_ID = idFrom(process.env.NEXT_PUBLIC_META_PIXEL_ID || '1429872412509869', /^\d{10,20}$/)
 /** Optional Google Tag Manager container, "GTM-XXXXXXX". */
 export const GTM_ID = idFrom(process.env.NEXT_PUBLIC_GTM_ID, /^GTM-[A-Z0-9]{4,12}$/)
 
 export type AnalyticsMode = 'gtm' | 'direct' | 'off'
 
-export const ANALYTICS_MODE: AnalyticsMode = GTM_ID ? 'gtm' : GA_ID || CLARITY_ID ? 'direct' : 'off'
+export const ANALYTICS_MODE: AnalyticsMode = GTM_ID ? 'gtm' : GA_ID || CLARITY_ID || META_PIXEL_ID ? 'direct' : 'off'
 
 /**
  * What a browser that has not answered the notice gets.
