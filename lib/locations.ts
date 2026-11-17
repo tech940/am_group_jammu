@@ -138,7 +138,13 @@ export const LOCATIONS: Location[] = [
     phoneE164: MAIN_PHONE_E164,
     email: 'info@amgroupind.com',
     // TODO: replace with the exact pin from the Google Business Profile.
-    geo: { latitude: 32.7266, longitude: 74.857, verified: false },
+    // Google Maps' own entry for the building "AM Business Park" (Guru Tegh
+    // Bahadur Nagar, Channi Himat; KTM Jammu is listed inside it), read
+    // 2026-11-17. Meta's vehicle catalogue requires a latitude and longitude
+    // for each car's dealership, and most cars are listed here. Google gives
+    // the building's PIN as 180015 where this record says 180012; the address
+    // is left as the company gave it until they say which is right.
+    geo: { latitude: 32.7019636, longitude: 74.8963506, verified: true },
     mapUrl:
       'https://www.google.com/maps/dir/?api=1&destination=AM+Business+Park+NH+1+Bye+Pass+Road+Jammu+180012',
     hours: STANDARD_HOURS,

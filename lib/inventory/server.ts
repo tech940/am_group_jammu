@@ -211,6 +211,27 @@ async function findRecentlySold(id: number): Promise<InventoryVehicle | null> {
   return ageDays <= SOLD_PAGE_RETENTION_DAYS ? car : null
 }
 
+/**
+ * Cars marked sold within the last SOLD_PAGE_RETENTION_DAYS, for the Meta
+ * catalogue feed. They are written into the feed as `not_available` so Meta
+ * stops advertising them whether the feed is set to Replace or Update - Meta's
+ * own advice is to mark an item unavailable rather than only drop it. Empty
+ * when the stock is not coming from the database.
+ */
+export async function getRecentlySold(): Promise<InventoryVehicle[]> {
+  let db: DbStock
+  try {
+    db = await cachedDbStock()
+  } catch {
+    return []
+  }
+  if (db.source !== 'database') return []
+  return db.sold.filter((car) => {
+    const soldAt = Date.parse(car.updatedAt ?? '')
+    return Number.isFinite(soldAt) && (Date.now() - soldAt) / 86_400_000 <= SOLD_PAGE_RETENTION_DAYS
+  })
+}
+
 export async function getVehicleBySlug(slug: string): Promise<{
   /** A car ON SALE. Null for a sold car: nothing that lists stock may show one. */
   vehicle: InventoryVehicle | null

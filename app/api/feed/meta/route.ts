@@ -15,9 +15,13 @@
  *   2. Add items -> Data feed -> Scheduled feed.
  *   3. Feed URL:  https://<this site's domain>/api/feed/meta
  *      Leave username and password empty — the feed is public.
- *   4. Schedule: Hourly (or Daily). Turn on "Add automatic updates" if offered.
- *   5. Currency INR. Upload type "Replace", so cars that have left the feed
- *      (sold) are removed from the catalogue.
+ *   4. Schedule: Hourly - the most often Meta fetches a scheduled feed.
+ *   5. Currency INR. Upload type "Replace". A car marked sold stays in the
+ *      feed for 30 days with availability `not_available`, so Meta stops
+ *      advertising it at the next fetch; a deleted car leaves the feed and
+ *      Replace removes it.
+ *      For removal within seconds rather than within the hour, set
+ *      META_CATALOG_ID and META_CATALOG_TOKEN: see lib/feed/meta-push.ts.
  *   6. Remove the old manually uploaded file as a data source, otherwise the
  *      same car is listed twice.
  *
@@ -35,13 +39,17 @@
  */
 
 import type { NextRequest } from 'next/server'
-import { getInventory } from '@/lib/inventory/server'
+import { getInventory, getRecentlySold } from '@/lib/inventory/server'
+import { metaPushConfigured } from '@/lib/feed/meta-push'
 import { buildMetaFeed, toCsv } from '@/lib/feed/meta'
 import { SITE_URL, SITE_URL_IS_EXPLICIT } from '@/lib/seo/site'
 
 export const maxDuration = 30
 
-const CACHE_OK = 'public, s-maxage=1800, stale-while-revalidate=3600'
+// Five minutes. Meta fetches a scheduled feed at most once an hour, so the
+// feed it reads is never more than a few minutes behind the admin. (It was 30
+// minutes, which could add half an hour before a sold car left the ads.)
+const CACHE_OK = 'public, s-maxage=300, stale-while-revalidate=60'
 /** Seconds Meta (or a CDN) should wait before retrying after a failed build. */
 const RETRY_AFTER_SECONDS = 600
 
@@ -84,12 +92,17 @@ export async function GET(request: NextRequest) {
     return unavailable('Inventory source is unavailable right now; feed not generated.', asJson)
   }
 
-  const { rows, skipped } = buildMetaFeed(snapshot.vehicles, siteOrigin(request))
+  const sold = await getRecentlySold()
+  const { rows, skipped } = buildMetaFeed(snapshot.vehicles, siteOrigin(request), sold)
+  const available = rows.filter((r) => r.availability === 'available').length
 
   if (asJson) {
     return Response.json(
       {
         included: rows.length,
+        available,
+        markedSold: rows.length - available,
+        instantPush: metaPushConfigured() ? 'on' : 'off (META_CATALOG_ID and META_CATALOG_TOKEN not set)',
         skipped,
         total: snapshot.vehicles.length,
         fetchedAt: snapshot.fetchedAt,
@@ -98,7 +111,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  if (rows.length === 0) {
+  if (available === 0) {
     return unavailable(
       'No car in the inventory is complete enough for the feed; see ?format=json for the reasons.',
       false,

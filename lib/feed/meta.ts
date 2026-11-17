@@ -28,6 +28,7 @@ export const META_COLUMNS: string[] = [
   'mileage.value',
   'mileage.unit',
   'price',
+  'availability',
   'state_of_vehicle',
   'body_style',
   'fuel_type',
@@ -230,14 +231,30 @@ function addressColumns(v: InventoryVehicle): MetaFeedRow {
  * @param origin  Scheme + host of THIS site, no trailing slash. Each car's
  *                `url` is its page here, so an ad click lands on our lead form.
  */
-export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): MetaFeed {
+export function buildMetaFeed(
+  vehicles: InventoryVehicle[],
+  origin: string,
+  /**
+   * Cars recently marked sold. Written with availability `not_available` so
+   * Meta stops showing them in ads at its next fetch, whichever upload mode
+   * the feed is set to (Meta's docs: mark items unavailable rather than only
+   * removing them). They are not counted in `skipped`.
+   */
+  sold: InventoryVehicle[] = [],
+): MetaFeed {
+  const soldIds = new Set(sold.map((v) => v.id))
+  // A car can be in both lists for a moment while caches catch up; the
+  // on-sale copy wins, because it is the newer state.
+  const onSaleIds = new Set(vehicles.map((v) => v.id))
+  const all = [...vehicles, ...sold.filter((v) => !onSaleIds.has(v.id))]
   const loc = PRIMARY_LOCATION
 
   const rows: MetaFeedRow[] = []
   const skipped: MetaFeedSkipped[] = []
   const seen = new Set<number>()
 
-  for (const v of vehicles) {
+  for (const v of all) {
+    const isSold = soldIds.has(v.id) && !onSaleIds.has(v.id)
     const make = tidyName(v.make ?? '')
     const model = tidyName(v.model ?? '')
     const body = resolveBodyStyle(v)
@@ -253,7 +270,9 @@ export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): Met
     if (seen.has(v.id)) reasons.push('duplicate listing ID')
 
     if (reasons.length > 0 || !body || !v.price) {
-      skipped.push({ id: v.id, title: cleanText(v.title), reasons })
+      // A sold car that could not be written was never in the catalogue as
+      // complete either, so there is nothing to take down; it is not reported.
+      if (!isSold) skipped.push({ id: v.id, title: cleanText(v.title), reasons })
       continue
     }
     seen.add(v.id)
@@ -293,6 +312,7 @@ export function buildMetaFeed(vehicles: InventoryVehicle[], origin: string): Met
       'mileage.value': String(km),
       'mileage.unit': 'KM',
       price: `${Math.round(v.price)} INR`,
+      availability: isSold ? 'not_available' : 'available',
       state_of_vehicle: 'USED',
       body_style: body,
       fuel_type: fuel,

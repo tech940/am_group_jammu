@@ -13,6 +13,8 @@
  * them next to the fields. Only a missing admin session throws.
  */
 
+import { after } from 'next/server'
+import { metaPushConfigured, pushCatalogChange, type CatalogChange } from '../feed/meta-push.ts'
 import { randomUUID } from 'node:crypto'
 import { revalidatePath, updateTag } from 'next/cache'
 import { requireAdmin } from '../admin/auth.ts'
@@ -65,6 +67,27 @@ function message(err: unknown): string {
  * saved car as a failure would invite a second press of Save, which for a new
  * car means a duplicate. The cache also expires by itself within minutes.
  */
+/**
+ * Tell Meta's catalogue at once when a car stops (or starts) being for sale,
+ * instead of waiting up to an hour for the next feed fetch. Runs after the
+ * response with `after()`, so the admin never waits on Meta, and does nothing
+ * until META_CATALOG_ID and META_CATALOG_TOKEN are set (lib/feed/meta-push.ts).
+ * Only a change of whether the car is on sale is sent; edits go by the feed.
+ */
+function syncCatalogue(id: number, before: CarStatus | null, after_: CarStatus | 'deleted'): void {
+  const wasOnSale = before === 'published'
+  const isOnSale = after_ === 'published'
+  let change: CatalogChange | null = null
+  if (after_ === 'deleted') change = wasOnSale || before === 'sold' ? 'deleted' : null
+  else if (wasOnSale && !isOnSale) change = 'sold'
+  else if (!wasOnSale && isOnSale && before !== null) change = 'available'
+  if (!change || !metaPushConfigured()) return
+  const what = change
+  after(async () => {
+    await pushCatalogChange(id, what)
+  })
+}
+
 function expireStock(): void {
   try {
     updateTag(INVENTORY_CACHE_TAG)
@@ -323,6 +346,7 @@ export async function saveCar(id: number | null, input: unknown): Promise<CarRes
     }
 
     expireStock()
+    syncCatalogue(car.id, existing ? existing.status : null, car.status)
     return { ok: true, car }
   } catch (err) {
     return { ok: false, error: message(err) }
@@ -342,6 +366,7 @@ export async function setCarStatus(id: number, status: CarStatus): Promise<CarRe
     const goingLive = status === 'published' && existing.status === 'draft'
     const car = await updateCar(id, goingLive ? { status, posted_at: new Date().toISOString() } : { status })
     expireStock()
+    syncCatalogue(id, existing.status, car.status)
     return { ok: true, car }
   } catch (err) {
     return { ok: false, error: message(err) }
@@ -362,6 +387,7 @@ export async function removeCar(id: number): Promise<DoneResult> {
       console.warn(`[cars] car ${id} deleted, but its photos could not be removed: ${message(err)}`)
     }
     expireStock()
+    syncCatalogue(id, existing.status, 'deleted')
     return { ok: true }
   } catch (err) {
     return { ok: false, error: message(err) }
