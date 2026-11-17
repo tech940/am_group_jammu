@@ -71,12 +71,17 @@ function projectOrigin(value: string | undefined): string | undefined {
   }
 }
 
+// Before the switch: old = the site's own variables, new = NEW_*.
+// After it: old = OLD_*, new = NEW_* or, if those are gone, the site's own
+// variables (which by then point at the new project).
+const afterSwitch = Boolean(env('OLD_SUPABASE_URL'))
 const sourceUrl = projectOrigin(env('OLD_SUPABASE_URL') ?? env('NEXT_PUBLIC_SUPABASE_URL'))
-const sourceKey = env('OLD_SUPABASE_SERVICE_ROLE_KEY') ?? env('SUPABASE_SERVICE_ROLE_KEY')
-const targetUrl = projectOrigin(env('NEW_SUPABASE_URL'))
-const targetKey = env('NEW_SUPABASE_SERVICE_ROLE_KEY')
+const sourceKey = env('OLD_SUPABASE_SERVICE_ROLE_KEY') ?? (afterSwitch ? undefined : env('SUPABASE_SERVICE_ROLE_KEY'))
+const targetUrl = projectOrigin(env('NEW_SUPABASE_URL') ?? (afterSwitch ? env('NEXT_PUBLIC_SUPABASE_URL') : undefined))
+const targetKey = env('NEW_SUPABASE_SERVICE_ROLE_KEY') ?? (afterSwitch ? env('SUPABASE_SERVICE_ROLE_KEY') : undefined)
 
-if (!sourceUrl || !sourceKey) fail('the current project is not configured (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).')
+if (!sourceUrl || !sourceKey)
+  fail(afterSwitch ? "add OLD_SUPABASE_SERVICE_ROLE_KEY (the old project's service_role key) to .env." : "the current project is not configured (NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY).")
 if (!targetUrl || !targetKey)
   fail('add NEW_SUPABASE_URL and NEW_SUPABASE_SERVICE_ROLE_KEY for the new project to .env (never paste them in chat).')
 if (new URL(sourceUrl).host === new URL(targetUrl).host)
