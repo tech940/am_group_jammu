@@ -14,7 +14,8 @@
     "test:inventory": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-motors-inventory.ts",
     "test:redirects": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/test-redirects.ts",
     "cars:import": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/import-wordpress-cars.mts",
-    "cars:parity": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-cars-parity.mts"
+    "cars:parity": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-cars-parity.mts",
+    "db:move": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/move-database.mts"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.4",

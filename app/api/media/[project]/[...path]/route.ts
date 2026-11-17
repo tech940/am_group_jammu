@@ -39,8 +39,21 @@
 const PROJECTS: Record<string, string> = {
   // Media library — the client's photography.
   m: "ehcmjypfxucvcvuofozx.supabase.co",
-  // Lead-data project, which also holds the legacy branch photography.
-  l: "nhceknbaslqdqofefyla.supabase.co",
+  // The website's own project (stock, leads), which also holds the branch
+  // photography. Follows NEXT_PUBLIC_SUPABASE_URL, so moving the site to
+  // another Supabase project moves these photos with it. Still a fixed
+  // allow-list: the value is deployment config, never request input.
+  l: siteProjectHost(),
+}
+
+function siteProjectHost(): string {
+  try {
+    const host = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").host
+    if (host.endsWith(".supabase.co")) return host
+  } catch {
+    /* not set: fall back below */
+  }
+  return "nhceknbaslqdqofefyla.supabase.co"
 }
 
 const BUCKET = "am_group_files"
