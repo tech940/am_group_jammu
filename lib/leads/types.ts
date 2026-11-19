@@ -186,6 +186,8 @@ export interface CreateLeadInput {
   consentScope?: ConsentScope
   /** How the visitor found the site, from lib/analytics/attribution.ts. */
   attribution?: LeadAttribution | null
+  /** The enquiry form showed the offer in ./offer.ts. Honoured only for an intent that offer covers. */
+  offerShown?: boolean
   /** Hidden field; a real user never fills this in. */
   companyWebsite?: string
 }

@@ -10,6 +10,8 @@ import { Field, Input, Textarea } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
 import { Alert, Spinner } from "@/components/ui/feedback"
 import { ChevronGlyph } from "@/components/system/marks"
+import { IlloBuy } from "@/components/system/illustrations"
+import { offerFor } from "@/lib/leads/offer"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { submitLead } from "@/lib/leads/actions"
@@ -119,6 +121,17 @@ const INTENT_COPY: Record<LeadIntent, IntentCopy> = {
   },
 }
 
+/**
+ * The send button while the offer is on (lib/leads/offer.ts). The offer is
+ * the reason to press it, so the button says so. Intents without the offer
+ * keep their own label.
+ */
+const OFFER_SUBMIT: Partial<Record<LeadIntent, (amount: string) => string>> = {
+  "Vehicle Enquiry": (a) => `Get best price + ${a} off`,
+  "Test Drive": (a) => `Book test drive + ${a} off`,
+  General: (a) => `Claim my ${a} off`,
+}
+
 /* -------------------------------------------------------------------------- */
 /* Shell — owns the open/close session                                        */
 /* -------------------------------------------------------------------------- */
@@ -212,7 +225,10 @@ function EnquiryDialog({
   const moreId = useId()
   // "This car" needs a car. A vehicle enquiry opened without one reads as a
   // general enquiry; the intent sent to submitLead is not changed.
-  const copy = INTENT_COPY[intent === "Vehicle Enquiry" && !vehicle ? "General" : intent]
+  const copyIntent: LeadIntent = intent === "Vehicle Enquiry" && !vehicle ? "General" : intent
+  const copy = INTENT_COPY[copyIntent]
+  const offer = offerFor(intent)
+  const submitLabel = offer ? (OFFER_SUBMIT[copyIntent]?.(offer.label) ?? copy.submit) : copy.submit
 
   // Driven by useActionState rather than post-await setState.
   //
@@ -240,6 +256,7 @@ function EnquiryDialog({
         // What the sentence at the send button says, and no more than that.
         consent: true,
         consentScope: "enquiry",
+        offerShown: Boolean(offer),
         attribution: getAttribution(),
         companyWebsite: String(fd.get("companyWebsite") ?? ""),
         vehicle: vehicle
@@ -390,6 +407,7 @@ function EnquiryDialog({
         lead_source_label: sourceLabel,
         lead_source_path: pathname,
         form_id: "enquiry-modal",
+        lead_offer: offer ? `extra_${offer.amount}_off` : undefined,
         // value 0, with the car's price as listing_price: an enquiry is not
         // a sale, and GA4 would add the asking prices up as revenue.
         ...leadVehicleParams(vehicle),
@@ -426,7 +444,7 @@ function EnquiryDialog({
             Sending…
           </>
         ) : (
-          copy.submit
+          submitLabel
         )}
       </Button>
       {/* The consent wording, at the button that gives it. Both documents
@@ -468,6 +486,12 @@ function EnquiryDialog({
           <p className="text-body-lg text-ink">
             Thanks — we have your details{vehicle ? ` for the ${vehicle.title}` : ""}. {copy.next}
           </p>
+          {offer && (
+            <p className="mt-3 rounded-sm bg-ground px-3 py-2 text-body text-ink">
+              Your extra <strong className="font-semibold" data-num>{offer.label}</strong> off is noted against
+              your number. Our team will take it off the price when you buy.
+            </p>
+          )}
           {vehicle && (
             <p className="mt-3 text-small text-ink-2" data-num>
               Listed asking price {vehicle.priceLabel}
@@ -476,6 +500,27 @@ function EnquiryDialog({
         </div>
       ) : (
         <>
+          {/* The offer, as a band across the top of the sheet rather than a
+              box inside it: forest green, white type, the shop's own buying
+              illustration. The tomato stays on the send button, the one thing
+              to press. */}
+          {offer && (
+            <div className="-mx-5 -mt-5 mb-5 flex items-center gap-3 bg-deep px-5 py-4 text-on-deep sm:-mx-6 sm:px-6">
+              <div className="min-w-0 flex-1">
+                <p className="font-display uppercase leading-none">
+                  <span className="block text-h3 text-on-deep-2">Extra</span>
+                  <span className="mt-1 block text-h1" data-num>
+                    {offer.label} off
+                  </span>
+                </p>
+                <p className="mt-2 text-small text-on-deep-2">
+                  On any used car you buy from AM Group. Leave your number to claim it.
+                </p>
+              </div>
+              <IlloBuy tone="blue" className="h-16 w-auto shrink-0 sm:h-20" />
+            </div>
+          )}
+
           {vehicle && (
             <div className="mb-4 flex items-center gap-3 rounded-sm border border-line bg-ground p-2">
               <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-sm bg-ground-2">

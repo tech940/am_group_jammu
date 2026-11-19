@@ -17,6 +17,7 @@ import { rateLimit, validateLead } from './validation.ts'
 import { sendLeadEmail } from './notify.ts'
 import { PRIMARY_LOCATION } from '../locations.ts'
 import { attributionNote } from './attribution.ts'
+import { offerFor } from './offer.ts'
 import { REPEAT_NOTE_PREFIX, consentRecord } from './types.ts'
 import type {
   CreateLeadInput,
@@ -71,6 +72,8 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
   // they are kept out of the row and written to the lead's history instead.
   const { attribution, consentScope, ...clean } = validation.clean
   const consentNote = consentRecord(clean.consent, consentScope)
+  // Decided here from the intent, not trusted from the browser alone.
+  const offerNote = input.offerShown === true ? (offerFor(clean.intent)?.record ?? null) : null
 
   const vehicle = input.vehicle
     ? {
@@ -99,7 +102,7 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
         duplicate.id,
         'note',
         `${REPEAT_NOTE_PREFIX} from the same number${clean.sourcePath ? ` on ${clean.sourcePath}` : ''}. ` +
-          `${origin ? `How they found us. ${origin}. ` : ''}Consent: ${consentNote}.` +
+          `${origin ? `How they found us. ${origin}. ` : ''}${offerNote ? `${offerNote} ` : ''}Consent: ${consentNote}.` +
           // The second form can carry different answers (a second car from the
           // valuation form, corrected kilometres). There is no new lead row to
           // hold them, so they are kept here rather than dropped.
@@ -125,7 +128,7 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
       await addActivity(
         lead.id,
         'note',
-        `${origin ? `How they found us. ${origin}. ` : ''}Consent: ${consentNote}.`,
+        `${origin ? `How they found us. ${origin}. ` : ''}${offerNote ? `${offerNote} ` : ''}Consent: ${consentNote}.`,
         null,
       )
     } catch (err) {
@@ -135,7 +138,7 @@ export async function submitLead(input: CreateLeadInput): Promise<Result<{ id: s
     console.error('[leads] database save failed', err)
   }
 
-  const mail = await sendLeadEmail({ ...clean, vehicle, leadId, attribution, consentNote })
+  const mail = await sendLeadEmail({ ...clean, vehicle, leadId, attribution, consentNote, offerNote })
 
   if (leadId || mail.sent) {
     if (!leadId) console.error('[leads] delivered by EMAIL ONLY — the database did not take this lead')

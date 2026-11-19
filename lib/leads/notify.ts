@@ -46,6 +46,8 @@ export interface LeadEmail {
   attribution?: LeadAttribution | null
   /** What the visitor agreed to, in words (consentRecord in ./types.ts). */
   consentNote?: string
+  /** The offer the visitor was shown, if any (./offer.ts). */
+  offerNote?: string | null
 }
 
 export type NotifyResult = { sent: true } | { sent: false; reason: 'not_configured' | 'failed' }
@@ -74,6 +76,7 @@ export async function sendLeadEmail(lead: LeadEmail): Promise<NotifyResult> {
     // bar, so like every other value here they go through esc() below and are
     // never put in a mail header.
     ...attributionLines(lead.attribution),
+    ...(lead.offerNote ? ([['Offer', lead.offerNote]] as [string, string][]) : []),
     ['Consent', lead.consentNote ?? '—'],
     [
       'Lead desk',
