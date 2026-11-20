@@ -16,7 +16,7 @@ import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
 import { HPromiseLine } from "@/components/seo/h-promise-line"
 import { getFrequentSearches } from "@/lib/seo/links"
-import { pageSocial } from "@/lib/seo/site"
+import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 import { jsonLdString, locationPageSchema } from "@/lib/seo-schemas"
 import {
   closedSundays,
@@ -73,12 +73,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!loc) return { title: "Location Not Found", robots: "noindex" }
 
   const { title, description } = describe(loc)
+  // A car from stock as the thumbnail, not the logo (see shareImageFrom).
+  const { vehicles } = await getInventory()
 
   return {
     title,
     description,
     alternates: { canonical: `/locations/${loc.slug}` },
-    ...pageSocial({ title, description, path: `/locations/${loc.slug}` }),
+    ...pageSocial({ title, description, path: `/locations/${loc.slug}`, image: shareImageFrom(vehicles) }),
   }
 }
 
@@ -152,7 +154,7 @@ export default async function LocationPage({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: jsonLdString(locationPageSchema(loc.slug, title, description)),
+          __html: jsonLdString(locationPageSchema(loc.slug, title, description, shareImageFrom(vehicles)?.url)),
         }}
       />
       <Breadcrumbs
@@ -181,38 +183,48 @@ export default async function LocationPage({ params }: Props) {
             </p>
           </div>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild variant="primary" size="lg">
-              <a href={`tel:${loc.phoneE164}`} data-track-location={`location-hero-${loc.slug}`}>
-                <PhoneGlyph /> {loc.addressConfirmed ? `Call ${loc.phone}` : "Call for directions"}
-              </a>
-            </Button>
-            <Button asChild variant="secondary" size="lg">
-              <a
-                href={whatsappUrl(`Hi AM Group, I'd like to visit ${loc.shortName} in ${loc.city} to see used cars.`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-track-location={`location-hero-${loc.slug}`}
-              >
-                WhatsApp
-              </a>
-            </Button>
-            {loc.addressConfirmed && (
+          {/* A list, not a row of bare links: search snippets read the page as text
+              and joined the labels ("…44456WhatsAppDirections"). */}
+          <ul className="mt-8 flex flex-wrap gap-3">
+            <li>
+              <Button asChild variant="primary" size="lg">
+                <a href={`tel:${loc.phoneE164}`} data-track-location={`location-hero-${loc.slug}`}>
+                  <PhoneGlyph /> {loc.addressConfirmed ? `Call ${loc.phone}` : "Call for directions"}
+                </a>
+              </Button>
+            </li>
+            <li>
               <Button asChild variant="secondary" size="lg">
                 <a
-                  href={loc.mapUrl}
+                  href={whatsappUrl(`Hi AM Group, I'd like to visit ${loc.shortName} in ${loc.city} to see used cars.`)}
                   target="_blank"
                   rel="noopener noreferrer"
                   data-track-location={`location-hero-${loc.slug}`}
                 >
-                  Directions
+                  WhatsApp
                 </a>
               </Button>
+            </li>
+            {loc.addressConfirmed && (
+              <li>
+                <Button asChild variant="secondary" size="lg">
+                  <a
+                    href={loc.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-track-location={`location-hero-${loc.slug}`}
+                  >
+                    Directions
+                  </a>
+                </Button>
+              </li>
             )}
-            <Button asChild variant="secondary" size="lg">
-              <Link href="/inventory">See used cars</Link>
-            </Button>
-          </div>
+            <li>
+              <Button asChild variant="secondary" size="lg">
+                <Link href="/inventory">See used cars</Link>
+              </Button>
+            </li>
+          </ul>
           <HPromiseLine track={`location-hpromise-${loc.slug}`} className="mt-4" />
         </div>
       </section>

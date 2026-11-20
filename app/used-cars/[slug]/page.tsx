@@ -15,7 +15,7 @@ import { toCardVehicle } from "@/lib/inventory/filter"
 import { getFrequentSearches, getSeoLinks, type SeoLinkGroup } from "@/lib/seo/links"
 import { getResolvableLandingSlugs, resolveLanding, type LandingKind } from "@/lib/seo/landing"
 import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
-import { pageSocial } from "@/lib/seo/site"
+import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * One route serving every "used cars …" landing page: the Jammu city page,
@@ -65,7 +65,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // tag: "index that page instead" and "do not index" are different
     // instructions, and sending both makes search engines ignore the first.
     ...(!landing.indexable && canonical === path ? { robots: { index: false, follow: true } } : {}),
-    ...pageSocial({ title: landing.title, description: landing.description, path: canonical }),
+    ...pageSocial({
+      title: landing.title,
+      description: landing.description,
+      path: canonical,
+      image: shareImageFrom(landing.vehicles),
+    }),
   }
 }
 

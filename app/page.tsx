@@ -6,10 +6,10 @@ import { toCardVehicle } from "@/lib/inventory/filter"
 import { Homepage } from "@/components/homepage/homepage"
 import { getLandingHrefResolver } from "@/lib/seo/landing"
 import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
-import { pageSocial } from "@/lib/seo/site"
+import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { total, facets, degraded } = await getHomeInventory()
+  const [{ total, facets, degraded }, { vehicles }] = await Promise.all([getHomeInventory(), getInventory()])
   const live = !degraded && total > 0
   const sites = siteCountWord()
 
@@ -34,7 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: "/" },
     // Set here, not inherited: a page's `openGraph` replaces the layout's
     // rather than merging into it.
-    ...pageSocial({ title, description, path: "/" }),
+    ...pageSocial({ title, description, path: "/", image: shareImageFrom(vehicles) }),
   }
 }
 

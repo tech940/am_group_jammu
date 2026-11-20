@@ -81,6 +81,29 @@ export const OG_IMAGE = {
   alt: 'AM Group Used Cars, Jammu',
 }
 
+/** A share image taken from the page's own stock. */
+export interface ShareImage {
+  url: string
+  alt: string
+}
+
+/**
+ * The first car photo among the cars a page lists, as its share image.
+ *
+ * WHY (2026-11-20): Google took the logo card as the thumbnail for a location
+ * page ("I don't want this AM Group logo, I want a vehicle"). Search picks the
+ * thumbnail from og:image and the page's structured data, so a page that
+ * lists cars names one of those cars instead. Pages with no car fall back to
+ * OG_IMAGE.
+ */
+export function shareImageFrom(
+  vehicles: { primaryImage: string | null; title: string; year?: number | null }[],
+): ShareImage | null {
+  const car = vehicles.find((v) => v.primaryImage)
+  if (!car?.primaryImage) return null
+  return { url: car.primaryImage, alt: `${car.year ? `${car.year} ` : ''}${car.title}, used, at AM Group Jammu` }
+}
+
 /**
  * Open Graph + Twitter block for a page.
  *
@@ -93,7 +116,18 @@ export const OG_IMAGE = {
  * A page that sets no openGraph at all inherits the root layout's, whose
  * og:url is the homepage, so every indexable route should call this.
  */
-export function pageSocial({ title, description, path }: { title: string; description: string; path: string }) {
+export function pageSocial({
+  title,
+  description,
+  path,
+  image = null,
+}: {
+  title: string
+  description: string
+  path: string
+  /** A photograph from the page itself (see shareImageFrom); the logo card otherwise. */
+  image?: ShareImage | null
+}) {
   return {
     openGraph: {
       type: 'website' as const,
@@ -102,13 +136,13 @@ export function pageSocial({ title, description, path }: { title: string; descri
       url: path,
       title,
       description,
-      images: [OG_IMAGE],
+      images: [image ?? OG_IMAGE],
     },
     twitter: {
       card: 'summary_large_image' as const,
       title,
       description,
-      images: [OG_IMAGE.url],
+      images: [image?.url ?? OG_IMAGE.url],
     },
   }
 }

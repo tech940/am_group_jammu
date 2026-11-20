@@ -10,7 +10,7 @@ import type { SortKey } from "@/store/use-inventory-store"
 import { buildListingCopy, buildListingFaqs } from "@/lib/seo/content"
 import { getFrequentSearches } from "@/lib/seo/links"
 import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
-import { pageSocial } from "@/lib/seo/site"
+import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * THE STOCK BROWSER: every car in stock, with search, filters and sorting.
@@ -146,7 +146,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     // string through let ?fbclid= and ?utm_ links mint their own canonical URLs.
     alternates: { canonical: path },
     robots: isFiltered || page > 1 ? { index: false, follow: true } : { index: true, follow: true },
-    ...pageSocial({ title, description, path }),
+    ...pageSocial({ title, description, path, image: shareImageFrom(vehicles) }),
   }
 }
 

@@ -9,7 +9,7 @@ import { RelatedLinks } from "@/components/seo/related-links"
 import { getInventory } from "@/lib/inventory/server"
 import { getLandingDirectory, type LandingEntry, type LandingKind } from "@/lib/seo/landing"
 import { getSeoLinks, type SeoLinkGroup } from "@/lib/seo/links"
-import { pageSocial } from "@/lib/seo/site"
+import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * The index of every used-car landing page that has stock behind it today.
@@ -37,7 +37,7 @@ const GROUPS: { kind: LandingKind; title: string }[] = [
 ]
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { total, degraded } = await getInventory()
+  const { total, degraded, vehicles } = await getInventory()
   const live = !degraded && total > 0
   const description =
     `Every used-car page at AM Group, Jammu, with the number of cars in stock today: by budget, make, model, ` +
@@ -49,7 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: { canonical: PATH },
     // With no stock there is nothing to list, so the page stays out of the index.
     ...(live ? {} : { robots: { index: false, follow: true } }),
-    ...pageSocial({ title: TITLE, description, path: PATH }),
+    ...pageSocial({ title: TITLE, description, path: PATH, image: shareImageFrom(vehicles) }),
   }
 }
 

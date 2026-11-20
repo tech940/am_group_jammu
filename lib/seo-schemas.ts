@@ -151,7 +151,9 @@ function dealerNode() {
     alternateName: SITE_NAME,
     url: SITE_URL,
     logo: LOGO,
-    image: LOGO,
+    // A photograph of the business, not the logo again: search engines use
+    // `image` as a picture of the place, and showed the logo as the thumbnail.
+    image: `${SITE_URL}/sell/am-hyundai-showroom.webp`,
     description:
       `Used car dealer in Jammu. Buy a second hand car or sell your car at ` +
       `${LOCATIONS.length} sites in Jammu city: ${locationNames()}.`,
@@ -236,6 +238,7 @@ export function pageSchema({
   description,
   mainEntityId,
   aboutId,
+  image,
 }: {
   type?: "WebPage" | "ContactPage" | "AboutPage"
   /** Site path, e.g. "/contact". */
@@ -244,6 +247,8 @@ export function pageSchema({
   description?: string
   mainEntityId?: string
   aboutId?: string
+  /** The page's main photograph, e.g. a car it lists. */
+  image?: string | null
 }) {
   const url = `${SITE_URL}${path}`
   return {
@@ -257,16 +262,18 @@ export function pageSchema({
     isPartOf: { "@id": websiteId() },
     ...(mainEntityId ? { mainEntity: { "@id": mainEntityId } } : {}),
     ...(aboutId ? { about: { "@id": aboutId } } : {}),
+    ...(image ? { primaryImageOfPage: { "@type": "ImageObject", url: image }, image } : {}),
   }
 }
 
 /** WebPage for one site's page, tied to that site's node. */
-export function locationPageSchema(slug: string, name: string, description?: string) {
+export function locationPageSchema(slug: string, name: string, description?: string, image?: string | null) {
   const location = getLocation(slug)
   return pageSchema({
     path: `/locations/${slug}`,
     name,
     description,
+    image,
     mainEntityId: location ? siteDealerId(location.slug) : dealerId(),
   })
 }
@@ -324,6 +331,8 @@ export function generateVehicleListSchema({
   startPosition?: number
 }) {
   const dateModified = newestStockDate(vehicles)
+  // The first car's photo as the page's main image, so search shows a car.
+  const cover = vehicles.find((v) => v.primaryImage)?.primaryImage ?? null
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -332,6 +341,7 @@ export function generateVehicleListSchema({
     url: `${SITE_URL}${path}`,
     isPartOf: { "@id": websiteId() },
     ...(dateModified ? { dateModified } : {}),
+    ...(cover ? { primaryImageOfPage: { "@type": "ImageObject", url: cover }, image: cover } : {}),
     mainEntity: {
       "@type": "ItemList",
       numberOfItems: vehicles.length,

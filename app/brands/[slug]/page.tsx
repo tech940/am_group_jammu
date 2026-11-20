@@ -19,7 +19,7 @@ import { getFrequentSearches, getSeoLinks, type SeoLink } from "@/lib/seo/links"
 import { getLandingHrefResolver, resolveSoldOutBrand } from "@/lib/seo/landing"
 import { locationNames } from "@/lib/seo/locations"
 import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
-import { pageSocial } from "@/lib/seo/site"
+import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * One page per make that is actually in stock — "used Hyundai cars in Jammu".
@@ -110,7 +110,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical: path },
     ...(brand.count === 0 ? { robots: { index: false, follow: true } } : {}),
-    ...pageSocial({ title, description, path }),
+    ...pageSocial({ title, description, path, image: shareImageFrom(brand.vehicles) }),
   }
 }
 
