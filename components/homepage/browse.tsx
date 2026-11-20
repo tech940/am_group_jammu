@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import type { InventoryFacets, InventoryVehicle } from "@/lib/inventory/types"
 import { underBudget, type Facet } from "@/lib/seo/landing"
 import { SectionHead, StoreBand } from "./section-head"

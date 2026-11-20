@@ -47,6 +47,71 @@ import { ConsentNotice } from "./consent-notice"
  * loading would still have had Clarity injected a moment later.
  */
 
+/**
+ * WHEN THE THIRD-PARTY SCRIPTS START (2026-11-20). Measured on the live home
+ * page: GA4, the Meta Pixel and Clarity each held the main thread for 60-90ms
+ * while starting up, and they started while the visitor was scrolling, which
+ * is the "sudden lag" the owner and the MD felt. So none of them starts during
+ * a scroll any more:
+ *
+ *   tags (GA4 / GTM / Pixel): after the window's load event, at the first
+ *     moment the visitor has not scrolled or touched for QUIET_MS, in an idle
+ *     callback.
+ *   Clarity: the same, but only after the tags, and after a second quiet moment.
+ *
+ * Neither waits for ever: after MAX_WAIT_MS they start at the next idle moment
+ * regardless. Nothing is lost by waiting: page_view and every other event is
+ * queued in the dataLayer / fbq queue by prepareTags() and sent when the
+ * script arrives. Only a visitor who leaves within those first seconds is not
+ * counted, the same trade the old Clarity rule already made.
+ */
+const QUIET_MS = 1000
+const MAX_WAIT_MS = 8000
+
+/**
+ * True once the page has loaded and the visitor has stopped scrolling for a
+ * moment. `after` chains a second wait onto an earlier one.
+ */
+function useQuietMoment(enabled: boolean, after = true): boolean {
+  const [quiet, setQuiet] = useState(false)
+  useEffect(() => {
+    if (!enabled || !after || quiet) return
+    let timer: number | undefined
+    let idle: number | undefined
+    let cap: number | undefined
+    let done = false
+    const fire = () => {
+      if (done) return
+      done = true
+      setQuiet(true)
+    }
+    const whenIdle = () => {
+      if (typeof window.requestIdleCallback === "function") idle = window.requestIdleCallback(fire, { timeout: 2000 })
+      else fire()
+    }
+    const arm = () => {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(whenIdle, QUIET_MS)
+    }
+    const start = () => {
+      arm()
+      cap = window.setTimeout(whenIdle, MAX_WAIT_MS)
+      for (const ev of ["scroll", "touchmove", "wheel"] as const) window.addEventListener(ev, arm, { passive: true })
+    }
+    if (document.readyState === "complete") start()
+    else window.addEventListener("load", start, { once: true })
+    return () => {
+      done = true
+      window.removeEventListener("load", start)
+      for (const ev of ["scroll", "touchmove", "wheel"] as const) window.removeEventListener(ev, arm)
+      window.clearTimeout(timer)
+      window.clearTimeout(cap)
+      if (idle !== undefined) window.cancelIdleCallback(idle)
+    }
+  }, [enabled, after, quiet])
+  return quiet
+}
+
 /** Scroll depth is only worth knowing where a page is long and has a job to do. */
 const SCROLL_PAGE_TYPES = new Set(["home", "vdp", "landing", "brand", "sell"])
 const SCROLL_MARKS = [25, 50, 75] as const
@@ -101,27 +166,10 @@ export function Analytics() {
   // while analytics are still allowed. The cleanup cancels a wait in progress,
   // so a refusal in the meantime means the script is never requested.
   const wantClarity = live && ANALYTICS_MODE === "direct" && Boolean(CLARITY_ID)
-  const [clarityDue, setClarityDue] = useState(false)
-  useEffect(() => {
-    if (!wantClarity) return
-    let idle: number | undefined
-    let timer: number | undefined
-    const due = () => setClarityDue(true)
-    const whenIdle = () => {
-      if (typeof window.requestIdleCallback === "function") {
-        idle = window.requestIdleCallback(due, { timeout: 3000 })
-      } else {
-        timer = window.setTimeout(due, 1500)
-      }
-    }
-    if (document.readyState === "complete") whenIdle()
-    else window.addEventListener("load", whenIdle, { once: true })
-    return () => {
-      window.removeEventListener("load", whenIdle)
-      if (idle !== undefined) window.cancelIdleCallback(idle)
-      if (timer !== undefined) window.clearTimeout(timer)
-    }
-  }, [wantClarity])
+  // See QUIET_MS above: the tags at the first quiet moment after load,
+  // Clarity at the next one. A refusal in the meantime means neither starts.
+  const tagsDue = useQuietMoment(live)
+  const clarityDue = useQuietMoment(wantClarity, tagsDue)
 
   // Anyone who opens the admin area is staff. From then on this browser is
   // not measured on the public pages either.
@@ -204,21 +252,21 @@ export function Analytics() {
 
   return (
     <>
-      {live && ANALYTICS_MODE === "gtm" && (
+      {live && tagsDue && ANALYTICS_MODE === "gtm" && (
         <Script
           id="gtm"
           src={`https://www.googletagmanager.com/gtm.js?id=${GTM_ID}`}
           strategy="afterInteractive"
         />
       )}
-      {live && ANALYTICS_MODE === "direct" && GA_ID && (
+      {live && tagsDue && ANALYTICS_MODE === "direct" && GA_ID && (
         <Script
           id="ga4"
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
           strategy="afterInteractive"
         />
       )}
-      {live && ANALYTICS_MODE === "direct" && META_PIXEL_ID && (
+      {live && tagsDue && ANALYTICS_MODE === "direct" && META_PIXEL_ID && (
         <Script
           id="meta-pixel"
           src="https://connect.facebook.net/en_US/fbevents.js"

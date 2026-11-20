@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { Band, Head, PageHero } from "@/components/system/page-kit"
 import { ContactForm } from "./contact-form"
 import { Button } from "@/components/ui/button"

@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { SectionHead, Settle } from "@/components/system/marks"

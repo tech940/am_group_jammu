@@ -1,6 +1,6 @@
 import { fitDescription } from "@/lib/seo/site"
 import type { Metadata } from "next"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
 import { getInventory } from "@/lib/inventory/server"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"

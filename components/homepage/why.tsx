@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { ArrowGlyph } from "@/components/system/marks"
 import { IlloChoose, IlloDrive, IlloPapers } from "@/components/system/illustrations"
 import { GROUP_ORIGIN } from "@/app/locations/about-facts"

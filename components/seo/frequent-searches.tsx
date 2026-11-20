@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import type { SeoLink, SeoLinkGroup } from "@/lib/seo/links"
 
 /**

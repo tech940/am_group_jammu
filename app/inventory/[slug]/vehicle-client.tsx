@@ -3,7 +3,7 @@
 import { linkPhones } from "@/components/system/phone-text"
 import { AutoEnquiry } from "@/components/modals/auto-enquiry"
 import React, { useEffect } from "react"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { ChatGlyph, ChevronGlyph, PhoneGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/feedback"

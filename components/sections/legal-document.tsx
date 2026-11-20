@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { buttonVariants } from "@/components/ui/button"
 import { PRIMARY_LOCATION, formatAddress } from "@/lib/locations"
 

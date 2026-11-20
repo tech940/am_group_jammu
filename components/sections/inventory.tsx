@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { VehicleCard } from "@/components/ui/vehicle-card"
 import { Button } from "@/components/ui/button"
 import { EmptyState } from "@/components/ui/feedback"

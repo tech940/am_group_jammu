@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { Head } from "@/components/system/page-kit"
 import { BigWave, GradientGround, Grain } from "@/components/system/backdrops"
 import { JourneyRoad } from "./journey-road"

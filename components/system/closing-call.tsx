@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { Aurora, GlowOrbs, GradientMesh, GradientSeam, Grain } from "@/components/system/backdrops"
 import { ParallaxImage } from "@/components/system/backdrop-motion"
 import { Button } from "@/components/ui/button"
@@ -130,7 +130,9 @@ export function ClosingCall({
         <ParallaxImage src={image} distance={50} />
         <div className="photo-scrim absolute inset-0" />
       </div>
-      <Aurora animate />
+      {/* Not animated (2026-11-20): it sits under a blurred glass panel, so a
+          drifting background made the browser redo that blur every frame. */}
+      <Aurora />
       {/* Top only: the footer below is already dark, so a seam there would fade
           one dark ground into another and do nothing but cost a layer. */}
       <GradientSeam side="top" ground={above === "ground" ? "bg-ground" : "bg-ground-2"} />

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { Band } from "@/components/system/page-kit"
 import { Button } from "@/components/ui/button"
 import { ClosingCall } from "@/components/system/closing-call"

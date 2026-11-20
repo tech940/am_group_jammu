@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { META_PIXEL_ID, ANALYTICS_MODE, CLARITY_ID, CONSENT_DEFAULT, GA_ID } from "@/lib/analytics/config"

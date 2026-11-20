@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { Band, Head, Plate } from "@/components/system/page-kit"
 import { RevealGroup, RevealItem } from "@/components/system/reveal"
 import { Grain, GridLines, WaveRibbons } from "@/components/system/backdrops"

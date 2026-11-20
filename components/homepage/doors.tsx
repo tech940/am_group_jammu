@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { ArrowGlyph } from "@/components/system/marks"
 import { IlloBuy, IlloSell } from "@/components/system/illustrations"
 import { Services } from "./services"

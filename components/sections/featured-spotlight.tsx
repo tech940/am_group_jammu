@@ -3,7 +3,7 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { Button } from "@/components/ui/button"
 import { ChevronGlyph } from "@/components/system/marks"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"

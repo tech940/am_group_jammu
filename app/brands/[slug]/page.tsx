@@ -1,7 +1,7 @@
 import { fitDescription } from "@/lib/seo/site"
 import { linkPhones } from "@/components/system/phone-text"
 import type { Metadata } from "next"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { notFound } from "next/navigation"
 import { H_PROMISE, LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
 import { FeaturedInventory } from "@/components/sections/inventory"

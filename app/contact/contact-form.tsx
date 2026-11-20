@@ -3,7 +3,7 @@
 import { linkPhones } from "@/components/system/phone-text"
 import { rememberEnquirySent } from "@/lib/leads/enquiry-memory"
 import { useRef, useState } from "react"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { usePathname } from "next/navigation"
 import { ChatGlyph } from "@/components/system/marks"
 import { Button } from "@/components/ui/button"

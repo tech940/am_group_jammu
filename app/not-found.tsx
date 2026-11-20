@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { PRIMARY_LOCATION } from "@/lib/locations"
 import Image from "next/image"
 import { getInventory } from "@/lib/inventory/server"

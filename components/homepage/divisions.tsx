@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import Image from "next/image"
 import { Band, Head, Plate } from "@/components/system/page-kit"
 import { ScrollDrift } from "@/components/system/scroll-drift"

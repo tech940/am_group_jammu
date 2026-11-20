@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { usePathname } from "next/navigation"
 import { H_PROMISE, PRIMARY_LOCATION } from "@/lib/locations"
 import { useEnquiryModal } from "@/hooks/use-enquiry-modal"

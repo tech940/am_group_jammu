@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Link from "next/link"
+import Link from "@/components/system/intent-link"
 import { LOCATIONS, PRIMARY_LOCATION, formatHours, whatsappUrl } from "@/lib/locations"
 import { closedSundays, locationAddressLines } from "@/lib/seo/locations"
 import type { SeoLinks } from "@/lib/seo/links"

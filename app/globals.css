@@ -460,7 +460,9 @@
    panels, never many small ones, and blur is never animated.
    ============================================================================= */
 :root {
-  --glass-blur: 22px;
+  /* Blur cost grows with the radius. 14px on a phone, where the GPU is the
+     bottleneck and the panels are small; the full 22px from tablet up. */
+  --glass-blur: 14px;
   /* LIGHT glass. White at 80%: measured against the worst thing it can sit
      over (a black part of a photograph) ink still holds above 9:1, and over the
      blue wash it holds above 11:1. Ratios are in DESIGN.md. */
@@ -540,46 +542,26 @@
      its own, so the caller puts the edge on whichever side it needs. Used by
      the phone tab bar and the sticky bars. */
   .glass-bar {
-    background-color: var(--glass-solid);
+    /* Fully opaque: with no blur, any see-through lets the text scrolling
+       beneath show as a ghost. Same surface colour as the panels. */
+    background-color: var(--color-surface);
   }
 
-  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .glass-bar {
-      background-color: rgb(255 252 246 / 0.86);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
-      backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
-    }
-  }
-
-  @media (prefers-reduced-transparency: reduce) {
-    .glass-bar {
-      background-color: var(--glass-solid);
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-    }
-  }
+  /* NO BACKDROP BLUR on the fixed bars (2026-11-20). A fixed element with
+     backdrop-filter has to re-blur whatever slides under it on EVERY scroll
+     frame, and the header and the phone tab bar are on screen for the whole
+     page: on a mid-range Android this was the stutter the owner felt when
+     scrolling. Both were 86%+ opaque, so the solid fill looks the same. Glass
+     that scrolls WITH the page (.glass panels) keeps its blur. */
 
   /* The header. Blue, because the logo is white artwork; frosted, so the page
      is felt moving beneath it. White text stays white here. */
   .glass-blue {
-    background-color: var(--glass-blue-solid);
+    /* Fully opaque for the same reason: --glass-blue-solid at 100%, i.e. deep-2. */
+    background-color: var(--color-deep-2);
   }
 
-  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .glass-blue {
-      background-color: var(--glass-blue-tint);
-      -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-      backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
-    }
-  }
-
-  @media (prefers-reduced-transparency: reduce) {
-    .glass-blue {
-      background-color: var(--glass-blue-solid);
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-    }
-  }
+  /* Solid for the same reason as .glass-bar above: it is fixed. */
 
   /* The same light panel with no blur, for large text-heavy regions: blur is a
      compositor cost that scales with painted area. */
@@ -755,3 +737,11 @@
 
 
  
+
+
+/* Full glass blur where the screen (and usually the GPU) is larger. */
+@media (min-width: 768px) {
+  :root {
+    --glass-blur: 22px;
+  }
+}
