@@ -1,4 +1,4 @@
-import { fitDescription } from "@/lib/seo/site"
+import { INDEX_ROBOTS, fitDescription } from "@/lib/seo/site"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import InventoryClient from "./inventory-client"
@@ -145,7 +145,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     // The canonical is built from the page number alone. Passing the query
     // string through let ?fbclid= and ?utm_ links mint their own canonical URLs.
     alternates: { canonical: path },
-    robots: isFiltered || page > 1 ? { index: false, follow: true } : { index: true, follow: true },
+    robots: isFiltered || page > 1 ? { index: false, follow: true } : INDEX_ROBOTS,
     ...pageSocial({ title, description, path, image: shareImageFrom(vehicles) }),
   }
 }

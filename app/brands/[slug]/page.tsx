@@ -1,4 +1,4 @@
-import { fitDescription } from "@/lib/seo/site"
+import { INDEX_ROBOTS, fitDescription } from "@/lib/seo/site"
 import { linkPhones } from "@/components/system/phone-text"
 import type { Metadata } from "next"
 import Link from "@/components/system/intent-link"
@@ -110,7 +110,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: path },
-    ...(brand.count === 0 ? { robots: { index: false, follow: true } } : {}),
+    robots: brand.count === 0 ? { index: false, follow: true } : INDEX_ROBOTS,
     ...pageSocial({ title, description, path, image: shareImageFrom(brand.vehicles) }),
   }
 }

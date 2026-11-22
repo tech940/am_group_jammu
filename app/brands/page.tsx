@@ -10,7 +10,7 @@ import { getInventory } from "@/lib/inventory/server"
 import { formatINRShort } from "@/lib/inventory/adapter"
 import { getLandingHrefResolver } from "@/lib/seo/landing"
 import type { SeoLinkGroup } from "@/lib/seo/links"
-import { pageSocial, shareImageFrom } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * Every make in stock today, each with its count and its model pages.
@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: TITLE,
     description,
     alternates: { canonical: PATH },
-    ...(live ? {} : { robots: { index: false, follow: true } }),
+    robots: live ? INDEX_ROBOTS : { index: false, follow: true },
     ...pageSocial({ title: TITLE, description, path: PATH, image: shareImageFrom(vehicles) }),
   }
 }

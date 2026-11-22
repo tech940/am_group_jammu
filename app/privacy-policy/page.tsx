@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { LegalDocument, type LegalSection } from "@/components/sections/legal-document"
 import { ANALYTICS_MODE, CLARITY_ID, GA_ID, META_PIXEL_ID } from "@/lib/analytics/config"
-import { pageSocial } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial } from "@/lib/seo/site"
 import { AnalyticsChoice } from "./analytics-choice"
 
 /**
@@ -79,6 +79,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy-policy" },
   // Without this the page inherits the root layout's Open Graph block, whose
   // og:url is the homepage.
+  robots: INDEX_ROBOTS,
   ...pageSocial({ title: TITLE, description: DESCRIPTION, path: "/privacy-policy" }),
 }
 

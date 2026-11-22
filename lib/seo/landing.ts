@@ -239,11 +239,12 @@ async function buildCatalogue(): Promise<{ specs: ResolvedSpec[]; vehicles: Inve
     })
   }
 
-  // Budget bands. Skipped when the band would return everything (a duplicate of
-  // the city page) or nothing. "Under" is meant literally: see underBudget.
+  // Budget bands. EVERY band has a page, always (2026-11-22): the addresses
+  // people search ("under 2 lakh", "under 3 lakh") used to appear and vanish
+  // as cars sold, 404 one week and live the next, which no search engine can
+  // rank. What changes with stock is whether the page is INDEXED (see below),
+  // never whether it exists. "Under" is meant literally: see underBudget.
   for (const ceiling of BUDGET_CEILINGS) {
-    const count = vehicles.filter((v) => underBudget(v, ceiling)).length
-    if (count === 0 || count === total) continue
     specs.push({
       kind: 'budget',
       slug: `under-${ceiling / 100_000}-lakh-in-${CITY.toLowerCase()}`,
@@ -315,7 +316,39 @@ async function buildCatalogue(): Promise<{ specs: ResolvedSpec[]; vehicles: Inve
   }
 
   const resolved = new Map<string, ResolvedSpec>()
+  // Budget pages are judged among themselves only. A budget page never hands
+  // its place to a model or body page: "used cars under 3 lakh in Jammu" is a
+  // search of its own, and it used to canonicalise to the Alto page whenever
+  // the Alto was the only car in the band.
+  //   no cars            -> its own page, not indexed (an honest "none today")
+  //   one car            -> its own page, not indexed (that car's page under a vaguer name)
+  //   every car in stock -> points at the city page, which lists the same cars
+  //   same cars as a lower band -> points at the lower band
+  //   otherwise          -> indexed
+  const budgetOwner = new Map<string, string>()
+  for (const spec of unique.filter((s) => s.kind === 'budget')) {
+    const cars = vehicles.filter(spec.match)
+    const self = pathOf(spec.slug)
+    let canonicalPath = self
+    if (cars.length > 0 && cars.length === total) {
+      canonicalPath = pathOf(SERVICE_CITY_SLUGS[0])
+    } else if (cars.length >= 2) {
+      // Only a band worth indexing can own a set of cars. A one-car band is
+      // not indexed, so a higher band holding the same single car must not
+      // point at it: each stays on its own address, out of the index.
+      const key = idKey(cars)
+      if (!budgetOwner.has(key)) budgetOwner.set(key, self)
+      canonicalPath = budgetOwner.get(key) ?? self
+    }
+    resolved.set(spec.slug, {
+      ...spec,
+      vehicles: cars,
+      canonicalPath,
+      indexable: canonicalPath === self && cars.length >= 2,
+    })
+  }
   for (const kind of CANONICAL_ORDER) {
+    if (kind === 'budget') continue
     for (const spec of unique.filter((s) => s.kind === kind)) {
       const cars = vehicles.filter(spec.match)
       const key = idKey(cars)
@@ -579,6 +612,85 @@ function withArticle(label: string): string {
   return `${/^(suv|mpv|muv)\b/i.test(label) || /^[aeiou]/i.test(label) ? 'An' : 'A'} ${label}`
 }
 
+/**
+ * A budget band with no car in it today, e.g. "under 2 lakh" while the
+ * cheapest car is ₹2.70 lakh. The page says so plainly, shows the cheapest
+ * cars we do have (labelled as above the budget) and offers a call. It is
+ * kept out of the index until a car qualifies: a page with nothing to sell at
+ * that price cannot answer the search.
+ */
+async function emptyBudgetLanding(spec: ResolvedSpec): Promise<Landing> {
+  const { vehicles: stock, degraded } = await getInventory()
+  const label = spec.label
+  const plain = label.toLowerCase()
+  // The stock could not be read, or there is no stock at all: that is not the
+  // same as "nothing under this budget", so the page must not say so. It says
+  // what the city page says in the same state.
+  if (degraded || stock.length === 0) {
+    return {
+      kind: spec.kind,
+      slug: spec.slug,
+      vehicles: [],
+      cityName: CITY,
+      canonicalPath: spec.canonicalPath,
+      indexable: false,
+      soldOut: true,
+      related: [],
+      crumb: `Under ₹${label}`,
+      heading: `Used Cars Under ${label} in ${CITY}`,
+      title: fitTitle(`Used Cars Under ${label} in ${CITY} | Second Hand`, `Used Cars Under ${label} in ${CITY}`),
+      description: `Used and second hand cars under ${plain} in ${CITY} at AM Group. Call ${PRIMARY_LOCATION.phone} for the cars in stock today.`,
+      stockHeading: `Used cars in stock in ${CITY}`,
+      intro: [
+        `Our stock list is being updated. Call ${PRIMARY_LOCATION.phone} and we will tell you which used cars ` +
+          `under ₹${label} are available in ${CITY} today.`,
+      ],
+      sections: [],
+      faqs: [],
+    }
+  }
+  const priced = stock.filter((v) => v.price !== null).sort((a, b) => (a.price ?? 0) - (b.price ?? 0))
+  const cheapest = priced[0]?.price ?? null
+  const nearest = priced.slice(0, 4)
+  const from = cheapest !== null ? formatINR(cheapest) : null
+  return {
+    kind: spec.kind,
+    slug: spec.slug,
+    vehicles: [],
+    cityName: CITY,
+    canonicalPath: spec.canonicalPath,
+    indexable: false,
+    soldOut: true,
+    related: nearest,
+    crumb: `Under ₹${label}`,
+    heading: `Used Cars Under ${label} in ${CITY}`,
+    title: fitTitle(`Used Cars Under ${label} in ${CITY} | Second Hand`, `Used Cars Under ${label} in ${CITY}`),
+    description: fitDescription([
+      `No used car under ${plain} is in stock in ${CITY} today.`,
+      from ? `Our second hand cars start at ${from}.` : '',
+      `Call ${PRIMARY_LOCATION.phone} and we will tell you when one comes in.`,
+    ]),
+    stockHeading: from ? `Our lowest priced used cars, from ${from}` : `Used cars in stock in ${CITY}`,
+    intro: [
+      `We have no used car under ₹${label} in ${CITY} today.` +
+        (from ? ` The lowest priced car in our stock is ${from}.` : ''),
+      `Cars at this price sell quickly. Call ${PRIMARY_LOCATION.phone} or send an enquiry, tell us your budget, ` +
+        `and we will call you when a second hand car under ${plain} comes in.` +
+        (nearest.length > 0 ? ` The cars below cost more than ₹${label}: they are the nearest we have.` : ''),
+    ],
+    sections: [],
+    faqs: [
+      {
+        question: `Do you have a used car under ₹${label} in ${CITY}?`,
+        answer:
+          `Not today.` +
+          (from ? ` The lowest priced car in stock is ${from}.` : '') +
+          ` Call ${PRIMARY_LOCATION.phone} with your budget and we will call you when one comes in.`,
+      },
+    ],
+  }
+}
+
 export async function resolveLanding(slug: string): Promise<Landing | null> {
   const wanted = slug.toLowerCase()
   const { specs } = await buildCatalogue()
@@ -592,6 +704,7 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
   // is different: it is the redirect target of the old site's strongest URL,
   // so it must keep resolving when the feed is briefly empty. The route marks
   // it noindex while it has no cars.
+  if (vehicles.length === 0 && spec.kind === 'budget') return emptyBudgetLanding(spec)
   if (vehicles.length === 0 && spec.kind !== 'city') return null
 
   const n = vehicles.length
@@ -646,8 +759,8 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
         ),
         description:
           fitDescription([
-            `Buy second hand cars in ${city} from AM Group.`,
-            `${n} ${cars} in stock${makes.length ? ` — ${list(makes)}` : ''}${range ? `, ${priced}` : ''}.`,
+            `Used cars in ${city}: ${n} second hand ${cars} for sale at AM Group.`,
+            `${makes.length ? `${list(makes)}` : 'In stock today'}${range ? `, ${priced}` : ''}.`,
             'Real photos and odometer readings.',
             'Finance and exchange.',
           ]),
@@ -695,21 +808,26 @@ export async function resolveLanding(slug: string): Promise<Landing | null> {
 
     case 'budget': {
       const label = spec.label // e.g. "10 Lakh"
+      const lowPrices = vehicles.map((v) => v.price).filter((p): p is number => p !== null)
+      const lowest = lowPrices.length ? formatINR(Math.min(...lowPrices)) : ''
       return {
         ...base,
         crumb: `Under ₹${label}`,
-        heading: `Used Cars Under ₹${label} in ${CITY} — ${n} in Stock`,
-        title: fitTitle(
-          `Used Cars Under ₹${label} in ${CITY} | ${n} in Stock`,
-          `Used Cars Under ₹${label} in ${CITY}`,
-        ),
+        // Plain "5 Lakh", no rupee sign, and both "used" and "second hand":
+        // the words in the search box, as every page that ranks for these
+        // searches writes them (research of 2026-11-22). The count is in the
+        // heading and the description, not the title: a title that says
+        // "1 in Stock" is weak and goes stale with every sale.
+        heading: n >= 3 ? `${n} Used Cars Under ${label} in ${CITY}` : `Used Cars Under ${label} in ${CITY}`,
+        title: fitTitle(`Used Cars Under ${label} in ${CITY} | Second Hand`, `Used Cars Under ${label} in ${CITY}`),
         description:
           fitDescription([
-            `${n} second hand ${cars} under ₹${label} for sale in ${CITY}${makes.length ? ` — ${list(makes)}` : ''}.`,
+            `${n} used and second hand ${cars} under ${label.toLowerCase()} in ${CITY}` +
+              `${lowest ? `, from ${lowest}` : ''}${makes.length ? `: ${list(makes)}` : ''}.`,
             'Real photos and odometer readings at AM Group.',
             'Finance and exchange.',
           ]),
-        stockHeading: `${n} used ${cars} under ₹${label} in stock today`,
+        stockHeading: `${n} second hand ${cars} under ${label.toLowerCase()} in ${CITY} today`,
         intro: [
           `We have ${n} used ${cars} under ₹${label} in ${CITY} right now` +
             `${range ? `, ${priced}` : ''}` +

@@ -1,3 +1,4 @@
+import { searchImageUrl } from "@/lib/seo/site"
 import { MetadataRoute } from "next"
 import { getInventory } from "@/lib/inventory/server"
 import { getAllLandingSlugs, resolveLanding } from "@/lib/seo/landing"
@@ -39,7 +40,9 @@ function dated(vehicles: InventoryVehicle[]): { lastModified?: Date } {
 }
 
 /** Google reads at most 1,000 images per URL; a car has a few dozen at most. */
-const MAX_IMAGES_PER_CAR = 50
+// Eight per car: enough for Google Images, and each address here is a new
+// image for the optimiser to produce (was 50, all on the storage host).
+const MAX_IMAGES_PER_CAR = 8
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL
@@ -85,7 +88,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...dated([v]),
     changeFrequency: "weekly",
     priority: 0.8,
-    ...(v.images.length > 0 ? { images: v.images.slice(0, MAX_IMAGES_PER_CAR) } : {}),
+    ...(v.images.length > 0
+      ? {
+          // Through the site's own image route (see searchImageUrl). Next
+          // writes <image:loc> without escaping, so "&" is escaped here.
+          images: v.images.slice(0, MAX_IMAGES_PER_CAR).map((src) => searchImageUrl(src).replace(/&/g, "&amp;")),
+        }
+      : {}),
   }))
 
   // Brand pages only for makes we actually stock — a brand page with no stock

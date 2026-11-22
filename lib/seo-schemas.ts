@@ -1,5 +1,5 @@
 import { H_PROMISE, LOCATIONS, PRIMARY_LOCATION, getLocation, type Location } from "@/lib/locations"
-import { DEALER_NAME, SITE_NAME, SITE_URL } from "@/lib/seo/site"
+import { DEALER_NAME, SITE_NAME, SITE_URL, searchImageUrl } from "@/lib/seo/site"
 import { locationNames, serviceLabel } from "@/lib/seo/locations"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 
@@ -332,7 +332,8 @@ export function generateVehicleListSchema({
 }) {
   const dateModified = newestStockDate(vehicles)
   // The first car's photo as the page's main image, so search shows a car.
-  const cover = vehicles.find((v) => v.primaryImage)?.primaryImage ?? null
+  const rawCover = vehicles.find((v) => v.primaryImage)?.primaryImage ?? null
+  const cover = rawCover ? searchImageUrl(rawCover) : null
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

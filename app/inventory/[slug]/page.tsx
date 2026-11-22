@@ -8,7 +8,7 @@ import { getLandingHrefResolver } from "@/lib/seo/landing"
 import { getFrequentSearches } from "@/lib/seo/links"
 import { getLocation, PRIMARY_LOCATION } from "@/lib/locations"
 import { dealerId, jsonLdString, siteDealerId, websiteId } from "@/lib/seo-schemas"
-import { DEALER_NAME, OG_IMAGE, SITE_URL } from "@/lib/seo/site"
+import { searchImageUrl, INDEX_ROBOTS, DEALER_NAME, OG_IMAGE, SITE_URL } from "@/lib/seo/site"
 import {
   carFactFaqs,
   carGraph,
@@ -60,7 +60,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = `/inventory/${car.slug}`
   // A car with no photograph still needs a share image; the site's default
   // stands in rather than leaving the tag out.
-  const photo = car.primaryImage
+  // Through the site's own image route: see searchImageUrl.
+  const photo = car.primaryImage ? searchImageUrl(car.primaryImage) : null
 
   return {
     title: { absolute: title },
@@ -68,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: url },
     // A sold car's page stays in the index for as long as it is served (see
     // SOLD_PAGE_RETENTION_DAYS); after that the address is a 404.
-    robots: { index: true, follow: true },
+    robots: INDEX_ROBOTS,
     openGraph: {
       type: "website",
       url,
@@ -121,6 +122,23 @@ async function linksUp(v: InventoryVehicle): Promise<{
     link(v.fuel, "fuel", `Used ${(v.fuel ?? "").toLowerCase()} cars in Jammu`),
     link(v.transmission, "transmission", `Used ${(v.transmission ?? "").toLowerCase()} cars in Jammu`),
   ].filter((l): l is CarLink => l !== null)
+
+  // Up to the car's budget page: the smallest band the car is under, e.g. a
+  // car at 4.8 lakh links to "Used cars under 5 lakh in Jammu". No car page
+  // linked to a budget page before, so those pages had almost no links in.
+  // Only when the band has a page of its own (a band that holds every car
+  // points at the city page, which the trail already links).
+  // Not from a sold car (it is no longer on that page), and only to a band
+  // with at least two cars: a smaller band is not indexed.
+  const { vehicles: onSale } = await getInventory()
+  if (v.price !== null && onSale.some((c) => c.id === v.id)) {
+    const lakhs = [2, 3, 5, 7, 10, 15].find((l) => v.price !== null && v.price < l * 100_000)
+    const inBand = lakhs ? onSale.filter((c) => c.price !== null && c.price < lakhs * 100_000).length : 0
+    const href = lakhs && inBand >= 2 ? hrefFor({ kind: "budget", lakhs }) : null
+    if (lakhs && href && href.includes(`under-${lakhs}-lakh`)) {
+      more.unshift({ label: `Used cars under ${lakhs} lakh in Jammu`, href })
+    }
+  }
 
   // When a make has one model in stock, the two share one indexed page (the
   // resolver hands back the same address for both). It is then listed once.

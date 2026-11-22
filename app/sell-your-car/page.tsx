@@ -12,7 +12,7 @@ import { ValuationWizard } from "./valuation-wizard"
 import { SectionHead, TIGHT_BAND } from "@/components/homepage/section-head"
 import { Visit } from "@/components/homepage/visit"
 import { PRIMARY_LOCATION, whatsappUrl } from "@/lib/locations"
-import { pageSocial } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial } from "@/lib/seo/site"
 import { jsonLdString, sellServiceSchema } from "@/lib/seo-schemas"
 import { DEALERSHIPS, GROUP_FACTS, SELL_FAQS, SELL_STEPS } from "./content"
 
@@ -42,6 +42,7 @@ export function generateMetadata(): Metadata {
     title: { absolute: TITLE },
     description: DESCRIPTION,
     alternates: { canonical: "/sell-your-car" },
+    robots: INDEX_ROBOTS,
     ...pageSocial({ title: TITLE, description: DESCRIPTION, path: "/sell-your-car" }),
   }
 }

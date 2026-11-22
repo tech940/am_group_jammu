@@ -81,6 +81,42 @@ export const OG_IMAGE = {
   alt: 'AM Group Used Cars, Jammu',
 }
 
+/**
+ * The address of a photo AS SEARCH ENGINES ARE GIVEN IT: through this site's
+ * own image route, not the storage host.
+ *
+ * WHY (2026-11-22). Car photos live on Supabase storage, which answers every
+ * request with "X-Robots-Tag: none" (noindex). Every image the site put
+ * forward to Google (og:image, the schema images, the sitemap's image
+ * entries) was on that host, so Google was told not to index exactly the
+ * pictures the pages nominated, and results showed no thumbnail. The same
+ * photo through /_next/image carries no such header (checked with a
+ * Googlebot-Image request). 1200 wide at quality 75 is a size and quality
+ * next.config.ts already allows.
+ *
+ * Use it for anything a crawler reads. Pages keep using next/image for what
+ * visitors see.
+ */
+export function searchImageUrl(src: string): string {
+  if (!/^https?:\/\//i.test(src) || src.startsWith(SITE_URL)) return src
+  return `${SITE_URL}/_next/image?url=${encodeURIComponent(src)}&w=1200&q=75`
+}
+
+/**
+ * Robots value for a page that should be indexed. "max-image-preview:large"
+ * lets Google show a large thumbnail (without it only a small one is
+ * allowed); "max-snippet:-1" puts no limit on the text snippet. Set on each
+ * indexable page, not in the root layout: a root value is inherited by the
+ * not-found page and printed beside its own noindex.
+ */
+export const INDEX_ROBOTS = {
+  index: true,
+  follow: true,
+  'max-image-preview': 'large' as const,
+  'max-snippet': -1,
+  'max-video-preview': -1,
+}
+
 /** A share image taken from the page's own stock. */
 export interface ShareImage {
   url: string
@@ -101,7 +137,7 @@ export function shareImageFrom(
 ): ShareImage | null {
   const car = vehicles.find((v) => v.primaryImage)
   if (!car?.primaryImage) return null
-  return { url: car.primaryImage, alt: `${car.year ? `${car.year} ` : ''}${car.title}, used, at AM Group Jammu` }
+  return { url: searchImageUrl(car.primaryImage), alt: `${car.year ? `${car.year} ` : ''}${car.title}, used, at AM Group Jammu` }
 }
 
 /**

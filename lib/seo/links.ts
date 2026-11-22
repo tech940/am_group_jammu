@@ -118,7 +118,7 @@ export async function getSeoLinks(): Promise<SeoLinks> {
         const lakhs = s.slug.match(/^under-([\d.]+)-lakh/)?.[1] ?? ''
         const ceiling = Number(lakhs) * 100_000
         return {
-          label: `Under ₹${lakhs} Lakh`,
+          label: `Used cars under ${lakhs} lakh`,
           href: `/used-cars/${s.slug}`,
           // The same "less than" rule that picks the page's cars.
           count: vehicles.filter((v) => underBudget(v, ceiling)).length,

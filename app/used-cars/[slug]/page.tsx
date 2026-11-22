@@ -17,7 +17,7 @@ import { toCardVehicle } from "@/lib/inventory/filter"
 import { getFrequentSearches, getSeoLinks, type SeoLinkGroup } from "@/lib/seo/links"
 import { getResolvableLandingSlugs, resolveLanding, type LandingKind } from "@/lib/seo/landing"
 import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
-import { pageSocial, shareImageFrom } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * One route serving every "used cars …" landing page: the Jammu city page,
@@ -66,7 +66,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     // vague name). A page that points its canonical elsewhere gets no robots
     // tag: "index that page instead" and "do not index" are different
     // instructions, and sending both makes search engines ignore the first.
-    ...(!landing.indexable && canonical === path ? { robots: { index: false, follow: true } } : {}),
+    ...(!landing.indexable && canonical === path
+      ? { robots: { index: false, follow: true } }
+      : landing.indexable && canonical === path
+        ? { robots: INDEX_ROBOTS }
+        : {}),
     ...pageSocial({
       title: landing.title,
       description: landing.description,

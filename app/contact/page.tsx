@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { LOCATIONS, PRIMARY_LOCATION, formatHours } from "@/lib/locations"
-import { pageSocial } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial } from "@/lib/seo/site"
 import { dealerId, jsonLdString, pageSchema } from "@/lib/seo-schemas"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { ContactPage } from "./contact-page"
@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/contact",
   },
+  robots: INDEX_ROBOTS,
   ...pageSocial({ title, description, path: "/contact" }),
 }
 

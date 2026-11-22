@@ -16,14 +16,13 @@ import { FaqSection } from "@/components/seo/faq-section"
 import { FrequentSearches } from "@/components/seo/frequent-searches"
 import { HPromiseLine } from "@/components/seo/h-promise-line"
 import { getFrequentSearches } from "@/lib/seo/links"
-import { pageSocial, shareImageFrom } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial, shareImageFrom } from "@/lib/seo/site"
 import { jsonLdString, locationPageSchema } from "@/lib/seo-schemas"
 import {
   closedSundays,
   locationAddressLine,
   locationAddressLines,
   locationHeading,
-  locationMapQuery,
   locationPlace,
   serviceLabel,
 } from "@/lib/seo/locations"
@@ -56,7 +55,7 @@ function describe(loc: Location) {
   const description = loc.addressConfirmed
     ? // Phone before hours, and no region or landmark, so the number survives
       // where a search result cuts the text at about 155 characters.
-      `Buy or sell a used car at AM Group, ${locationMapQuery(loc)}. Call ${loc.phone}. Open ${formatHours(loc)}.`
+      `Buy or sell a used car at ${loc.shortName}, ${loc.city}. Call ${loc.phone}. Open ${formatHours(loc)}.`
     : `Buy or sell a used car with AM Group in ${locationPlace(loc)}, ${loc.city}. Open ${formatHours(loc)}. ` +
       `Call ${loc.phone} for exact directions.`
   return { title, description }
@@ -81,6 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: `/locations/${loc.slug}` },
+    robots: INDEX_ROBOTS,
     ...pageSocial({ title, description, path: `/locations/${loc.slug}`, image: shareImageFrom(vehicles) }),
   }
 }

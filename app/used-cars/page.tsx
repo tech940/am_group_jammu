@@ -9,7 +9,7 @@ import { RelatedLinks } from "@/components/seo/related-links"
 import { getInventory } from "@/lib/inventory/server"
 import { getLandingDirectory, type LandingEntry, type LandingKind } from "@/lib/seo/landing"
 import { getSeoLinks, type SeoLinkGroup } from "@/lib/seo/links"
-import { pageSocial, shareImageFrom } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
  * The index of every used-car landing page that has stock behind it today.
@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description,
     alternates: { canonical: PATH },
     // With no stock there is nothing to list, so the page stays out of the index.
-    ...(live ? {} : { robots: { index: false, follow: true } }),
+    robots: live ? INDEX_ROBOTS : { index: false, follow: true },
     ...pageSocial({ title: TITLE, description, path: PATH, image: shareImageFrom(vehicles) }),
   }
 }

@@ -6,7 +6,7 @@ import { toCardVehicle } from "@/lib/inventory/filter"
 import { Homepage } from "@/components/homepage/homepage"
 import { getLandingHrefResolver } from "@/lib/seo/landing"
 import { LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
-import { pageSocial, shareImageFrom } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 export async function generateMetadata(): Promise<Metadata> {
   const [{ total, facets, degraded }, { vehicles }] = await Promise.all([getHomeInventory(), getInventory()])
@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   // (components/homepage/used-hero.tsx) says the same thing.
   const title = "AM Group Used Cars | Buy or Sell a Used Car in Jammu"
   const description = live
-    ? `Buy or sell a used car in Jammu at AM Group Used Cars. ${total} ${total === 1 ? "car" : "cars"} in stock today` +
+    ? `Buy or sell a used car in Jammu at AM Group Used Cars. ${total} second hand ${total === 1 ? "car" : "cars"} in stock today` +
       `${facets.priceRange.max > 0 ? ` from ${formatINRShort(facets.priceRange.min)}` : ""}, at ${sites} Jammu sites. ` +
       `Call ${PRIMARY_LOCATION.phone}.`
     : `Buy or sell a used car in Jammu at AM Group Used Cars, at ${sites} Jammu sites. Call ${PRIMARY_LOCATION.phone}.`
@@ -32,6 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: title },
     description,
     alternates: { canonical: "/" },
+    robots: INDEX_ROBOTS,
     // Set here, not inherited: a page's `openGraph` replaces the layout's
     // rather than merging into it.
     ...pageSocial({ title, description, path: "/", image: shareImageFrom(vehicles) }),

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { Breadcrumbs } from "@/components/seo/breadcrumbs"
 import { LegalDocument, type LegalSection } from "@/components/sections/legal-document"
-import { pageSocial } from "@/lib/seo/site"
+import { INDEX_ROBOTS, pageSocial } from "@/lib/seo/site"
 
 /**
  * Carried over from the /terms/ page of the previous site so the legacy URL
@@ -25,6 +25,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/terms" },
   // Without its own block the page inherited the root layout's, whose og:url
   // is the homepage, so a shared link to /terms pointed at "/".
+  robots: INDEX_ROBOTS,
   ...pageSocial({ title, description, path: "/terms" }),
 }
 

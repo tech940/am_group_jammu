@@ -12,6 +12,7 @@
  * rating, a delivery promise or an opening hour.
  */
 
+import { searchImageUrl } from '../../../lib/seo/site.ts'
 import type { InventoryVehicle } from '../../../lib/inventory/types.ts'
 import type { Location } from '../../../lib/locations.ts'
 
@@ -354,7 +355,9 @@ export function carGraph({
   const carId = `${pageUrl}#car`
   // Structured data needs absolute addresses; a photo path that is not one is
   // left out here (the page itself still shows it).
-  const images = v.images.filter((src) => /^https?:\/\//i.test(src))
+  // Through the site's own image route, so Google may index them: see
+  // searchImageUrl. Eight at most: each one is an image the optimiser must make.
+  const images = v.images.filter((src) => /^https?:\/\//i.test(src)).slice(0, 8).map(searchImageUrl)
 
   const offer =
     v.price !== null
