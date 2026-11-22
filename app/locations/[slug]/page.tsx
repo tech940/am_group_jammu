@@ -29,6 +29,7 @@ import {
 } from "@/lib/seo/locations"
 import { SiteMap } from "../site-map"
 import { FeaturedInventory } from "@/components/sections/inventory"
+import { SeeAllButton } from "@/components/sections/more-cars"
 import { Button } from "@/components/ui/button"
 import { PhoneGlyph } from "@/components/system/marks"
 
@@ -229,6 +230,22 @@ export default async function LocationPage({ params }: Props) {
         </div>
       </section>
 
+      {/* Cars right after the first screen (2026-11-22): they used to come after
+          the address, map and visiting notes, and visitors left before reaching them. */}
+      {vehicles.length > 0 && (
+        <FeaturedInventory
+          // Each card is handed only the photos it can show, not all of the
+          // car's photos (up to 49 addresses per car were written into this page).
+          vehicles={vehicles.slice(0, 6).map((v) => toCardVehicle(v))}
+          listId={`location-${loc.slug}`}
+          listName={`Used cars at ${loc.shortName}`}
+          title="Used cars in stock in Jammu"
+          subtitle={`${total} ${total === 1 ? "car" : "cars"} across our ${LOCATIONS.length} locations — call to check which site a car is at`}
+          className="border-b border-line bg-ground py-12 md:py-16"
+          footer={<SeeAllButton total={total} />}
+        />
+      )}
+
       {/* Details */}
       <section aria-labelledby="details-title" className="border-b border-line py-12">
         <div className="container mx-auto px-4 md:px-8">
@@ -389,17 +406,6 @@ export default async function LocationPage({ params }: Props) {
         </div>
       </section>
 
-      {vehicles.length > 0 && (
-        <FeaturedInventory
-          // Each card is handed only the photos it can show, not all of the
-          // car's photos (up to 49 addresses per car were written into this page).
-          vehicles={vehicles.slice(0, 6).map((v) => toCardVehicle(v))}
-          listId={`location-${loc.slug}`}
-          listName={`Used cars at ${loc.shortName}`}
-          title="Used cars in stock in Jammu"
-          subtitle={`${total} ${total === 1 ? "car" : "cars"} across our ${LOCATIONS.length} locations — call to check which site a car is at`}
-        />
-      )}
 
       <FaqSection items={faqs} title={`Visiting ${loc.shortName} — FAQs`} />
 

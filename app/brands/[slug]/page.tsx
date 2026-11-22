@@ -5,6 +5,7 @@ import Link from "@/components/system/intent-link"
 import { notFound } from "next/navigation"
 import { H_PROMISE, LOCATIONS, PRIMARY_LOCATION } from "@/lib/locations"
 import { FeaturedInventory } from "@/components/sections/inventory"
+import { MoreCars } from "@/components/sections/more-cars"
 import { getInventory } from "@/lib/inventory/server"
 import { formatINR, slugify } from "@/lib/inventory/adapter"
 import { Button } from "@/components/ui/button"
@@ -127,6 +128,7 @@ export default async function BrandPage({ params }: Props) {
   }
 
   const { brandName, vehicles: brandVehicles, count, models } = brand
+  const { vehicles: stock } = await getInventory()
   const path = `/brands/${brand.slug}`
   const cars = count === 1 ? "car" : "cars"
 
@@ -267,6 +269,13 @@ export default async function BrandPage({ params }: Props) {
         sourceLabel="brand-grid"
         listId={`brand-${brand.slug}`}
         listName={`Used ${brandName} cars`}
+      />
+
+      <MoreCars
+        shown={brandVehicles}
+        stock={stock}
+        listId={`more-brand-${brand.slug}`}
+        title="Used cars from other makes"
       />
 
       <section className="border-t border-line bg-ground-2 py-16">

@@ -4,6 +4,8 @@ import Link from "@/components/system/intent-link"
 import { notFound } from "next/navigation"
 import { H_PROMISE, PRIMARY_LOCATION } from "@/lib/locations"
 import { FeaturedInventory } from "@/components/sections/inventory"
+import { MoreCars } from "@/components/sections/more-cars"
+import { getInventory } from "@/lib/inventory/server"
 import { Button } from "@/components/ui/button"
 import { PhoneGlyph } from "@/components/system/marks"
 import { EnquireCta } from "@/components/system/enquire-cta"
@@ -99,7 +101,11 @@ export default async function UsedCarsLandingPage({ params }: Props) {
   // an empty grid.
   if (!landing) notFound()
 
-  const [frequentSearches, seoLinks] = await Promise.all([getFrequentSearches(30), getSeoLinks()])
+  const [frequentSearches, seoLinks, { vehicles: stock }] = await Promise.all([
+    getFrequentSearches(30),
+    getSeoLinks(),
+    getInventory(),
+  ])
 
   const path = `/used-cars/${landing.slug}`
   const count = landing.vehicles.length
@@ -217,6 +223,15 @@ export default async function UsedCarsLandingPage({ params }: Props) {
           listName={landing.crumb}
         />
       )}
+
+      {/* A short list (e.g. two Maruti Suzukis) is followed by similar cars
+          from stock and a way on to the full list, so the visit does not end
+          here. Nothing is added when the page already lists enough. */}
+      <MoreCars
+        shown={landing.soldOut ? landing.related : landing.vehicles}
+        stock={stock}
+        listId={`more-landing-${landing.slug}`}
+      />
 
       {/* Long-form copy */}
       <section className="border-t border-line bg-ground-2 py-16">

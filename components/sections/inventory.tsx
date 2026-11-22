@@ -1,5 +1,6 @@
 "use client"
 
+import type { ReactNode } from "react"
 import Link from "@/components/system/intent-link"
 import { VehicleCard } from "@/components/ui/vehicle-card"
 import { Button } from "@/components/ui/button"
@@ -26,6 +27,7 @@ export function FeaturedInventory({
   sourceLabel = "inventory-grid",
   listId,
   listName,
+  footer,
 }: {
   vehicles: InventoryVehicle[]
   title?: string
@@ -43,6 +45,8 @@ export function FeaturedInventory({
   listId?: string
   /** What a person would call the list, e.g. "Used Kia cars". */
   listName?: string
+  /** Shown under the cars, e.g. a "See all" button. */
+  footer?: ReactNode
 }) {
   const { onOpen } = useEnquiryModal()
   const shown = typeof limit === "number" ? vehicles.slice(0, limit) : vehicles
@@ -94,6 +98,7 @@ export function FeaturedInventory({
           </div>
         )}
 
+        {footer && shown.length > 0 && <div className="mt-10">{footer}</div>}
       </div>
     </section>
   )
