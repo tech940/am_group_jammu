@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { notFound, permanentRedirect } from "next/navigation"
 import { getAllVehicleSlugs, getInventory, getVehicleBySlug } from "@/lib/inventory/server"
-import { idFromSlug } from "@/lib/inventory/adapter"
+import { idFromSlug, slugify } from "@/lib/inventory/adapter"
 import type { InventoryVehicle } from "@/lib/inventory/types"
 import { buildSellerNotes, buildVehicleFaqs } from "@/lib/seo/content"
 import { getLandingHrefResolver } from "@/lib/seo/landing"
@@ -153,16 +153,43 @@ async function linksUp(v: InventoryVehicle): Promise<{
   }
 }
 
+/**
+ * For a car address with no car behind it: the page of the same model, or of
+ * the same make, from what is in stock today. The address reads
+ * make-model-year-id, so the make and model are matched as slug prefixes.
+ */
+async function nearestPageFor(slug: string): Promise<string | null> {
+  const wanted = slug.toLowerCase()
+  const { vehicles } = await getInventory()
+  const hrefFor = await getLandingHrefResolver()
+  const byModel = vehicles.find(
+    (v) => v.make && v.model && wanted.startsWith(`${slugify(v.make)}-${slugify(v.model)}-`),
+  )
+  if (byModel?.model) {
+    const href = hrefFor({ kind: "model", value: byModel.model })
+    if (href) return href
+  }
+  const byMake = vehicles.find((v) => v.make && wanted.startsWith(`${slugify(v.make)}-`))
+  if (byMake?.make) return hrefFor({ kind: "make", value: byMake.make })
+  return null
+}
+
 export default async function VehiclePage({ params }: Props) {
   const { slug } = await params
   const { vehicle, soldVehicle, similar, canonicalSlug, position, total, prev, next } =
     await getVehicleBySlug(slug)
 
   // On sale, or sold recently enough to still have a page. Anything else (a
-  // draft, a deleted car, one sold long ago, a number that never existed) is
-  // a real 404.
+  // draft, a deleted car, one sold long ago, a number that never existed) has
+  // no page of its own: it goes on to the same model, or the same make, when
+  // we have one in stock (Google had /inventory/kia-syros-2025-4337 for a
+  // deleted Syros while another Syros was for sale), and is a 404 otherwise.
   const car = vehicle ?? soldVehicle
-  if (!car) notFound()
+  if (!car) {
+    const nearest = await nearestPageFor(slug)
+    if (nearest) permanentRedirect(nearest)
+    notFound()
+  }
   const sold = vehicle === null
 
   // One address per car, for good: a stale or hand-typed slug that still ends

@@ -16,7 +16,7 @@
 
 import { getInventory } from '../inventory/server.ts'
 import { formatINRShort } from '../inventory/adapter.ts'
-import { getAllLandingSlugs, getLandingHrefResolver, SERVICE_CITY_SLUGS, underBudget } from './landing.ts'
+import { getAllLandingSlugs, getLandingHrefResolver, HEAD_PATH, SERVICE_CITY_SLUGS, underBudget } from './landing.ts'
 import { LOCATIONS } from '../locations.ts'
 import { locationHeading } from './locations.ts'
 
@@ -56,7 +56,7 @@ export interface SeoLinks {
 export async function getSeoLinks(): Promise<SeoLinks> {
   const cities: SeoLink[] = SERVICE_CITIES.map((c) => ({
     label: `Used Cars in ${c.label}`,
-    href: `/used-cars/${c.slug}`,
+    href: HEAD_PATH,
   }))
   const locations: SeoLink[] = LOCATIONS.map((l) => ({
     label: locationHeading(l),
@@ -194,7 +194,7 @@ export async function getFrequentSearches(limit = 40): Promise<SeoLink[]> {
 
     // The head term first.
     for (const city of SERVICE_CITIES) {
-      push(`Used cars in ${city.label}`, `/used-cars/${city.slug}`)
+      push(`Used cars in ${city.label}`, HEAD_PATH)
     }
 
     // Budget queries — the highest-volume shape after brand.
@@ -235,7 +235,7 @@ export async function getFrequentSearches(limit = 40): Promise<SeoLink[]> {
     console.warn(`[frequent-searches] search resolution degraded (${reason}); serving city fallbacks`)
     return SERVICE_CITIES.map((c) => ({
       label: `Second hand cars in ${c.label}`,
-      href: `/used-cars/${c.slug}`,
+      href: HEAD_PATH,
     }))
   }
 }

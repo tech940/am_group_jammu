@@ -52,7 +52,7 @@ export function Navbar({ seoLinks }: { seoLinks: SeoLinks }) {
   const citiesList = seoLinks?.cities?.length
     ? seoLinks.cities
     : [
-        { label: "Used Cars in Jammu", href: "/used-cars/jammu" },
+        { label: "Used Cars in Jammu", href: "/inventory" },
         { label: "Used Cars in Srinagar", href: "/used-cars/srinagar" },
         { label: "Used Cars in Udhampur", href: "/used-cars/udhampur" },
         { label: "Used Cars in Kathua", href: "/used-cars/kathua" },

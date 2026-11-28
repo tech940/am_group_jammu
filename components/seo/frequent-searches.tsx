@@ -22,8 +22,10 @@ export function FrequentSearches({
       <div className="container mx-auto px-4 md:px-8">
         <h2 className="font-display text-h3 text-ink mb-4">{title}</h2>
         <div className="flex flex-wrap gap-x-3 gap-y-2">
+          {/* Keys are not href + index: a key is written into the page's inline
+              data, and Google crawled "/used-cars/under-5-lakh-in-jammu1" from it. */}
           {searches.map((s, i) => (
-            <span key={s.href + i} className="flex items-center gap-3">
+            <span key={`${i}-${s.label}`} className="flex items-center gap-3">
               <Link
                 href={s.href}
                 className="inline-flex min-h-11 items-center md:min-h-0 text-small text-ink-2 hover:text-accent-text-light hover:underline transition-colors duration-(--duration-1)"

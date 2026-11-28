@@ -102,7 +102,7 @@ export default async function UsedCarsIndexPage() {
 
           <div className="mt-7 flex flex-wrap items-center gap-3">
             <Button asChild variant="primary" size="lg">
-              <Link href="/used-cars/jammu">Used cars in Jammu</Link>
+              <Link href="/inventory">Used cars in Jammu</Link>
             </Button>
             <Button asChild variant="secondary" size="lg">
               <Link href="/inventory">All used cars in stock</Link>

@@ -25,7 +25,7 @@ import { ChatGlyph, PhoneGlyph } from "./marks"
 
 const BUY: { label: string; href: string }[] = [
   { label: "All used cars", href: "/inventory" },
-  { label: "Used cars in Jammu", href: "/used-cars/jammu" },
+  { label: "Used cars in Jammu", href: "/inventory" },
 ]
 
 const SELL_AND_HELP: { label: string; href: string }[] = [

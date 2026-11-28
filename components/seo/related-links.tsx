@@ -55,9 +55,8 @@ export function RelatedLinks({
               {[
                 { label: "Sell your car in Jammu", href: "/sell-your-car" },
                 { label: "Our used-car locations", href: "/locations" },
-                // One anchor text per page: /used-cars/jammu is "used cars in
-                // Jammu", /inventory is the stock browser.
-                { label: "Used cars in Jammu", href: "/used-cars/jammu" },
+                // The stock list is the "used cars in Jammu" page (HEAD_PATH).
+                { label: "Used cars in Jammu", href: "/inventory" },
                 { label: "Browse by budget, model and type", href: "/used-cars" },
                 { label: "All used cars in stock", href: "/inventory" },
               ].map((l) => (

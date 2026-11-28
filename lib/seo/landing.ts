@@ -74,6 +74,19 @@ const CITY = 'Jammu'
  */
 export const SERVICE_CITY_SLUGS = ['jammu'] as const
 
+/**
+ * THE page for "used cars in Jammu" and "second hand cars in Jammu": the stock
+ * list. Decided from Search Console on 2026-11-28 (queries since 2026-11-14):
+ * for searches containing "used cars in jammu" Google ranked /inventory at an
+ * average position of 25, against 41 for /used-cars/jammu and 42 for the home
+ * page; for "second hand" searches 23 against 44 and 39. Three pages were
+ * splitting the same search. /used-cars/jammu still answers at its address
+ * (old links and the amgroupind.com redirect land there) but names this page
+ * as its canonical, and every link on the site that says "used cars in Jammu"
+ * points here. Reversible: change this constant back.
+ */
+export const HEAD_PATH = '/inventory'
+
 /** Round budget ceilings Indian buyers actually search for, in rupees. */
 const BUDGET_CEILINGS = [200_000, 300_000, 500_000, 700_000, 1_000_000, 1_500_000] as const
 
@@ -331,7 +344,7 @@ async function buildCatalogue(): Promise<{ specs: ResolvedSpec[]; vehicles: Inve
     const self = pathOf(spec.slug)
     let canonicalPath = self
     if (cars.length > 0 && cars.length === total) {
-      canonicalPath = pathOf(SERVICE_CITY_SLUGS[0])
+      canonicalPath = HEAD_PATH
     } else if (cars.length >= 2) {
       // Only a band worth indexing can own a set of cars. A one-car band is
       // not indexed, so a higher band holding the same single car must not
@@ -372,12 +385,12 @@ async function buildCatalogue(): Promise<{ specs: ResolvedSpec[]; vehicles: Inve
     specs: unique.map(
       (spec) =>
         resolved.get(spec.slug) ?? {
-          // The city page. Always its own canonical; with no cars at all it is
-          // kept reachable but out of the index.
+          // The city page. It shows the same cars as the stock list, which is
+          // the page indexed for them (see HEAD_PATH), so it points there.
           ...spec,
           vehicles,
-          canonicalPath: pathOf(spec.slug),
-          indexable: vehicles.length > 0,
+          canonicalPath: HEAD_PATH,
+          indexable: false,
         },
     ),
   }
@@ -391,7 +404,7 @@ async function buildCatalogue(): Promise<{ specs: ResolvedSpec[]; vehicles: Inve
  */
 export async function getAllLandingSlugs(): Promise<{ slug: string; kind: LandingKind }[]> {
   const { specs } = await buildCatalogue()
-  return specs.filter((s) => s.kind === 'city' || s.indexable).map(({ slug, kind }) => ({ slug, kind }))
+  return specs.filter((s) => s.indexable).map(({ slug, kind }) => ({ slug, kind }))
 }
 
 /** Every slug that resolves today, indexed or not — for generateStaticParams. */
@@ -465,7 +478,7 @@ const same = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLow
 export async function getLandingHrefResolver(): Promise<(facet: Facet) => string | null> {
   const { specs, vehicles } = await buildCatalogue()
   return (facet) => {
-    if (facet.kind === 'city') return pathOf(SERVICE_CITY_SLUGS[0])
+    if (facet.kind === 'city') return HEAD_PATH
     if (facet.kind === 'make') {
       const hit = vehicles.find((v) => v.make && same(v.make, facet.value))
       return hit?.make ? brandPath(hit.make) : null

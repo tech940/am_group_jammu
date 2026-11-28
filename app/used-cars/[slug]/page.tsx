@@ -15,7 +15,7 @@ import { FrequentSearches } from "@/components/seo/frequent-searches"
 import { RelatedLinks } from "@/components/seo/related-links"
 import { toCardVehicle } from "@/lib/inventory/filter"
 import { getFrequentSearches, getSeoLinks, type SeoLinkGroup } from "@/lib/seo/links"
-import { getResolvableLandingSlugs, resolveLanding, type LandingKind } from "@/lib/seo/landing"
+import { HEAD_PATH, getResolvableLandingSlugs, resolveLanding, type LandingKind } from "@/lib/seo/landing"
 import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
 import { INDEX_ROBOTS, pageSocial, shareImageFrom } from "@/lib/seo/site"
 
@@ -45,7 +45,8 @@ export async function generateStaticParams() {
   return (await getResolvableLandingSlugs()).map((slug) => ({ slug }))
 }
 
-const HEAD_PAGE = "/used-cars/jammu"
+// The page for "used cars in Jammu" (see HEAD_PATH in lib/seo/landing.ts).
+const HEAD_PAGE = HEAD_PATH
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -113,7 +114,7 @@ export default async function UsedCarsLandingPage({ params }: Props) {
 
   const path = `/used-cars/${landing.slug}`
   const count = landing.vehicles.length
-  const isHead = path === HEAD_PAGE
+  const isHead = landing.kind === "city"
 
   const pool: Record<string, SeoLinkGroup> = {
     budget: { title: "By budget", links: seoLinks.budgets },
@@ -152,9 +153,8 @@ export default async function UsedCarsLandingPage({ params }: Props) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(jsonLd) }} />
       )}
 
-      {/* "Used Cars in Jammu" is the name of one page, /used-cars/jammu, and
-          every trail that uses those words points there. On that page itself
-          the trail is just Home and the page. */}
+      {/* "Used Cars in Jammu" is the name of one page, the stock list
+          (HEAD_PAGE), and every trail that uses those words points there. */}
       <Breadcrumbs
         items={
           isHead

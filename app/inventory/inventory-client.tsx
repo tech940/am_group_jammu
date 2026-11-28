@@ -275,15 +275,16 @@ export default function InventoryClient({
     <div className="min-h-screen bg-ground text-ink">
       {/* Opens the enquiry form once, a few seconds after landing. */}
       <AutoEnquiry />
-      <Breadcrumbs items={[{ label: "All used cars in stock" }]} />
+      <Breadcrumbs items={[{ label: "Used Cars in Jammu" }]} />
 
-      {/* The H1 says what this page is: the whole stock list, to filter.
-          "Used cars in Jammu" is the heading of /used-cars/jammu, not this. */}
+      {/* The H1 carries the search this page is for: "used cars in Jammu" and
+          "second hand cars" (see HEAD_PATH in lib/seo/landing.ts). A filtered
+          view names its filter instead. */}
       <section className="container mx-auto px-4 md:px-8 pt-2 pb-8">
         <h1 className="font-display text-h1 text-ink mb-1">
           {isFiltered
             ? `${matchedCount > 0 ? `${matchedCount} ` : ""}Used ${headingScope ? `${headingScope} ` : ""}Cars in Stock`
-            : `All ${matchedCount > 0 ? `${matchedCount} ` : ""}Used Cars in Stock`}
+            : `Used Cars in Jammu${matchedCount > 0 ? ` — ${matchedCount} Second Hand ${matchedCount === 1 ? "Car" : "Cars"} in Stock` : ""}`}
         </h1>
       </section>
 

@@ -13,12 +13,11 @@ import { generateVehicleListSchema, jsonLdString } from "@/lib/seo-schemas"
 import { pageSocial, shareImageFrom } from "@/lib/seo/site"
 
 /**
- * THE STOCK BROWSER: every car in stock, with search, filters and sorting.
- *
- * It is not the "used cars in Jammu" page. That is /used-cars/jammu, and the
- * homepage is the dealer's own page. Three pages used to carry near-identical
- * titles and headings for that one search and competed with each other, so
- * this one is titled for what it is: all the cars, to filter.
+ * THE "USED CARS IN JAMMU" PAGE: every car in stock, with search, filters and
+ * sorting. Since 2026-11-28 this is the page for "used cars in Jammu" and
+ * "second hand cars in Jammu" (see HEAD_PATH in lib/seo/landing.ts for the
+ * Search Console figures that decided it). /used-cars/jammu names it as its
+ * canonical; the home page stays the dealer's own page.
  *
  * WHY IT IS RENDERED PER REQUEST. Filters, search, sort and page number arrive
  * as query parameters, and reading `searchParams` makes a route dynamic in this
@@ -110,7 +109,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   const title = isFiltered
     ? `${n > 0 ? `${n} ` : ""}Used ${scope ? `${scope} ` : ""}Cars in Stock${suffix}`
-    : `All ${n > 0 ? `${n} ` : ""}Used Cars in Stock | Search and Filter${suffix}`
+    : // Both phrasings people search, as every page ranking for them writes it.
+      `Used Cars in Jammu | ${n > 0 ? `${n} ` : ""}Second Hand Cars for Sale${suffix}`
 
   const makes = facets.makes.map((m) => m.label).join(", ")
   const priceFrom = vehicles.length > 0 && facets.priceRange.max > 0 ? formatINRShort(facets.priceRange.min) : null
@@ -119,8 +119,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const description =
     vehicles.length > 0
       ? fitDescription([
-          `Browse ${isFiltered ? `${n}` : `all ${n}`} used ${scope ? `${scope} ` : ""}cars in stock at AM Group, Jammu` +
-            `${!isFiltered && makes ? `: ${makes}` : ""}.`,
+          isFiltered
+            ? `Browse ${n} used ${scope ? `${scope} ` : ""}cars in stock at AM Group, Jammu.`
+            : `Used cars in Jammu: ${n} second hand cars for sale at AM Group${makes ? `, ${makes}` : ""}.`,
           priceFrom && !isFiltered && `Prices from ${priceFrom}.`,
           "Real photos and odometer readings.",
           "Filter by make, budget, fuel and gearbox.",

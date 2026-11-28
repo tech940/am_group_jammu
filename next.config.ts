@@ -55,7 +55,7 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   /* Used-car inventory --------------------------------------------------- */
   // The strongest legacy URL on the site: it ranks for "used cars in jammu".
   // /used-cars/jammu is the exact-intent equivalent — same query, same stock.
-  { source: '/used-cars-in-jammu', destination: '/used-cars/jammu' },
+  { source: '/used-cars-in-jammu', destination: '/inventory' },
   // Two more renders of the identical Motors listings archive.
   { source: '/listings', destination: '/inventory' },
 
@@ -92,9 +92,9 @@ const LEGACY_PAGE_REDIRECTS: LegacyRedirect[] = [
   { source: '/used-cars/gasoline-cars-in-jammu', destination: '/used-cars/petrol-cars-in-jammu' },
   // City pages and the Srinagar location were retired with the move to three
   // Jammu sites.
-  { source: '/used-cars/srinagar', destination: '/used-cars/jammu' },
-  { source: '/used-cars/kathua', destination: '/used-cars/jammu' },
-  { source: '/used-cars/udhampur', destination: '/used-cars/jammu' },
+  { source: '/used-cars/srinagar', destination: '/inventory' },
+  { source: '/used-cars/kathua', destination: '/inventory' },
+  { source: '/used-cars/udhampur', destination: '/inventory' },
   { source: '/locations/srinagar', destination: '/locations' },
 
   // NOT HERE ON PURPOSE (all handled in proxy.ts):

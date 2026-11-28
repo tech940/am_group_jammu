@@ -93,7 +93,7 @@ const GONE_HTML =
   '<meta name="robots" content="noindex"><title>Page removed | AM Group Used Cars</title></head>' +
   '<body><h1>This page has been removed</h1>' +
   '<p>This website is now AM Group Used Cars, Jammu.</p>' +
-  '<p><a href="/used-cars/jammu">Used cars in Jammu</a> · <a href="/sell-your-car">Sell your car</a> · ' +
+  '<p><a href="/inventory">Used cars in Jammu</a> · <a href="/sell-your-car">Sell your car</a> · ' +
   '<a href="/contact">Contact</a></p></body></html>'
 
 function gone(): NextResponse {
@@ -108,7 +108,7 @@ function gone(): NextResponse {
 /* -------------------------------------------------------------------------- */
 
 /** Always exists, and lists every car: the safe place to land. */
-const FALLBACK = '/used-cars/jammu'
+const FALLBACK = '/inventory'
 
 /**
  * The old new-car showroom pages for makes we do sell used. Someone looking

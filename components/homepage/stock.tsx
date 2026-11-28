@@ -67,7 +67,7 @@ export function Stock({
                 <Link href="/inventory">See all {total} cars in stock</Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
-                <Link href="/used-cars/jammu">Used cars in Jammu</Link>
+                <Link href="/inventory">Used cars in Jammu</Link>
               </Button>
             </div>
           </>
